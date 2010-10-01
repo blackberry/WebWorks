@@ -137,12 +137,14 @@ public class Widget extends UiApplication implements GlobalEventListener {
         // use ApplicationManager.waitForStartup() in 6.0 when it's available
         ApplicationManager manager = ApplicationManager.getApplicationManager();
         while(manager.inStartup()) {
-            net.rim.vm.Process.waitForIdle();
             try {
                 Thread.sleep(2000);
             } catch(InterruptedException e) {}
         }
-        net.rim.vm.Process.waitForIdle(30000);        
+        
+        try {
+            Thread.sleep(1500);
+        } catch(InterruptedException e) {}        
     }
     
     private static void makeDebugArgs(String[] args,WidgetConfigImpl wConfig) {
