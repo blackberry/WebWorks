@@ -15,7 +15,7 @@ Operating System | Java Support | Release | File | File Format | File size
 Windows&reg; XP (32-bit), Windows 7 (32-bit or 64-bit) | 32-bit | 1.5.0 | [Setup.exe](https://www.blackberry.com/Downloads/contactFormPreload.do?code=DC727151E5D55DDE1E950767CF861CA5&dl=8185E1D15E547FA5D76168608FF54721) | InstallShield&reg; Installer | 301.5 MB
 
 ## Reference Material &amp; Community
-You can also find associated reference material for the BlackBerry WebWorks as well as community forums for building and contributing to the BlackBerry WebWorks project
+You can also find associated reference material for the BlackBerry WebWorks platform as well as community forums for building and contributing to the BlackBerry WebWorks project
 
 * [API Reference](http://www.blackberry.com/developers/docs/widgetapi/)
 * [Developer Guides](http://docs.blackberry.com/en/developers/subcategories/?userType=21&category=BlackBerry+Widgets&subCategory=BlackBerry+Widget+Development+Guides)
