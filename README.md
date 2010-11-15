@@ -1,5 +1,5 @@
 # About BlackBerry&reg; WebWorks
-The BlackBerry WebWorks&reg; Platform is the next evolution of our BlackBerry® Widget technology that we have contributed to this Open Source community under the Apache 2.0 license. It is a unique platform in the mobile market and is designed to take the Web as a first class citizen to create full featured applications. BlackBerry WebWorks is built on three main strategic principles:
+The BlackBerry WebWorks&reg; Platform is the next evolution of our BlackBerry&reg; Widget technology that we have contributed to this Open Source community under the Apache 2.0 license. It is a unique platform in the mobile market and is designed to take the Web as a first class citizen to create full featured applications. BlackBerry WebWorks is built on three main strategic principles:
 
 * Advanced Standards
 * Powerful Integration
