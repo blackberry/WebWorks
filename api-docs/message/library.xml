@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library>
+	<extension>
+		<entryClass>blackberry.message.MessageExtension</entryClass>
+	</extension>
+
+  <features>
+    <feature id="blackberry.message.sms" version="1.0.0.0" required="true">SMS Object</feature>
+  </features>
+</library>
