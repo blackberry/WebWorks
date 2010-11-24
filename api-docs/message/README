@@ -11,6 +11,6 @@ Steps:
    1. Copy WebWorks/api/message/src/blackberry folder to your destination folder
    2. Create common/util foler in the destination folder
    3. Copy WebWorks/api/CommonAPI/src/common/util/ArgumentValidationUtil.java to the util folder you created in step 2. 
-   3. Copy both the library.xml and the SMS folder in the WebWorks/api-docs/message folder to your destination folder.
-   4. Open a Command Prompt window and go into your destination folder
-   5. Execute: jar cf [output path]\message_api.jar blackberry common library.xml SMS
+   4. Copy both the library.xml and the SMS folder in the WebWorks/api-docs/message folder to your destination folder.
+   5. Open a Command Prompt window and go into your destination folder
+   6. Execute: jar cf [output path]\message_api.jar blackberry common library.xml SMS
