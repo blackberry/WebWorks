@@ -45,7 +45,7 @@ public class WidgetPackager {
 	public static final String[] OTA_OUTPUTS = new String[] { ".cod", ".jad" };
 
 	// TODO: retrieve from logger
-	public static final String BLACKBERRY_WIDGET_PORTAL_URL = "http://www.blackberry.com/developers/widget/";
+	public static final String BLACKBERRY_WIDGET_PORTAL_URL = "http://www.blackberry.com/developers/webworkssdk/";
 	public static final String PROPERTIES_FILE = "bbwp.properties";
 	public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
 
@@ -84,7 +84,7 @@ public class WidgetPackager {
 			BBWPProperties bbwpProperties = new BBWPProperties(propertiesFile,
 					sessionManager.getSessionHome());
 
-			// validate widget archive
+			// validate BlackBerry WebWorks application archive
 			Logger.logMessage(LogType.INFO,
 					"PROGRESS_VALIDATING_WIDGET_ARCHIVE");
 			WidgetArchive wa = new WidgetArchive(sessionManager
@@ -98,7 +98,7 @@ public class WidgetPackager {
 			
 
 			// create/clean outputs/source
-			// Logger.printInfoMessage("Widget packaging starts...");
+			// Logger.printInfoMessage("BlackBerry WebWorks application packaging starts...");
 			FileManager fileManager = new FileManager(bbwpProperties);
 			Logger.logMessage(LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE");
 			fileManager.prepare();

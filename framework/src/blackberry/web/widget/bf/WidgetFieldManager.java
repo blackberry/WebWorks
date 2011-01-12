@@ -1,18 +1,10 @@
 /*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * WidgetFieldManager.java
+ *
+ * Research In Motion Limited proprietary and confidential
+ * Copyright Research In Motion Limited, 2009-2009
+ */
+
 package blackberry.web.widget.bf;
 
 import net.rim.device.api.ui.container.VerticalFieldManager;
@@ -33,6 +25,7 @@ import net.rim.device.api.ui.XYRect;
 import net.rim.device.api.ui.XYPoint;
 import net.rim.device.api.ui.*;
 
+//import net.rim.device.apps.internal.browser.mango.windowimpl.WindowField;
 import net.rim.device.api.util.MathUtilities;
 
 /**
@@ -40,12 +33,12 @@ import net.rim.device.api.util.MathUtilities;
  */
 public class WidgetFieldManager extends VerticalFieldManager {
 
-    /* Creates a new WidgetFieldManager. */
+    /* Creates a new WidgetFieldManager */
     public WidgetFieldManager() {
         this(0);
     }
     
-    /* Creates a new WidgetFieldManager with a style. */
+    /* Creates a new WidgetFieldManager with a style */
     public WidgetFieldManager(long style) {
         super(style);
     }
@@ -53,7 +46,7 @@ public class WidgetFieldManager extends VerticalFieldManager {
     private BrowserFieldScreen getBrowserFieldScreen() {
         Screen bfScreen = getScreen();
 
-        // Get the screen object.
+        // Get the screen object
         if(bfScreen instanceof BrowserFieldScreen ) {
             return (BrowserFieldScreen) bfScreen;
         }
@@ -70,7 +63,7 @@ public class WidgetFieldManager extends VerticalFieldManager {
                 return true;
             }
 
-            // Handle the directional event.
+            // Handle the directional event
             int direction = -1;
             if( Math.abs(dx) >= Math.abs(dy)){
                 if(dx > 0) {
@@ -134,7 +127,7 @@ public class WidgetFieldManager extends VerticalFieldManager {
     /* override */ public void paint(Graphics graphics) {
         super.paint(graphics);
 
-        // Paint current node if it exists, is not focused, and does not have a hover style.
+        // paint current node if exists, is not focused and does not have a hover style
         if (getBrowserFieldScreen().getAppNavigationMode()) {
             if (getBrowserFieldScreen().getWidgetNavigationController().requiresDefaultHover()) {
                 Node currentNode = getBrowserFieldScreen().getWidgetNavigationController().getCurrentFocusNode();
@@ -195,7 +188,7 @@ public class WidgetFieldManager extends VerticalFieldManager {
     public static final int SAFE_MARGIN = 30;
     
     private void scrollToRect(XYRect rect) {
-        // Check vertical scroll.
+        // Check vertical scroll
         int verticalScroll = getVerticalScroll();
         int newVerticalScroll = verticalScroll;
 
@@ -209,7 +202,7 @@ public class WidgetFieldManager extends VerticalFieldManager {
             setVerticalScroll( newVerticalScroll );
         }
         
-        // Check horizontal scroll.
+        // Check horizontal scroll
         int horizontalScroll = getHorizontalScroll();
         int newHorizontalScroll = horizontalScroll;
 

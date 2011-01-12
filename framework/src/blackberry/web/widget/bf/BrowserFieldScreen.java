@@ -101,7 +101,7 @@ public final class BrowserFieldScreen extends WidgetScreen{
     
     // Dispatcher:
     // Used to dispatch UI events to not block the UI event thread.
-    private static Dispatcher _dispatcher = new Dispatcher( "WidgetUiDispatcher" ); 
+    private static Dispatcher _dispatcher = new Dispatcher( "WebWorksUiDispatcher" ); 
     private CacheManager                _cacheManager;
     private WidgetCacheNamespace        _widgetCacheExtension;
     private String                      _locationURI;
@@ -172,8 +172,8 @@ public final class BrowserFieldScreen extends WidgetScreen{
     private void initialize() {
         _bfConfig = new BrowserFieldConfig();
                 
-        // POINTER mode is used for for normal widgets.
-        // NONE mode is used for navigation mode widgets.
+        // POINTER mode is used for for normal WebWorks Applications.
+        // NONE mode is used for navigation mode WebWorks Applications.
         if (getAppNavigationMode()) {
             _bfConfig.setProperty(BrowserFieldConfig.NAVIGATION_MODE, BrowserFieldConfig.NAVIGATION_MODE_NONE);
         } else {

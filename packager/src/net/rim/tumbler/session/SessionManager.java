@@ -37,7 +37,7 @@ public class SessionManager {
     private String          _sessionHome; 
     private String          _tld;
     
-    // Widget info
+    // BlackBerry WebWorks Application info
     private String          _widgetArchive;
     private String          _archiveName;
     
@@ -119,7 +119,7 @@ public class SessionManager {
             checkSignatureKeys();
         }
         
-        // Validate widget archive
+        // Validate application archive
         validateArchive(_widgetArchive);
         
         // Load top level domain info

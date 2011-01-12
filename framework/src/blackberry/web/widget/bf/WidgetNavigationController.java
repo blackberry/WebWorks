@@ -1,18 +1,10 @@
 /*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * WidgetNavigationController.java
+ *
+ * Research In Motion Limited proprietary and confidential
+ * Copyright Research In Motion Limited, 2009-2009
+ */
+
 package blackberry.web.widget.bf;
 
 import net.rim.device.api.browser.field2.BrowserField;
@@ -77,7 +69,7 @@ public class WidgetNavigationController {
     
     private boolean _allowInaccurateVerticallyMove;
     
-    /* Creates a new WidgetNavigationController. */
+    /* Creates a new WidgetNavigationController */
     public WidgetNavigationController(BrowserFieldScreen widgetScreen) {
         _widgetScreen = widgetScreen;
         _allowInaccurateVerticallyMove = true;
@@ -118,7 +110,8 @@ public class WidgetNavigationController {
         _defaultHoverEffect = true;
     }
     
-    public void update() {        
+    public void update() {
+        //System.out.println("WIDGET==> enter update()");
         if (!_pageLoaded) {
             _pageLoaded = true;
             getUiDispatcher().dispatch( new NavigationMapUpdateDispatcherEvent(this, true) );
@@ -132,7 +125,8 @@ public class WidgetNavigationController {
                 }
             }
             getUiDispatcher().dispatch( new NavigationMapUpdateDispatcherEvent(this, false) );
-        }        
+        }
+        //System.out.println("WIDGET==> leave update()");
     }    
     
     private void internalCreateNavigationMap() {
@@ -773,19 +767,19 @@ public class WidgetNavigationController {
             String id = getNamedAttibute(_currentFocusNode, "id");
             getNavigationNamespace().setOldFocusedId(id);
             
-            // Disable BF focus.
+            // disable BF focus
             if (_currentNodeFocused) {
                 getBrowserField().setFocus(_currentFocusNode, false);
                 _currentNodeFocused = false;         
             }
         
-            // Disable BF hover.
+            // disable BF hover
             getBrowserField().setHover(_currentFocusNode, false);
             
-            // Create a synthetic mouseout Event.
+            // create a synthetic mouseout Event
             fireMouseEvent("mouseout", _currentFocusNode);
             
-            // Invalidate the area of old _currentFocusNode.
+            // invalidate the area of old _currentFocusNode
             invalidateNode(_currentFocusNode);
             
             _currentFocusNode = null;
@@ -803,10 +797,10 @@ public class WidgetNavigationController {
             String id = getNamedAttibute(node, "id");
             getNavigationNamespace().setNewFocusedId(id);
     
-            // Create a synthetic mouse over Event.
+            // create a synthetic mouse over Event
             fireMouseEvent("mouseover", node);
             
-            // Call BF setHover.
+            // call BF setHover
             _currentNodeHovered = getBrowserField().setHover(node, true);
             
             if (isAutoFocus(node)) {
@@ -819,7 +813,7 @@ public class WidgetNavigationController {
     }
 
     private void scrollToNode(Node node) {
-        // Scroll to the current focus node.
+        // scroll to the current focus node
         _widgetScreen.getWidgetFieldManager().scrollToNode(node);
     }
     
@@ -852,11 +846,13 @@ public class WidgetNavigationController {
     }
     
     /* Handles the navigation movement based on direction */
-    public void handleDirection(int direction) {        
-        dispathUiEvent(NAVIGATION_EVENT_DIRECTION, direction); 
+    public void handleDirection(int direction) {
+        //System.out.println("WIDGET==> handleDirection: " + (new Integer(direction)).toString());
+        dispathUiEvent(NAVIGATION_EVENT_DIRECTION, direction); //Application.getApplication().invokeLater(new JavaScriptExecutantRunnable(_currentFocusNode, direction));
     }
     
-    private void internalHandleDirection(int direction) throws Exception {        
+    private void internalHandleDirection(int direction) throws Exception {
+        //System.out.println("WIDGET==> internalHandleDirection: " + (new Integer(direction)).toString());
         getNavigationNamespace().setDirection(direction);
         
         String attributeValue = null;
@@ -903,7 +899,7 @@ public class WidgetNavigationController {
                     }
                 }
                 
-                // Only scroll down the screen when there is more content underneath.
+                // Only scroll down the screen when there is more content underneath
                 int screenVerticalDelta = unscaleScreenValue(_widgetScreen.getWidgetFieldManager().getVirtualHeight()) - screenRect.y - screenRect.height;
                 if (screenVerticalDelta > WidgetFieldManager.SAFE_MARGIN) {
                     screenVerticalDelta = WidgetFieldManager.SAFE_MARGIN;
@@ -911,7 +907,7 @@ public class WidgetNavigationController {
                 
                 if (screenVerticalDelta > 0) {
                     if (_currentFocusNode != null) {    
-                        // If current focused node is out of screen, focus out.
+                        // If current focused node is out of screen, focus out
                         XYRect currentNodeRect = getPosition(_currentFocusNode);
                         if (currentNodeRect.y + currentNodeRect.height <= screenRect.y + screenVerticalDelta) {
                             focusOut();
@@ -932,7 +928,7 @@ public class WidgetNavigationController {
                     }
                 }
                 
-                // Only scroll down the screen when there is more content underneath.
+                // Only scroll down the screen when there is more content underneath
                 int screenVerticalDelta = screenRect.y;
                 if (screenVerticalDelta > WidgetFieldManager.SAFE_MARGIN) {
                     screenVerticalDelta = WidgetFieldManager.SAFE_MARGIN;
@@ -940,7 +936,7 @@ public class WidgetNavigationController {
                 
                 if (screenVerticalDelta > 0) {
                     if (_currentFocusNode != null) {    
-                        // If current focused node is out of screen, focus out.
+                        // If current focused node is out of screen, focus out
                         XYRect currentNodeRect = getPosition(_currentFocusNode);
                         if (currentNodeRect.y > screenRect.y - screenVerticalDelta + screenRect.height) {
                             focusOut();
@@ -961,7 +957,7 @@ public class WidgetNavigationController {
                     }
                 }
                 
-                // Only scroll down the screen when there is more content underneath.
+                // Only scroll down the screen when there is more content underneath
                 int screenHorizontalDelta = unscaleScreenValue(_widgetScreen.getWidgetFieldManager().getVirtualWidth()) - screenRect.x - screenRect.width;
                 if (screenHorizontalDelta > WidgetFieldManager.SAFE_MARGIN) {
                     screenHorizontalDelta = WidgetFieldManager.SAFE_MARGIN;
@@ -969,7 +965,7 @@ public class WidgetNavigationController {
                 
                 if (screenHorizontalDelta > 0) {
                     if (_currentFocusNode != null) {    
-                        // If current focused node is out of screen, focus out.
+                        // If current focused node is out of screen, focus out
                         XYRect currentNodeRect = getPosition(_currentFocusNode);
                         if (currentNodeRect.x + currentNodeRect.width <= screenRect.x + screenHorizontalDelta) {
                             focusOut();
@@ -990,7 +986,7 @@ public class WidgetNavigationController {
                     }
                 }
                 
-                // Only scroll down the screen when there is more content underneath.
+                // Only scroll down the screen when there is more content underneath
                 int screenHorizontalDelta = screenRect.x;
                 if (screenHorizontalDelta > WidgetFieldManager.SAFE_MARGIN) {
                     screenHorizontalDelta = WidgetFieldManager.SAFE_MARGIN;
@@ -998,7 +994,7 @@ public class WidgetNavigationController {
                 
                 if (screenHorizontalDelta > 0) {
                     if (_currentFocusNode != null) {    
-                        // If current focused node is out of screen, focus out.
+                        // If current focused node is out of screen, focus out
                         XYRect currentNodeRect = getPosition(_currentFocusNode);
                         if (currentNodeRect.x > screenRect.x - screenHorizontalDelta + screenRect.width) {
                             focusOut();
@@ -1011,7 +1007,8 @@ public class WidgetNavigationController {
                     }                    
                 } 
             }
-        }        
+        }
+        //System.out.println("WIDGET==> leave internalHandleDirection");
     }
     
     public void handleClick() {
@@ -1074,6 +1071,13 @@ public class WidgetNavigationController {
         return null;
     }
 
+/*    
+    private void setNamedAttibuteValue(Node node, String name, String value) {
+        if((node.getAttributes().getNamedItem(name) != null) && (node.getAttributes().getNamedItem(name) instanceof Attr)){
+            ((Attr)(node.getAttributes().getNamedItem(name))).setValue(value);            
+        }
+    }
+*/    
     private Node getNamedNode(String name) {
         return _dom.getElementById(name);
     }    
@@ -1174,7 +1178,17 @@ public class WidgetNavigationController {
         event.initEvent(type, true, true);
         return event;
     }    
-    
+
+/*    
+    private void removeCurrentFocus() {
+        if (_currentFocusNode != null && _currentNodeFocused) {
+            getBrowserField().setFocus( _currentFocusNode, false );   
+            _currentNodeFocused = false;         
+            invalidateNode( _currentFocusNode );
+        }
+    }
+*/
+
     private void addCurrentFocus() {
         if (_currentFocusNode != null && !_currentNodeFocused) {
             _currentNodeFocused = getBrowserField().setFocus( _currentFocusNode, true );   

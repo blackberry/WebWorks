@@ -1,18 +1,3 @@
-/*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 package net.rim.tumbler;
 
 import java.io.BufferedInputStream;
@@ -56,7 +41,7 @@ public class WidgetArchive {
             ZipInputStream zis = new ZipInputStream(new BufferedInputStream(
                     checksum));
                 
-            // Parse each zip file
+            // parse each zip file
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName().replace('\\', '/');
@@ -80,9 +65,9 @@ public class WidgetArchive {
                     _iconFile = "icon.gif";                        
                 }
                 else if (entry.isDirectory()) {
-                    // Check for reservedDirs
+                    // check for reservedDirs
                     for (String reserved : RESERVED_DIRS) {
-                        // The dir entry name has a trailing / like "dir/"
+                        // the dir entry name has a trailing / like "dir/"
                         if (entryName.equals(reserved + "/")) {
                             throw new ValidationException("EXCEPTION_ARCHIVE_RESERVED_DIR");
                         }
@@ -118,7 +103,7 @@ public class WidgetArchive {
             }
         }
         catch (FileNotFoundException fnfe) {
-            // Already validated for existence of archive file - never get here
+            // already validated for existence of archive file - never get here
             Logger.logMessage(LogType.FATAL, "EXCEPTION_WIDGET_ARCHIVE_NOT_FOUND");
         }
         catch (IOException ioe) {

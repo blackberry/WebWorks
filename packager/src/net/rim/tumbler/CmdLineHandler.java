@@ -1,18 +1,3 @@
-/*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 package net.rim.tumbler;
 
 import java.io.File;
@@ -46,24 +31,24 @@ public class CmdLineHandler {
     private String          _archiveName;
     
     public boolean parse (String[] inputParams) throws PackageException, CommandLineException {
-        // Validate at least one parameter.
+        // validate at least one parameter
         if (inputParams.length < 1) {
             throw new CommandLineException("EXCEPTION_INVALID_COMMAND_LINE");
         }
 
-        // Get first param - exception case: /h
+        // get first param - exception case: /h
         String input1 = inputParams[0].toLowerCase().trim();
         if (input1.equals(OPTION_HELP)) {
             Logger.logMessage(LogType.NONE, "BBWP_USAGE", WidgetPackager.getVersion());
             return false;
         }
 
-        // Check archive format
+        // check archive format
         if (!input1.endsWith(".zip")) {
             throw new CommandLineException("EXCEPTION_INVALID_COMMAND_LINE");
         }
 
-        // Parse the command line
+        // parse the command line
         _widgetArchive = getAbsolutePath(input1);
         _archiveName = parseWidgetName(_widgetArchive);
 
@@ -72,7 +57,7 @@ public class CmdLineHandler {
         	throw new PackageException("EXCEPTION_INVALID_ARCHIVE_NAME");
         }
 
-        // Parse options
+        // parse options
         try {
             parseOptionParameters(inputParams);
         } catch (Exception e) {
@@ -82,7 +67,7 @@ public class CmdLineHandler {
     }
     
     public SessionManager createSession() throws Exception {
-        // Parse location of packager
+        // parse location of packager
         String bbwpInstallFolder; 
         String installPath = getAbsolutePath(SessionManager.BBWP_JAR_PATH);
         File p = new File(installPath);

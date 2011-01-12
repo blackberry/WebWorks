@@ -78,7 +78,7 @@ public class ConfigXMLParser implements XMLParser {
 
     private WidgetConfig parseDocument(Document dom, WidgetArchive archive) throws Exception {
         
-        // Widget node
+        // <widget> node
         Node root = (Node) dom.getElementsByTagName("widget").item(0);
         processWidgetNode(root);
 
@@ -123,7 +123,7 @@ public class ConfigXMLParser implements XMLParser {
 					"PROGRESS_VALIDATING_CONFIG_XML_WIDGET_AUTHOR");
 		}
 		
-        // Validate that a widget name/author was specified
+        // Validate that an application name/author was specified
         if (_widgetConfig.getName() == null) {
         	//exception
         	throw new ValidationException("EXCEPTION_CONFIGXML_MISSING_WIDGET_NAME");

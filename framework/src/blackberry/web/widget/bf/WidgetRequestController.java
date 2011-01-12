@@ -1,18 +1,9 @@
 /*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * WidgetRequestController.java
+ *
+ * Copyright ?2009 Research In Motion Limited.  All rights reserved.
+ */
+
 package blackberry.web.widget.bf;
 
 import blackberry.web.widget.impl.WidgetConfigImpl;
@@ -59,10 +50,10 @@ public class WidgetRequestController extends ProtocolController {
         _widgetConfig = config;
         _widgetPolicy = WidgetPolicyFactory.getPolicy();  
         
-        // Set BF handle.
+        // Set BF handle
         _browserField = bf;        
         
-        // Support for *
+        //support for *
         if (_widgetConfig instanceof WidgetConfigImpl) {     
             _hasMultiAccess = ((WidgetConfigImpl) _widgetConfig).allowMultiAccess(); 
         }
@@ -92,9 +83,9 @@ public class WidgetRequestController extends ProtocolController {
         if(openWithBrowser(normalizedContentType, protocol, request.getURL())){
             
             invokeBrowser(request.getURL());
-                        
-                        // Throw a special type of exception that will prevent the history from being updated
-                        throw new MediaHandledException();
+			
+			// Throw a special type of exception that will prevent the history from being updated
+			throw new MediaHandledException();
         }
         else{
             BrowserFieldScreen bfScreen = ((BrowserFieldScreen)_browserField.getScreen());
@@ -128,7 +119,7 @@ public class WidgetRequestController extends ProtocolController {
                 }
 
                 if (!bfScreen.getPageManager().isRedirectableNavigation(protocol)) {
-                    // The navigation won't redirect
+                    // the navigation won't redirect
                     bfScreen.getPageManager().clearFlags();
 
                     if (!bfScreen.getPageManager().isLocalTextHtml(normalizedContentType)) {
@@ -139,13 +130,10 @@ public class WidgetRequestController extends ProtocolController {
                 } 
                 
             } catch (Exception e) {
-                if (bfScreen.getPageManager().isLoadingScreenDisplayed()) {
-                    bfScreen.getPageManager().hideLoadingScreen();
-                }
-                
+                bfScreen.getPageManager().hideLoadingScreen();
                 bfScreen.getPageManager().clearFlags();
                 
-                // Rethrow the Exception
+                // rethrow the Exception
                 throw e;
             }
         }
@@ -180,21 +168,21 @@ public class WidgetRequestController extends ProtocolController {
         }
     }
     
-    // Method to check if the browser needs to be launched to handle the file.
+    // Method to check if the browser needs to be launched to handle the file
     private boolean openWithBrowser(String mimeType, String protocol, String url)
     {
         if(mimeType != null){
             
-            // Determine media type.
+            // Determine media type
             int mediaType = MIMETypeAssociations.getMediaTypeFromMIMEType( mimeType );
             
-            // Allow all local media to be handled by BF2.
-            // Even if it is not supported by BF2 yet.
+            // Allow all local media to be handled by BF2 
+            // Even if it is not supported by BF2 yet
             if(protocol.equalsIgnoreCase("local")){                           
                     return false;
             }
             
-            // List of types we don't want BF2 to handle.
+            // List of types we don't want BF2 to handle
             if( (mediaType == MIMETypeAssociations.MEDIA_TYPE_AUDIO)
             || (mediaType == MIMETypeAssociations.MEDIA_TYPE_VIDEO)
             || (mediaType == MIMETypeAssociations.MEDIA_TYPE_PLAY_LIST)
@@ -215,7 +203,7 @@ public class WidgetRequestController extends ProtocolController {
         }
     }        
     
-    // Checks the file extension for special types.
+    // Checks the file extension for special types
     private boolean checkFileExtension(String url){       
         
         boolean isMarked = false;

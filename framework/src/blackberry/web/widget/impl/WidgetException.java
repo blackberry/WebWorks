@@ -1,18 +1,10 @@
 /*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * WidgetException.java
+ *
+ * Research In Motion Limited proprietary and confidential
+ * Copyright Research In Motion Limited, 2009-2009
+ */
+
 package blackberry.web.widget.impl;
 
 /**
@@ -57,7 +49,7 @@ public final class WidgetException extends Exception {
                 return "The resource - "
                     + _url
                     + " - could not be retrieved because it was not found in the config.xml.\n\n"
-                    + "Please verify the <access> elements in the widget config.  Contact your "
+                    + "Please verify the <access> elements in the WebWorks config.  Contact your "
                     + "service provider if the problem persists.";
             default:
                 return "An unknown error has occured.";

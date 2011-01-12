@@ -1,18 +1,8 @@
 /*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * WidgetConfig.java
+ *
+ * Copyright ?2009 Research In Motion Limited.  All rights reserved.
+ */
 package blackberry.web.widget.impl;
 
 import blackberry.web.widget.util.WidgetUtil;
@@ -119,12 +109,12 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
         _featureTable = new Hashtable();
         _widgetExtensions = new Vector();        
                 
-        // Set defaults
+        //set defaults
         setVersion();
         _widgetExtensions.addElement(   net.rim.device.api.web.jse.BlackBerryWidgetToolkit.getInstance());
         _widgetExtensions.addElement(new WidgetCacheExtension());
         
-        // Set default value of loading screen configuration
+        // set default value of loading screen configuration
         _backgroundImage = "";
         _foregroundImage = "";
         _firstPageLoad = false;
@@ -134,7 +124,7 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
         _transitionDuration = TransitionConstants.DEFAULT_DURATION;
         _transitionDirection = TransitionConstants.DIRECTION_LEFT;
         
-         // Set default value of cache configuration
+         // set default value of cache configuration
         _cacheEnabled = true;
         _aggressivelyCaching = true;
         _aggressiveCacheAge = 2592000;
@@ -170,7 +160,7 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     public String               getBackButtonBehaviour() { return _backButtonBehaviour; }   
     public boolean              getNavigationMode() { return _widgetNavigationMode; };
      
-    // Getters of loading screen configuration
+    // getters of loading screen configuration
     public String               getBackgroundImage() { return _backgroundImage; }
     public String               getForegroundImage() { return _foregroundImage; }
     public boolean              getFirstPageLoad() { return _firstPageLoad; }
@@ -180,7 +170,7 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     public int                  getTransitionDuration() { return _transitionDuration; }
     public int                  getTransitionDirection() { return _transitionDirection; }
     
-    // Getters of cache configuration
+    // getters of cache configuration
     public boolean              isCacheEnabled() { return _cacheEnabled; }
     public boolean              getAggressivelyCaching() { return _aggressivelyCaching; }
     public int                  getAggressiveCacheAge() { return _aggressiveCacheAge; }
@@ -189,7 +179,7 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     public int                  getMaxCacheSize() { return _maxCacheSize; }
     public Hashtable            getAllowedUriTypes() { return _allowedUriTypes; }
     
-    // Getters of Auto-startup
+    // getters of Auto-startup
     public boolean                              isStartupEnabled() { return _runOnStartup; }
     public boolean                              allowInvokeParams() { return _allowInvokeParams; }
     public String                               getBackgroundSource() { return _backgroundSource; }
@@ -225,7 +215,8 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
                 // Create doc builder
                 DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
                             
-                // Parse        
+                // Parse
+                //_configXMLDoc = docBuilder.parse(Connector.openDataInputStream(WidgetUtil.getLocalPath(_configXML)));                
                 Object o = bfConfig.getProperty(BrowserFieldConfig.CONTROLLER);
                 if(o instanceof BrowserFieldController){
                     BrowserFieldController bfController = (BrowserFieldController) o;
@@ -270,10 +261,10 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     
     /**
      * Initializes hashtable of the features found in the config.xml mapped to the 
-     * corresponding Widget Extensions that have the matching feature.
+     * corresponding WebWorks Extensions that have the matching feature.
      */
     private void initFeatureTable() {
-        // Enumerate access elements, map feature elements to proper extension        
+        // enumerate access elements, map feature elements to proper extension        
         // loop through <access>
         int waSize = _accessArray.length;
         for (int a=0; a<waSize; a++) {
@@ -282,7 +273,7 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
             if (wfList == null) {
                 continue;
             }
-            // Loop through <feature>
+            // loop through <feature>
             int wfSize = wfList.length;
             for(int b=0; b<wfSize; b++) {
                 if (!_featureTable.containsKey(wfList[b].getID())) {

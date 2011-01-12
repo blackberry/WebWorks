@@ -1,18 +1,3 @@
-/*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 package net.rim.tumbler.file;
 
 import java.io.BufferedInputStream;
@@ -84,11 +69,11 @@ public class FileManager {
     }
     
     public void prepare() throws Exception {
-        // Clean out source folder
+        // clean out source folder
         deleteDirectory(new File(SessionManager.getInstance().getSourceFolder()));
         (new File(SessionManager.getInstance().getSourceFolder())).mkdirs();
         
-        // Copy templates
+        // copy templates
         try {
             TemplateWrapper templateWrapper = new TemplateWrapper(_bbwpProperties);
             _outputFiles.addAll(templateWrapper.writeAllTemplates(
@@ -97,12 +82,12 @@ public class FileManager {
             throw new PackageException("EXCEPTION_IO_TEMPLATES");
         }
         
-        // Extract archive
+        // extract archive
         ZipFile zip = new ZipFile(new File(SessionManager.getInstance().getWidgetArchive()).getAbsolutePath());
         Enumeration<?> en = zip.entries();
         String sourceFolder = SessionManager.getInstance().getSourceFolder();
         while (en.hasMoreElements()) {
-            // Create output file name
+            // create output file name
             ZipEntry ze = (ZipEntry) en.nextElement();
 			if (ze.isDirectory())
 				continue;            
@@ -112,7 +97,7 @@ public class FileManager {
             boolean isRoot = zipEntryFile.getParent() == null;
             String fname = sourceFolder + FILE_SEP + zipEntryFile.getPath();
             
-            // Extract file
+            // extract file
 			InputStream is = zip.getInputStream(ze);
 			File fi = new File(fname);
 			if (!fi.getParentFile().isDirectory() || !fi.getParentFile().exists())
@@ -126,7 +111,7 @@ public class FileManager {
 			if (zipEntryName.startsWith("ext") && zipEntryName.endsWith(".jar")) {
 				populateExtension(fname);
 			} else { 
-	            // Hack for icon files not displayed properly if similar named files exist in sub folders
+	            // HACK for icon files not displayed properly if similar named files exist in sub folders
 	            if (!isRoot) {
 	                _outputFiles.add(0, fname);
 	            } else {
@@ -407,14 +392,14 @@ public class FileManager {
     
     private void expandCod(File codFile) throws Exception {
 
-        // If the codFile can be unzipped,
+        // if the codFile can be unzipped,
         // then the cod is too big and actually in the zip format with smaller
         // cods inside
         // otherwise, the cod is already a good cod
 
         ZipFile zipFile;
 
-        // Check for file's existence
+        // check for file's existence
         if (!codFile.exists()) {
             throw new PackageException("EXCEPTION_COD_NOT_FOUND");
         } else {
@@ -422,7 +407,7 @@ public class FileManager {
                 zipFile = new ZipFile(codFile);
                 zipFile.close();
             } catch (Exception e) {
-                return; // This is a not a zip file and thus, not a big cod
+                return; // this is a not a zip file and thus, not a big cod
             }
         }
 
@@ -449,7 +434,7 @@ public class FileManager {
             f.getParentFile().mkdirs();
             f.createNewFile();
             
-            // Write the files to the disk
+            // write the files to the disk
             FileOutputStream fos = new FileOutputStream(f);
             dest = new BufferedOutputStream(fos, BUFFER_SIZE);
             while ((count = zis.read(data, 0, BUFFER_SIZE)) != -1) {
@@ -467,7 +452,7 @@ public class FileManager {
         FileChannel inChannel = new FileInputStream(in).getChannel();
         FileChannel outChannel = new FileOutputStream(out).getChannel();
         try {
-            // Windows is limited to 64mb chunks
+            // windows is limited to 64mb chunks
             long size = inChannel.size();
             long position = 0;
             while (position < size)
@@ -495,9 +480,9 @@ public class FileManager {
         }      
     }
 
-    // Delete a dir
+    // delete a dir
     private boolean deleteDirectory(File dir) {
-        // Remove files first
+        // remove files first
         if (dir.exists() && dir.isDirectory()) {
             String[] children = dir.list();
             for (String child : children) {
@@ -506,18 +491,18 @@ public class FileManager {
             }
         }
         if (dir.exists()) {
-            // Then remove the directory
+            // then remove the directory
             return dir.delete();
         }
         return false;
     }    
     
 	private void populateExtension(String extensionArchive) throws Exception {
-		// Create the extension directory
+		// create the extension directory
 		String extensionPath = SessionManager.getInstance().getSourceFolder() + FILE_SEP + EXTENSION_DIRECTORY  + FILE_SEP;
 		(new File(extensionPath)).mkdirs();
 		
-		// Extract all resource files in archive
+		// extract all resource files in archive
 		ZipFile zip = new ZipFile(new File(extensionArchive).getAbsolutePath());
 		Enumeration<?> en = zip.entries();
 		while (en.hasMoreElements()) {
@@ -563,7 +548,7 @@ public class FileManager {
 					DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 					DocumentBuilder builder = builderFactory.newDocumentBuilder();
 
-					// Parse the xml file
+					// parse the xml file
 					Document doc = builder.parse(new ByteArrayInputStream(bytes));
 					doc.getDocumentElement().normalize();
 					

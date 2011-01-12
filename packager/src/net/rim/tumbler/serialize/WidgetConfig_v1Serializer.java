@@ -1,18 +1,3 @@
-/*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 package net.rim.tumbler.serialize;
 
 import java.util.HashMap;
@@ -62,8 +47,8 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         _buffer = new StringBuffer();
         _memberMap = new HashMap<String, String>();
 		
-        // Populate the basic members
-        // Special characters for Java source file: escape /, ", ' for Java source 
+        // populate the basic members
+        // MKS: special characters for Java source file: escape /, ", ' for Java source 
         _memberMap.put("_id",                       widgetConfig.getID());
         _memberMap.put("_name",                     widgetConfig.getName());
         _memberMap.put("_description",              widgetConfig.getDescription());
@@ -92,7 +77,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         _buffer.append(TemplateFile.refactor(AUTOGEN_HEADER));
         Set<String> members = _memberMap.keySet();
         
-        // Iterate memberMap
+        // iterate memberMap
         for( String member : members ) {
             String value = _memberMap.get(member);
             if (value != null) {
@@ -106,7 +91,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             _buffer.append(makeLine("_hasMultiAccess = true;", 0));
         }
        
-        // Add icons
+        // add icons
         if (_widgetConfig.getIconSrc().size() > 0) {
             _buffer.append(makeLine(
                      "_icon = \"" + _widgetConfig.getIconSrc().firstElement() + "\";", 0));
@@ -116,19 +101,19 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             }
         }
         
-        // Add custom headers
+        // add custom headers
         for( String key : _widgetConfig.getCustomHeaders().keySet()) {
             _buffer.append(makeLine("_customHeaders.addProperty(", 0));
             _buffer.append(makeLine("\"" + key + "\",", 1));
             _buffer.append(makeLine("\"" + escapeSpecialCharacterForJavaSource(_widgetConfig.getCustomHeaders().get(key)) + "\");", 1));
         }
         
-        // Set navigation mode
+        // set navigation mode
         if (_widgetConfig.getNavigationMode()) {
             _buffer.append(makeLine("_widgetNavigationMode = true;", 0));
         }
 
-        // Add LoadingScreen configuration
+        // add LoadingScreen configuration
         if (_widgetConfig.getFirstPageLoad()) {
             _buffer.append(makeLine("_firstPageLoad = true;", 0));
         }        
@@ -139,7 +124,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             _buffer.append(makeLine("_localPageLoad = true;", 0));
         }     
         
-        // Add TransitionEffect configuration
+        // add TransitionEffect configuration
         if (_widgetConfig.getTransitionType() != null) {
             _buffer.append(makeLine(
                     "_transitionType = " + _widgetConfig.getTransitionType() + ";", 0));
@@ -155,7 +140,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             }            
         }
         
-        // Add cache options
+        // add cache options
         if (_widgetConfig.isCacheEnabled() != null) {
             _buffer.append(makeLine("_cacheEnabled = " + _widgetConfig.isCacheEnabled() + ";", 0));
         }
@@ -176,12 +161,12 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             _buffer.append(makeLine("_maxCacheable = " 
             		+ _widgetConfig.getMaxCacheItemSize() + ";", 0));
         }
-        // Debug issue fix ?
+        //Debug issue fix ?
         if(_widgetConfig.isDebugEnabled()) {
         	_buffer.append(makeLine("_debugEnabled = true;", 0));
         }
         
-        // Auto-Startup options
+        //Auto-Startup options
         if(_widgetConfig.allowInvokeParams()) {
         	_buffer.append(makeLine("_allowInvokeParams = " 
             		+ _widgetConfig.allowInvokeParams() + ";", 0));
@@ -192,7 +177,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             		+ _widgetConfig.isStartupEnabled() + ";", 0));
         }
         
-        // Add 3rd party extensions
+        // add 3rd party extensions
         for (int j = 0; j < _widgetConfig.getExtensionClasses().size(); j++) {
         	String extensionClass = _widgetConfig.getExtensionClasses().elementAt(j);
         	_buffer.append(makeLine(
@@ -200,7 +185,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         	
         }
         
-        // Add transport
+        // add transport
         if (_widgetConfig.getTransportTimeout() >= 0) {
             _buffer.append(makeLine(
                     "_transportTimeout = new Integer(" + _widgetConfig.getTransportTimeout() + ");", 0));
@@ -218,7 +203,7 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
             _buffer.append(makeLine("};", 0));
         }
         
-        // Add access/features
+        // add access/features
         if (_widgetConfig.getAccessTable().size() > 0) {
             String line;
             _buffer.append(makeLine("try {", 0));
@@ -240,6 +225,9 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
 
                 Vector<?> wfList = (Vector<?>)_widgetConfig.getAccessTable().get(key);
                 for (int j = 0; j < wfList.size(); j++) {
+                    //if (j > 0) {
+                    //    addLine(",");
+                    //}
                     WidgetFeature wf = (WidgetFeature) wfList.get(j);
                     _buffer.append(makeLine("new WidgetFeature(", 4));
                     line = "\"" + wf.getID() + "\"" + ",";

@@ -85,7 +85,7 @@ public class CacheManager implements HttpProtocolConstants {
            // Check Persistent Store for existing cacheTable data.
            PersistentObject cacheTableStore = PersistentStore.getPersistentObject(_storeKey);
            
-           // Get the code signing key associated with this widget.
+           // Get the code signing key associated with this BlackBerry WebWorks Application.
            CodeSigningKey codeSigningKey = CodeSigningKey.get(this);
            Object cacheTableObj = cacheTableStore.getContents(codeSigningKey);
            
@@ -193,7 +193,7 @@ public class CacheManager implements HttpProtocolConstants {
         // Check Persistent Store for existing cacheTable data.
         PersistentObject cacheItemStore = PersistentStore.getPersistentObject(storeKey);
         
-        // Get the code signing key associated with this widget.
+        // Get the code signing key associated with this BlackBerry WebWorks Application.
         CodeSigningKey codeSigningKey = CodeSigningKey.get(this);
         
         // If we find an entry in the Persistent store.    
@@ -221,7 +221,7 @@ public class CacheManager implements HttpProtocolConstants {
                // Use key to access store.
                PersistentObject persistentObject = PersistentStore.getPersistentObject(storeKey);
             
-               // Get the code signing key associated with this widget.
+               // Get the code signing key associated with this BlackBerry WebWorks Application.
                CodeSigningKey codeSigningKey = CodeSigningKey.get(this);
                
                // ByteVector is used to bypass persistent storage object size limits.
@@ -523,7 +523,7 @@ public class CacheManager implements HttpProtocolConstants {
     }
     
     public InputConnection createCache(String url, HttpConnection response) {
-        System.out.println("WIDGET ==> createCache: " + url);
+        System.out.println("WEBWORKS ==> createCache: " + url);
         
         // Calculate expires
         long expires = calculateCacheExpires(response);
@@ -570,10 +570,10 @@ public class CacheManager implements HttpProtocolConstants {
         // Store the cache copy and create in-memory cache item
         CacheItem ci = writeCacheFile(url, expires, data, headers);
         if (ci != null) {
-            System.out.println("WIDGET ==> cache created: " + url + " at " + ci.getStoreKey());
+            System.out.println("WEBWORKS ==> cache created: " + url + " at " + ci.getStoreKey());
             addCacheItem(ci);
         } else {
-            System.out.println("WIDGET ==> cache not created: " + url);
+            System.out.println("WEBWORKS ==> cache not created: " + url);
         }
         
         return new BrowserFieldResponse(url, data, headers);

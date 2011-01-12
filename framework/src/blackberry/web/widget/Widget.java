@@ -120,7 +120,7 @@ public class Widget extends UiApplication implements GlobalEventListener {
             mgr.postGlobalEvent(WIDGET_GUID ,0,0,qsParams,null);
             makeDebugArgs(args,wConfig);
         } else {
-            /* If the widget is launched during system startup,
+            /* If the WebWorks Application is launched during system startup,
             *  wait until system startup is complete.
             *  This will allow startup widget to create BrowserField without the ApplicaitonRegistry timeout error.
             */
@@ -175,7 +175,7 @@ public class Widget extends UiApplication implements GlobalEventListener {
     
     private static String argsToQuery(String[] args,WidgetConfigImpl wConfig) {
         //If parameters are not specified return a query string that handles default cases
-        //If the widget is launched from the icon "WIDGET;" will be present.
+        //If the WebWorks Application is launched from the icon "WIDGET;" will be present.
         //If allow invoke params is false then fall back on the default cases.
         boolean rimEntryPoint = (args.length>0)?args[0].startsWith("rim:"):false;
         String foregroundSource = wConfig.getForegroundSource();

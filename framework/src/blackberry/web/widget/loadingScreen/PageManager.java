@@ -1,18 +1,3 @@
-/*
-* Copyright 2010 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
 package blackberry.web.widget.loadingScreen;
 
 import net.rim.device.api.browser.field2.BrowserField;
@@ -91,7 +76,9 @@ public class PageManager {
     }
     
     public boolean isFirstPageLoadRequired() {
-        return _widgetConfigImpl.getFirstPageLoad();        
+        return _widgetConfigImpl.getFirstPageLoad();
+        //String startingUrl = WidgetUtil.getLocalPath(_widgetConfigImpl.getContent());
+        //return isLoadingScreenRequired(startingUrl);
     }
         
     private boolean isRemotePageLoadRequired() {
@@ -233,7 +220,8 @@ public class PageManager {
         _app.invokeLater(new Runnable(){ 
             public void run() {
                 synchronized(_app.getAppEventLock()){
-                    /* Removed the condition checking for "active screen" of the application,
+                    /* Fix MKS 754331:
+                    *  Removed the condition checking for "active screen" of the application,
                     *  since it's not right if there is a "modal" dialog,
                     *  because the application will release event lock for "modal" dialog,
                     *  in order to proceed next events.

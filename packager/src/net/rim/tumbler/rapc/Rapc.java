@@ -582,7 +582,7 @@ public class Rapc {
             }
         }
 
-        /// Hover icons are not displayed correctly in widget, if 
+        /// Hover icons are not displayed correctly for application if 
         /// used as icons
         /// FIX - make copies of all hover icons
         Vector<String> hoverIcons = _widgetConfig.getHoverIconSrc();

@@ -36,7 +36,7 @@ import net.rim.device.api.web.WidgetConfig;
 import javax.microedition.io.InputConnection;
 
 /**
- * Custom error handler class for widgets.
+ * Custom error handler class for WebWorks.
  */
 public class BrowserFieldCustomErrorHandler extends BrowserFieldErrorHandler {
     private WidgetConfig    _config;
