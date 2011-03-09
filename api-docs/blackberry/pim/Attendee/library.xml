@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Attendee" shortName="Attendee" introduced="1.0.0" comment="The Attendee object is used to represent a person who is invited to a calendar appointment.">
+    <details>
+      The Attendee object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.pim.Attendee" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  // Create our Event
+    var newAppt = new blackberry.pim.Appointment();
+    newAppt.location = "Your office";
+    newAppt.summary = "Talk about new project";
+    newAppt.freeBusy = 0; // Free
+
+  // Create our hour time slot
+    var start = new Date();
+    newAppt.start = start;
+    var end = start.setHours(start.getHours() + 1);
+    newAppt.end = end;
+
+  // Create Attendee
+    var attendees = new Array();
+    var onlyAttendee = new blackberry.pim.Attendee();
+    onlyAttendee.address = "john@foo.com";
+    onlyAttendee.type = blackberry.pim.Attendee.INVITED;
+    attendees.push(onlyAttendee);
+
+    newAppt.attendees = attendees;
+    newAppt.save();
+</script>]]></example>
+
+    <constants comment="[Attendee Types]">
+      <const name="ORGANIZER" type="Number" value="0" comment="Event organizer"/>
+      <const name="INVITED" type="Number" value="1" comment="Attendee as been invited"/>
+      <const name="ACCEPTED" type="Number" value="2" comment="Attendee has accepted the invitation"/>
+      <const name="DECLINED" type="Number" value="3" comment="Attendee has declined the invitation"/>
+      <const name="TENTATIVE " type="Number" value="4" comment="Attendee has tentatively accepted the invitation"/>
+    </constants>
+    <constructors>
+      <ctor comment="Constructor for a new Attendee object.">
+      </ctor>
+    </constructors>
+    <properties>
+      <property name="type" type="Number" readonly="false" comment="Indicates the type of a particular attendee. Value can be one of the Attendee types."/>
+      <property name="address" type="String" readonly="false" comment="Contains the email address of a particular attendee."/>
+    </properties>
+    
+  </object>
+</library>

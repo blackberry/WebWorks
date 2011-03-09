@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.identity.phone" shortName="Phone Identity" introduced="1.0.0" comment="The Phone Identity object contains information regarding the user's phone lines on a BlackBerry smartphone.">
+    <details>
+      The Phone Identity object is static; all of its functions and properties are used directly from the object.
+    </details>
+    <features>
+      <feature id="blackberry.identity.phone" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  var lines = blackberry.identity.phone.getLineIds();
+  for (var i = 0; i < lines.length-1; i++) {
+    alert("Line id : " + lines[i] + " has phone number : " + blackberry.identity.phone.getLineNumber(lines[i]));
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="getLineIds" static="true" returns="Number" array="true" comment="Returns the id of all the lines registered with the device.">
+        <details>
+          Returns an array of integers containing the IDs of all the lines registered with the BlackBerry device.
+        </details>
+      </func>
+      <func name="getLineLabel" static="true" returns="String" comment="Returns a string description of the line specified.">
+        <param name="lineId" type="Number" comment="[optional] ID of the line to retrieve the label for.  If not specified the label for the default line is returned."/>
+        <details>
+          Returns a string description of the line specified.  If no line is specified, the default line label is returned.
+        </details>
+      </func>
+      <func name="getLineNumber" static="true" returns="Number" comment="Returns the phone number of the line specified.">
+        <param name="lineId" type="Number" comment="[optional] ID of the line to retrieve the label for.  If not specified the label for the default line is returned."/>
+        <details>
+          The phone number of the line specified.  If no line is specified, the default phone number is returned.
+        </details>
+      </func>
+      <func name="getLineType" static="true" returns="Number" comment="Returns the type of the line specified.">
+        <param name="lineId" type="Number" comment="[optional] ID of the line to retrieve the label for.  If not specified the label for the default line is returned."/>
+        <details>
+          The line type of the line specified.  If no line is specified, the default line type is returned.
+          
+          Possible values are:
+          1 - mobile
+          2 - PBX
+          0 - neither
+        </details>
+      </func>
+    </functions>
+    
+  </object>
+</library>

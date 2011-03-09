@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,115 +25,138 @@ import javax.microedition.io.file.FileConnection;
 
 import net.rim.device.api.io.MIMETypeAssociations;
 
+/**
+ * An utility class for File.
+ * 
+ * @author dmeng
+ *
+ */
 public class FileUtil {
     public final static String FILE_NAME = "name";
     public final static String FILE_MIME = "mime";
     public final static String FILE_ENCODING = "enc";
     public final static String FILE_CONTENT = "content";
 
-    public static boolean exists(String fullPath) {
-        FileConnection con = open(fullPath);
-        boolean retval = (con != null && con.exists() && !con.isDirectory());
-        close(con);
+    /**
+     * Returns if the file exists with the given path.
+     * 
+     * @param fullPath The path of the file
+     * @return <code>true</code> if the file exists; <code>false</code> otherwise
+     */
+    public static boolean exists( String fullPath ) {
+        FileConnection con = open( fullPath );
+        boolean retval = ( con != null && con.exists() && !con.isDirectory() );
+        close( con );
 
         return retval;
     }
 
-    public static Hashtable getProperties(String fullPath) throws IOException {
-        FileConnection con = open(fullPath);
-        if (con == null) {
-            throw new IOException(fullPath + " does not exist.");
+    /**
+     * Returns the file properties.
+     * 
+     * @param fullPath The path of the file
+     * @return The properties of the file
+     * @throws IOException if any error occurs during reading of the file
+     */
+    public static Hashtable getProperties( String fullPath ) throws IOException {
+        FileConnection con = open( fullPath );
+        if( con == null ) {
+            throw new IOException( fullPath + " does not exist." );
         }
 
         String name = con.getName();
-        String mimeType = MIMETypeAssociations.getMIMEType(name);
+        String mimeType = MIMETypeAssociations.getMIMEType( name );
 
         int size = (int) con.fileSize();
-        byte[] data = new byte[size];
+        byte[] data = new byte[ size ];
         DataInputStream dis = con.openDataInputStream();
-        dis.read(data, 0, size);
-        close(dis);
-        close(con);
+        dis.read( data, 0, size );
+        close( dis );
+        close( con );
 
-        String encoding = getEncoding(data);
+        String encoding = getEncoding( data );
 
         Hashtable properties = new Hashtable();
-        properties.put(FILE_NAME, name);
-        properties.put(FILE_MIME, mimeType);
-        properties.put(FILE_ENCODING, encoding);
-        properties.put(FILE_CONTENT, data);
+        properties.put( FILE_NAME, name );
+        properties.put( FILE_MIME, mimeType );
+        properties.put( FILE_ENCODING, encoding );
+        properties.put( FILE_CONTENT, data );
 
         return properties;
     }
 
-    private static FileConnection open(String fullPath) {
+    private static FileConnection open( String fullPath ) {
         Connection con;
         try {
-            con = Connector.open(fullPath);
-        } catch (IOException e) {
+            con = Connector.open( fullPath );
+        } catch( IOException e ) {
             return null;
         }
 
-        if (con instanceof FileConnection) {
+        if( con instanceof FileConnection ) {
             return (FileConnection) con;
-        }
-        else {
-            close(con);
+        } else {
+            close( con );
         }
 
         return null;
     }
 
-    private static void close(DataInputStream con) {
-        if (con != null) {
+    private static void close( DataInputStream con ) {
+        if( con != null ) {
             try {
                 con.close();
-            } catch (Exception e) {
+            } catch( Exception e ) {
             }
         }
     }
 
-    private static void close(Connection con) {
-        if (con != null) {
+    private static void close( Connection con ) {
+        if( con != null ) {
             try {
                 con.close();
-            } catch (Exception e) {
+            } catch( Exception e ) {
             }
         }
     }
 
-    public static String getEncoding(byte[] data) {
+    /**
+     * Returns the encoding of the file.
+     * 
+     * @param data The byte array of the file
+     * @return The encoding of the file
+     */
+    public static String getEncoding( byte[] data ) {
 
-        if (data == null || data.length < 2) {
+        if( data == null || data.length < 2 ) {
             return "";
         }
 
-        switch (data[0] & 0xFF) {
-        case 0x00:
-            if (data.length >= 4 && data[1] == (byte) 0x00 && data[2] == (byte) 0xFE && data[3] == (byte) 0xFF) {
-                return "utf-32be";
-            }
-            break;
-        case 0xFE:
-            if (data[1] == (byte) 0xFF) {
-                return "utf-16be";
-            }
-            break;
-        case 0xFF:
-            if (data[1] == (byte) 0xFE) {
-                if (data.length >= 4 && data[2] == (byte) 0x00 && data[3] == (byte) 0x00) {
-                    return "utf-32le";
+        switch( data[ 0 ] & 0xFF ) {
+            case 0x00:
+                if( data.length >= 4 && data[ 1 ] == (byte) 0x00 && data[ 2 ] == (byte) 0xFE && data[ 3 ] == (byte) 0xFF ) {
+                    return "utf-32be";
                 }
-                else {
-                    return "utf-16le";
+                break;
+            case 0xFE:
+                if( data[ 1 ] == (byte) 0xFF ) {
+                    return "utf-16be";
                 }
-            }
-            break;
-        case 0xEF:
-            if (data.length >= 3 && data[1] == (byte) 0xBB && data[2] == (byte) 0xBF) {
-                return "utf-8";
-            }
-            break;
+                break;
+            case 0xFF:
+                if( data[ 1 ] == (byte) 0xFE ) {
+                    if( data.length >= 4 && data[ 2 ] == (byte) 0x00 && data[ 3 ] == (byte) 0x00 ) {
+                        return "utf-32le";
+                    } else {
+                        return "utf-16le";
+                    }
+                }
+                break;
+            case 0xEF:
+                if( data.length >= 3 && data[ 1 ] == (byte) 0xBB && data[ 2 ] == (byte) 0xBF ) {
+                    return "utf-8";
+                }
+                break;
         }
         return "";
     }

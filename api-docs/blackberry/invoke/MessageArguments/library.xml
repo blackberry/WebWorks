@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.MessageArguments" shortName="MessageArguments" introduced="1.0.0" comment="The MessageArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Messaging application.">
+    <details>
+      The MessageArguements object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.MessageArguments" version="1.0.0"/>
+      <feature id="blackberry.message" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">   
+  var args = new blackberry.invoke.MessageArguments('foo@domain.com', 'hello', 'world');
+  args.view = blackberry.invoke.MessageArguments.VIEW_NEW; // New
+   
+  blackberry.invoke.invoke(blackberry.invoke.APP_MESSAGES, args);  // New Message
+</script>]]></example>
+    
+    <constants comment="View">
+      <const name="VIEW_NEW" type="Number" value="0" readonly="true" static="true" comment="New/Compose View"/>
+      <const name="VIEW_DEFAULT" type="Number" value="1" readonly="true" static="true" comment="Opens up the Inbox"/>
+      <const name="VIEW_SAVED" type="Number" value="2" readonly="true" static="true" comment="Saved Messages View"/>
+      <const name="VIEW_SEARCH" type="Number" value="3" readonly="true" static="true" comment="Search View"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new MessageArguments object.">
+      </ctor>
+      <ctor comment="Constructor for a new MessageArguments object with a Message object.">
+        <param name="message" type="blackberry.message.Message" comment="Message to open in the Messages application."/>
+      </ctor>
+      <ctor comment="Constructor for a new MessageArguments object.">
+        <param name="to" type="String" comment="'To' recipients of the Message to open in the Messages application."/>
+        <param name="subject" type="String" comment="The subject of the Message to open in the Messages application."/>
+        <param name="body" type="String" comment="The body of the Message to open in the Messages application."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="view" type="Number" static="false" comment="Value that specifies what kind of view you want to view in Messages application. If MessageArguments object is created with a Message object or 'to','subject','body' values, the view is 'VIEW_NEW' regardless if any other value is assigned."/>
+    </properties>
+    
+  </object>
+</library>
+

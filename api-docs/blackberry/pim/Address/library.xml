@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Address" shortName="Address" introduced="1.0.0" comment="The Address object represents an address used for a contact or for use with launching the BlackBerry Maps application.">
+    <details>
+      The Address object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.pim.Address" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  if (blackberry.system.hasCapability("location.maps")) {
+    // Create our address 
+    var homeAddress = new blackberry.pim.Address();
+    homeAddress.country = "Canada";
+    homeAddress.stateProvince = "Ontario";
+    homeAddress.city = "Waterloo";  
+
+    // Open our maps 
+    var args = new blackberry.invoke.MapsArguments(homeAddress);
+    blackberry.invoke.invoke(blackberry.invoke.APP_MAPS, args);  // Maps
+  }
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Constructor for a new Address object.">
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="country" type="String" static="false" comment="Contains the country of a particular address."/>
+      <property name="address1" type="String" static="false" comment="Contains the street of a particular address."/>
+      <property name="address2" type="String" static="false" comment="Contains the extra street information of a particular address."/>
+      <property name="city" type="String" static="false" comment="Contains the locality information of a particular address, for example a city, county, town."/>
+      <property name="zipPostal" type="String" static="false" comment="Contains the postal code or zip code of a pariticular address."/>
+      <property name="stateProvince" type="String" static="false" comment="Contains the region information (such as province, state, or territory) of a particular address."/>
+    </properties>
+    
+  </object>
+</library>

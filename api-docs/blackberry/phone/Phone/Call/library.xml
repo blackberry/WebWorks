@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="false">
+  <object name="blackberry.phone.Phone.Call" shortName="Call" comment="Represents an active phone call.">
+    <features>
+      <feature id="blackberry.phone.Phone" version="1.0.0.0" required="true">Phone Object</feature>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Check if active call at index specified is on hold
+  var res = blackberry.phone.Phone.activeCalls();
+  if (res) {
+    var index = 0;
+    alert("Is active call " + index + " on hold? " + res[index].isOnHold());
+  }
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Check if active call at index specified is outgoing
+  var res = blackberry.phone.Phone.activeCalls();
+  if (res) {
+    var index = 0;
+    alert("Is active call " + index + " outgoing? " + res[index].outgoing);
+  }
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Check recipient name of active call at index specified
+  var res = blackberry.phone.Phone.activeCalls();
+  if (res) {
+    var index = 0;
+    alert("Recipient name of active call " + index + " is: " + res[index].recipientName);
+  }
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Check recipient number of active call at index specified
+  var res = blackberry.phone.Phone.activeCalls();
+  if (res) {
+    var index = 0;
+    alert("Recipient number of active call " + index + " is: " + res[index].recipientNumber);
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="isOnHold" returns="Boolean" comment="Determines whether or not the current call is being held."/>
+    </functions>
+    
+    <properties>
+      <property name="outgoing" type="Boolean" readonly="true" comment="Indicates if the call is outgoing."/>
+      <property name="recipientName" type="String" readonly="true" comment="Number string for display in a UI. If a contact list entry is found with a matching phone number, the 'friendly name' (either First/Last or Company name) is returned."/>
+      <property name="recipientNumber" type="String" readonly="true" comment="Number associated with this phone call."/>
+    </properties>
+  </object>
+</library>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.io.dir" shortName="Directory" introduced="1.0.0" comment="The Directory object provides functions for interacting with directories on the file system.">
+    <features>
+      <feature id="blackberry.io.dir" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  var i;
+  var root = blackberry.io.dir.getRootDirs();
+  // Loop through all the files in the first root directory and display them
+  var files = blackberry.io.dir.listFiles(root[0]);
+  for (i = 0; i < files.length; i++) {
+    alert(files[i]);
+  }
+  var roots = blackberry.io.dir.getRootDirs();
+  for (i = 0; i < roots.length; i++) {
+    alert("Free space on '" + roots[i] + "' is " + blackberry.io.dir.getFreeSpaceForRoot(roots[i]) + " bytes");
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="listFiles" static="true" returns="String" array="true" comment="List all the files and sub-directories that reside in a given directory.">
+        <param name="path" type="String" comment="Path location of the directory."/>
+        <details>
+          Returns the names of the files in the directory.
+          IOException - if invoked on a file, the directory does not exist, the directory is not accessible, or an I/O error occurs.
+        </details>
+      </func>
+      <func name="listDirectories" static="true" returns="String" array="true" comment="List all the directories that reside in a given directory.">
+        <param name="path" type="String" comment="path location of the directory."/>
+        <details>
+          Return a list of directories in a given directory.
+        </details>
+        IOException - if invoked on a file, the directory does not exist, the directory is not accessible, or an I/O error occurs.
+      </func>
+      <func name="exists" static="true" returns="Boolean" comment="Determine whether a given directory exists or not.">
+        <param name="path" type="String" comment="path location of the directory."/>
+        <details>
+          Return true if the directory exists, false otherwise. Note: If the path is to an existing file (not a directory), the method will still return false.
+        </details>
+      </func>
+      <func name="rename" static="true" returns="void" comment="Rename a given directory.">
+        <param name="path" type="String" comment="path location of the directory to be renamed."/>
+        <param name="newDirectoryName" type="String" comment="the new name for the directory."/>
+        <details>
+          IOException - if the target does not exist, is not accessible, or a file or directory already exists by the newDirectoryName,
+          or newDirectoryName is an invalid filename for the platform (for example, it contains characters invalid in a filename on the platform).
+        </details>
+      </func>
+      <func name="deleteDirectory" static="true" returns="void" comment="Delete a given directory. The directory has to be empty unless the recursive flag is set to true.">
+        <param name="path" type="String" comment="path of the directory to be deleted."/>
+        <param name="recursive" type="Boolean" optional="true" comment="flag to decide if all contents should be deleted"/>
+        <details>
+          IOException - If the target is is not an empty directory, the connection target does not exist or is inaccessible,
+          or an unspecified error occurs preventing deletion of the target.
+        </details>
+      </func>
+      <func name="getParentDirectory" static="true" returns="String" comment="Returns the path location of the directory that the give file or directory resides in.">
+        <param name="path" type="String" comment="Path of the directory or file."/>
+        <details>
+          Returns the path location of the directory that the give file or directory resides in.
+        </details>
+      </func>
+      <func name="createNewDir" static="true" returns="void" comment="Create an empty directory.">
+        <param name="path" type="String" comment="path location of the new directory. The name of the new directory should be included as parts of the path."/>
+        <details>
+        </details>
+      </func>
+      <func name="getRootDirs" static="true" returns="String" array="true" comment="Get a list of root directories.">
+        <details>
+        </details>
+      </func>
+      <func name="getFreeSpaceForRoot" static="true" returns="Number" comment="Get the amount of free space available in the specified root.">
+        <param name="rootPath" type="String" comment="Root path location to determine free space for."/>
+        <details>
+          Determines the free memory that is available on the file system that the file or directory resides on.
+        </details>
+      </func>
+    </functions>
+    
+  </object>  
+</library>

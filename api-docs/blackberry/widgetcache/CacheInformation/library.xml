@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.widgetcache.CacheInformation" shortName="CacheInformation" introduced="1.0.0" comment="The CacheInformation object provides information about entities saved in the widget cache.">
+    <features>
+      <feature id="blackberry.widgetcache.CacheInformation" version="1.0.0">Browser Field 2 Caching Extension.</feature>
+    </features>
+    <properties>
+      <property name="url" static="true" type="String" readonly="true" comment="Contains the URL string of the mapping request."/>
+      <property name="size" static="true" type="Number" readonly="true" comment="Contains the disk size of the cached copy."/>
+      <property name="expires" static="true" type="Date" readonly="true" comment="Contains the expiration date of the cached copy."/>
+    </properties>
+  </object>
+</library>

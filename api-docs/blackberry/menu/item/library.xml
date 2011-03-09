@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <features>
+    <feature id="blackberry.ui.menu" version="1.0.0"/>
+  </features>
+  <object name="blackberry.ui.menu.MenuItem" shortName="MenuItem" introduced="1.0.0" comment="The MenuItem object represents a menu item for the screen.">
+    <details>
+      The MenuItem object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <example><![CDATA[<script type="text/javascript">
+  var item = new blackberry.ui.menu.MenuItem(false, 1, "Hello World", clickMe);
+  blackberry.ui.menu.addMenuItem(item);
+  function clickMe() {
+    alert("user just clicked me");
+  }
+</script>]]></example>
+    
+    <subclasses>
+      <object name="OnClick" shortName="OnClick Interface" interface="true" comment="Interface for Click Callback.">
+        <details>
+          This is the interface that must be available on the click callback function provided.
+        </details>
+      </object>
+    </subclasses>
+    
+    <constructors>
+      <ctor comment="Constructor for a new MenuItem object ">
+        <param name="isSeparator" type="Boolean" comment="If set to true the MenuItem will be created as a separator."/>
+        <param name="ordinal" type="Number" comment="The ordinal of this MenuItem. Ordinal has to be greater than or equal to zero. Exception will be thrown if it is less than zero."/>
+        <param name="caption" optional="true" type="String" comment="Optional text to display on the menu item.  This must be supplied if isSeparator is false."/>
+        <param name="callback" optional="true" type="OnClick" comment="Optional parameter to specify the function to call when the user clicks the menu item.  If supplied when isSeparator is true, an exception will be thrown."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="caption" type="String" comment="Contains the caption for the menu item."/>
+      <property name="ordinal" type="Number" comment="Each MenuItem has an ordinal specifying the sort order within the menu. MenuItems with a lower ordinal will have higher positions on the menu than the MenuItems with higher ordinal. A separator will be automatically inserted between adjacent items whose ordinals differ by at least 0x00010000."/>
+      <property name="isSeparator" type="Boolean" readonly="true" comment="Value is true if the menu item is a separator."/>
+      <property name="isDefault" type="Boolean" readonly="true" comment="Value is true if the menu item is marked as the default item to be selected in the menu."/>
+    </properties>
+    
+  </object>
+</library>

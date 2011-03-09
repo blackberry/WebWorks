@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -31,26 +31,34 @@ public class MessageUtil {
      * @return True if currently active WAF is CDMA, otherwise false
      */
     public static boolean isCDMA() {
-        return (RadioInfo.getActiveWAFs() & RadioInfo.WAF_CDMA) == RadioInfo.WAF_CDMA;
+        return ( RadioInfo.getActiveWAFs() & RadioInfo.WAF_CDMA ) == RadioInfo.WAF_CDMA;
     }
 
-    public static String getFormattedAddress(String protocol, String address) {
-        if (address == null) {
+    /**
+     * Gets the formatted address of the given message.
+     * 
+     * @param protocol The message protocol
+     * @param address The message address
+     * @return The formatted address of the message
+     */
+    public static String getFormattedAddress( String protocol, String address ) {
+        if( address == null ) {
             return "";
         }
 
-        if (address.startsWith(protocol)) {
-            address = address.substring(protocol.length());
+        String addr = address;
+        if( addr.startsWith( protocol ) ) {
+            addr = addr.substring( protocol.length() );
         }
-        
+
         int offset = 0;
-        char c = address.charAt(offset);
-        
-        while (!Character.isDigit(c)) {
+        char c = addr.charAt( offset );
+
+        while( !Character.isDigit( c ) ) {
             offset++;
-            c = address.charAt(offset);
+            c = addr.charAt( offset );
         }
-        
-        return address.substring(offset);
+
+        return addr.substring( offset );
     }
 }

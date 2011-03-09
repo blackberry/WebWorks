@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,10 +17,19 @@ package blackberry.message;
 
 import net.rim.device.api.script.Scriptable;
 
+/**
+ * Parent class for SMS namespace.
+ *  
+ * @author dmeng
+ *
+ */
 public class MessageNamespace extends Scriptable {
     protected static Receiver _receiver;
     private static final String FIELD_RECEIVING = "isListeningForMessage";
 
+    /**
+     * @see net.rim.device.api.script.Scriptable#getField(String)
+     */
     public Object getField(String name) throws Exception {
         if (name.equals(FIELD_RECEIVING)) {
             return new Boolean(_receiver.isRunning());
@@ -36,6 +45,9 @@ public class MessageNamespace extends Scriptable {
         return super.getField(name);
     }
 
+    /**
+     * @see net.rim.device.api.script.Scriptable#putField(String, Object)
+     */
     public boolean putField(String field, Object value) throws Exception {
         if (FIELD_RECEIVING.equals(field)) {
             boolean letRun = ((Boolean) value).booleanValue();

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <object name="blackberry.location" shortName="Location" comment="The Location object provides access to the GPS location of the BlackBerry device. The GPS location refers to the geographical coordinates, latitude and longitude, of the BlackBerry device. blackberry.location is available by default in the regular browser.">
+    <details title="Gears GeoLocation Recommendation">
+      You should use the Gears GeoLocation object instead of the blackberry.location object.  The blackberry.location object
+      is a legacy object.  The GeoLocation object is much more functional and has many more desired features.
+    </details>
+    <example><![CDATA[<script type="text/javascript">
+  // called when location object changes
+  function locationCB() {
+    alert("Latitude "  + blackberry.location.latitude);
+    alert("Longitude " + blackberry.location.longitude);
+    return true;
+  }
+
+  // test to see if the blackberry location API is supported
+  if( window.blackberry && blackberry.location.GPSSupported) {
+    document.write("GPS Supported");
+
+    // Set our call back function                      
+    blackberry.location.onLocationUpdate("locationCB()");
+
+    // set to Autonomous mode
+    blackberry.location.setAidMode(2);
+
+    //refresh the location
+    blackberry.location.refreshLocation();
+  }    
+  else {
+    document.write("This Device doesn't support the Blackberry Location API");
+  }
+</script>]]></example>
+    
+    <subclasses>
+      <object name="OnLocationChanged" shortName="OnLocationChanged Interface" interface="true" comment="Interface for location changed callbacks.">
+        <details>
+          This is the interface that must be available on the location changed callback function provided
+        </details>
+      </object>
+    </subclasses>
+    
+    <functions>
+      <func name="onLocationUpdate" static="true" returns="void" comment="The onLocationUpdate() method registers a listener that evaluates a string or calls a function whenever the BlackBerry device receives updated location information.">
+        <details>
+          Once onLocationUpdate() has been invoked, the callback occurs whenever there is an update to the location
+          information. This can be as frequent as once every several seconds. If you have passed a function to the method, you
+          can cancel the callback using location.removeLocationUpdate(). If you have passed a string, the
+          callback cannot be removed.
+        </details>
+        <param name="callback" type="OnLocationChanged" comment="A JavaScript function object to be executed or a string to be evaluated when the location information is updated."/>
+      </func>
+      <func name="refreshLocation" static="true" returns="Boolean" comment="Returns 'true' if the GPS location of the BlackBerry device is successfully updated, otherwise, returns false.">
+        <details>
+          The refreshLocation() method requests an update of the location of the BlackBerry device.
+          This method is asynchronous, so the script continues regardless of whether updated location information has been
+          received. To ensure that location information is updated before reading it, you should first register a listener using
+          location.onLocationUpdate() that reads location.latitude and location.longitude,
+          and call refreshLocation() afterwards.
+        </details>
+      </func>
+      <func name="removeLocationUpdate" static="true" returns="void" comment="The removeLocationUpdate() method removes a previously registered callback method.">
+        <param name="callback" type="OnLocationChanged" comment="A JavaScript function previously registered by onLocationUpdate()."/>
+      </func>
+      <func name="setAidMode" static="true" returns="void" comment="specifies which method the BlackBerry device will use to obtain the GPS location.">
+        <param name="aidMode" type="Number" comment="The method used to obtain the GPS location. The value for this parameter may be one of: Cellsite=0, Assisted=1."/>
+        <details>
+          The device can obtain location information in one of three ways:
+        </details>
+        <details>
+          Cellsite = 0 This method uses the GPS location of the active cellsite tower to provide first order GPS information. It
+          provides the least accurate location information; however, it is the fastest location mode.
+          Note: This location method requires network connectivity and carrier support.
+        </details>
+        <details>
+          Assisted = 1 This method uses the network to provide ephemeris satellite data to the device chip. It provides the GPS
+          location faster than the autonomous mode and more accurately than the cellsite mode.
+          Note: This location method requires network connectivity and carrier support.
+        </details>
+        <details>
+          Autonomous = 2 This method uses the GPS chip on the BlackBerry device without assistance from the network. The
+          autonomous mode provides the first GPS location in the slowest amount of time.
+        </details>
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="GPSSupported" static="true" type="Boolean" readonly="true" comment="When true, this property indicates that GPS positioning is supported by the BlackBerry device."/>
+      <property name="latitude" static="true" type="Number" readonly="true" comment="Returns the current latitude, in degrees, of the BlackBerry device.">
+        <details>
+          Positive values indicate northern latitude, negative values indicate southern latitude. To ensure that
+          the most accurate coordinate is returned, you should register a listener using BlackberryLocation.onLocationUpdate() and read
+          acquire the location information within the callback.
+        </details>
+      </property>
+      <property name="longitude" static="true" type="Number" readonly="true" comment="Returns the current longitude, in degrees, of the BlackBerry device.">
+        <details>
+          Positive values indicate eastern longitude, negative values indicate western longitude.
+          To ensure that the most accurate coordinate is returned, you should register a listener
+          using BlackberryLocation.onLocationUpdate() and read acquire the location information within
+          the callback.
+        </details>
+      </property>
+      <property name="timestamp" static="true" type="Number" readonly="true" comment="Returns the time (in milliseconds since epoch) at which the location object was updated."/>
+    </properties>
+    
+  </object>
+</library>

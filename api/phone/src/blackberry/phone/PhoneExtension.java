@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,9 +26,6 @@ import blackberry.phone.call.CallNamespace;
 import blackberry.phone.calllog.CallLogNamespace;
 import blackberry.phone.find.FindNamespace;
 
-/**
- * 
- */
 public class PhoneExtension implements WidgetExtension {
 
     /* @Override */

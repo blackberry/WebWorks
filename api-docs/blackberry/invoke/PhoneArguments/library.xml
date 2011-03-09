@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.PhoneArguments" shortName="PhoneArguments" introduced="1.0.0" comment="The PhoneArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Phone application.">
+    <details>
+      The PhoneArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.PhoneArguments" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">   
+  var args = new blackberry.invoke.PhoneArguments('555-555-5555', true);
+  args.view = blackberry.invoke.PhoneArguments.VIEW_CALL;     
+
+  blackberry.invoke.invoke(blackberry.invoke.APP_PHONE, args);  
+</script>]]></example>
+    
+    <constants comment="View">
+      <const name="VIEW_CALL" type="Number" value="0" comment="Make Phone Call"/>
+      <const name="VIEW_VOICEMAIL" type="Number" value="1" comment="Call Voicemail"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Create an instance of a PhoneArguments with optional parameters.">
+        <param name="dialString" optional="true" type="String" comment="Optional parameter specifying the Number to dial; this may contain special dialing characters in addition to the components of a traditional phone number."/>
+        <param name="smartDialing" optional="true" type="Boolean" comment="Optional parameter. If true, smart dialing will be enabled.  Smart dialing is ignored if a line id is specified."/>
+        <param name="lineId" optional="true" type="Number" comment="Optional ID of the line to use for the call. If not specified the default line is used.  Line ID cannot be specified when VIEW_VOICEMAIL is used.  This will cause the invocation to throw an IllegalArgumentException."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="view" type="Number" static="false" comment="Value that specifies what kind of view you want to open in the Phone application."/>
+    </properties>
+    
+  </object>
+</library>

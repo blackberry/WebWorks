@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <object name="blackberry.utils.URL" shortName="URL Utility" introduced="1.0.0" comment="A URL Utility object contains information about a URL string.">
+    <features>
+      <feature id="blackberry.utils" version="1.0.0"/>
+    </features>
+    <example><![CDATA[
+<script type="text/javascript">
+  var url = blackberry.utils.parseURL("http://www.bla.com:8080/index.html?COUNTER=3&FOO=BAR");
+
+  alert("port:"+url.port);
+  alert("host:"+url.host);
+
+  alert("parameter:"+url.getURLParameterByIndex(0));
+  alert("parameter:"+url.getURLParameter("FOO"));
+</script>]]></example>
+    
+    <details>
+      An instance of a URL object can be created by using blackberry.utils.parseURL() function.
+    </details>
+    <properties>
+      <property name="host" type="String" readonly="true" comment="Host address in the URL string."/>
+      <property name="port" type="Number" readonly="true" comment="Port number in the URL string."/>
+    </properties>
+    <functions>
+      <func name="getURLParameterByIndex" returns="String" comment="Obtain the value of a parameter by index. The values are stored in the order they appear in the URL string.">
+        <param name="index" type="Number" comment="index of the parameter to be retrieved."/>
+      </func>
+      <func name="getURLParameter" returns="String" comment="Obtain the value of a parameter by key.">
+        <param name="key" type="String" comment="The key of the parameter to be retrieved."/>
+        <details>
+          An undefined object is returned if the key does not exist in the URL query.
+        </details>
+      </func>
+    </functions>
+    
+  </object>
+</library>

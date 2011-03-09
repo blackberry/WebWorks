@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.TaskArguments" shortName="TaskArguments" introduced="1.0.0" comment="The TaskArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Tasks application.">
+    <details>
+      The TaskArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.TaskArguments" version="1.0.0"/>
+      <feature id="blackberry.pim.Task" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  var task= new blackberry.pim.Task();
+  task.summary = 'Pick it up';
+    
+  var args = new blackberry.invoke.TaskArguments(task);
+  args.view = 0;
+   
+  blackberry.invoke.invoke(blackberry.invoke.APP_TASKS, args);    
+</script>]]></example>
+    
+    <constants comment="View">
+      <const name="VIEW_NEW" type="Number" value="0" comment="New View"/>
+      <const name="VIEW_EDIT" type="Number" value="1" comment="Edit View"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new TaskArguments object.">
+        <param name="task" optional="true" type="blackberry.pim.Task" comment="Task to view in Tasks application."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="view" type="Number" static="false" comment="Value that specifies what kind of view you want to view the task in Tasks application."/>
+    </properties>
+    
+  </object>
+</library>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <object name="blackberry.focus" shortName="TrackBall/TrackPad Focus" introduced="1.0.0" comment="The focus object provides functions and properties for retrieving and setting focus to focusable areas of the HTML">
+    <details title="Guidelines">
+      If the BlackBerry device doesn't have a trackball or trackpad, the focus-based navigation mode will not be enabled even if the widget configuration document specifies that focus-based navigation is used.
+      If the widget is configured for focus-based navigation and it runs on a BlackBerry device that uses a trackpad or trackball, focus-based navigation will be enabled.
+    </details>
+    <details>
+      In summary, running a widget with focus-based navigation mode markup on a BlackBerry device without a trackball is the same as running the widget without specifying any focus-based navigation and the entire navigation related HTML mark-up, JavaScript and CSS extensions are ignored.
+    </details>
+    <details>
+      <![CDATA[
+      Currently, focus based navigation will not function in a "child" document that is contained by a <frameset> <frame>
+      or <iframe> or any other HTML element that contains a document element. Focus based navigation only works in the "root" document.
+      ]]>
+    </details>
+    <details title="Configuration">
+      <![CDATA[
+      Navigation mode can be enabled for BlackBerry devices with trackball by adding a  <rim:navigation> element in config.xml document that looks like the following:
+        <rim:navigation mode="focus" />
+        ]]>
+    </details>
+    <details title="HTML Mark-up Details">
+      <![CDATA[
+      By default, all <textarea>, <a>, <input>, <select> and <button> elements are focusable.
+      If you wish to have other HTML elements to become focusable, which will make them a part of the navigation map, you can add the attribute x-blackberry-focusable with the value of "true" to these elements, e.g.
+        ]]>
+    </details>
+    <details>
+      <![CDATA[
+      <td id="Td1" x-blackberry-focusable="true" > 1 </td>
+      ]]>
+    </details>
+    <details>
+      In addition, if you want to remove some of the default focusable elements from the navigation map, which prevent them from gaining focus, add the attribute x-blackberry-focusable with the value of "false" to these elements. For example:
+    </details>
+    <details>
+      <![CDATA[
+      <input value="Fixed" x-blackberry-focusable="false" />
+      ]]>
+    </details>
+    <details>
+      By default, the "highest" focusable element will be initially focused after the document is completely loaded.
+      You can set a specific focusable element to be initially focused after the document is loaded by adding the "x-blackberry-initialFocus" attribute to it.  For example:
+    </details>
+    <details>
+      <![CDATA[
+      <a class="list" x-blackberry-initialFocus="true" >First Link</a>
+      ]]>
+    </details>
+    <details title="Events and Overrides">
+      By default, all focusable HTML elements compose the navigation map and the focus will move from one focusable element to another focusable element according to the direction of the scroll wheel and the 2-D dimension of the focusable elements.
+      This default navigation behavior can be overridden and customized, by using the x-blackberry-onUp, x-blackberry-onDown, x-blackberry-onLeft, and x-blackberry-onRight event attributes.
+      For example, here is a snippet of HTML:
+    </details>
+    <details>
+      <![CDATA[
+      <input id="input1" value="OverrideNavigationBehavior" x-blackberry-onUp="SomeJsFunction()" />
+      ]]>
+    </details>
+    <details>
+      If the input1 element is currently focused, and the user scrolls up using the trackpad or trackball, SomeJsFunction() will be executed instead of the default focus moving behavior.
+      The content of the x-blackberry-onUp value will be executed as JavaScript and the default focus movement will not occur.
+    </details>
+    <details>
+      In the above case, if SomeJsFunction() doesn't programmatically move the focus to another element, the current focused element will not change.  If you want
+      to trap scrolling and do not want any navigation action to occur, or JavaScript to execute, you can override one of the navigation attributes with an empty value like the following: x-blackberry-onUp="".
+    </details>
+    <details>
+      When an element gains focus, it will receive a mouseover event. An element can gain focus when the user moves the trackpad or trackball under the default navigation behavior or if blackberry.focus.setFocus() is called programmatically to set the focus to an element.
+      When an element loses focus, it will receive a mouseout event. An element loses focus when the focus is set to another element.
+    </details>
+    <details>
+      When the user presses the trackpad or trackball in a selection action, the current focused element will receive a mousedown, mouseup, and click in sequence if it doesn't consume these actions as UI events in advance.
+      For example, when the current focused element is a text box, the element won't receive a mousedown, mouseup, and click when the user presses the trackpad or trackball, because the text box consumed these actions as UI events before these actions were popped up to the DOM level.
+    </details>
+    <details>
+      When there is no focusable element visible in the current viewable part of the screen, no element will be considered focused. In this case, the mousedown, mouseup, and click event is not directed to any element if you press the scroll wheel.
+    </details>
+    <details title="Focus Visual Effect">
+      By default, when an element is focused, a light-blue round rectangle appears around the dimension of the element. When an element gains focus, the CSS hover will be triggered, allowing you to customize
+      the focused element. You can also turn off the default focus highlight by using the following meta tag:
+    </details>
+    <details>
+      <![CDATA[
+      <meta name="x-blackberry-defaultHoverEffect" content="false" />
+      ]]>
+    </details>
+    <details title="Limitations">
+      <![CDATA[
+      Currently focus navigation doesn't support the <select> element with the "multiple" attribute. Therefore the <select>
+      element with the "multiple" attribute is not focusable and cannot be added to navigation map. The workaround is to either add some navigation JavaScript outside the <select> element or simply using other HTML elements to mimic the multiple selection function.
+      ]]>
+    </details>
+    <example><![CDATA[<html>
+  <head>
+    <meta name="viewport" id="viewport" content="initial-scale=1.0,user-scalable=no" />
+    <script type="text/javascript">
+      function moveDown(id)
+      {
+        blackberry.focus.setFocus(id);
+      }
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+          <td></td>
+          <td x-blackberry-focusable="true" x-blackberry-onDown="moveDown('bottom');" ></td>
+          <td ></td>
+      </tr>
+      <tr>
+          <td x-blackberry-focusable="true"></td>
+          <td x-blackberry-focusable="true" onclick="alert('clicked me')" ></td>
+          <td x-blackberry-focusable="true" x-blackberry-onDown=""></td>
+      </tr>
+      <tr>
+          <td></td>
+          <td x-blackberry-focusable="true" id="bottom"></td>
+          <td></td>
+      </tr>
+    </table>
+  </body>
+</html>]]></example>
+    
+    <constants comment="Scroll Direction">
+      <const name="RIGHT" type="Number" value="0" readonly="true" static="true" comment="User scrolled Right"/>
+      <const name="LEFT" type="Number" value="1" readonly="true" static="true" comment="User scrolled Left"/>
+      <const name="UP" type="Number" value="2" readonly="true" static="true" comment="User scrolled Up"/>
+      <const name="DOWN" type="Number" value="3" readonly="true" static="true" comment="User scrolled Down"/>
+    </constants>
+    
+    <functions>
+      <func name="getFocus" static="true" returns="String" comment="Returns the id of the current focused HTML element"/>
+      <func name="getPriorFocus" static="true" returns="String" comment="Returns the id of the prior focused HTML element to current focused element"/>
+      <func name="getDirection" static="true" returns="Number" comment="Returns the current direction of the scroll action.  This is an integer value that is represented in the direction constants RIGHT, LEFT, UP, DOWN"/>
+      
+      <func name="setFocus" static="true" returns="void" comment="This function will set the focus on the HTML element with specified id value">
+        <param name="id" type="String" comment="The element 'id' in which you want to set focus"/>
+        <details>
+          For example, blackberry.focus.setFocus("input1"); will set the focus on the element with the ID input1, if input1 is a focusable element.
+        </details>
+      </func>      
+    </functions>
+    
+  </object>  
+</library>

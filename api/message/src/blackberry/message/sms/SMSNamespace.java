@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -17,18 +17,30 @@ package blackberry.message.sms;
 
 import blackberry.message.MessageNamespace;
 
+/**
+ * SMS message namespace.
+ * 
+ * @author dmeng
+ * 
+ */
 public class SMSNamespace extends MessageNamespace {
 
     public static final String NAME = "blackberry.message.sms";
 
+    /**
+     * Constructor.
+     */
     public SMSNamespace() {
         _receiver = new SMSReceiver();
     }
 
-    public Object getField(String name) throws Exception {
-        if (name.equals(FunctionSendSMS.NAME)) {
+    /**
+     * @see net.rim.device.api.script.Scriptable#getField(String)
+     */
+    public Object getField( String name ) throws Exception {
+        if( name.equals( FunctionSendSMS.NAME ) ) {
             return new FunctionSendSMS();
         }
-        return super.getField(name);
+        return super.getField( name );
     }
 }

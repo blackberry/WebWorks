@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Contact" shortName="Contact" introduced="1.0.0" comment="The Contact object represents a contact in the BlackBerry PIM. This object can be created to be used when launching the new contact screen using the invoke API or for direct interaction with the PIM storage itself.">
+    <details>
+      The Contact object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.pim.Contact" version="1.0.0"/>
+      <feature id="blackberry.pim.Address" version="1.0.0"/>
+      <feature id="blackberry.identity" version="1.0.0"/>
+      <feature id="blackberry.find" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript"> 
+  // Create the contact  
+  var contact = new blackberry.pim.Contact();  
+  contact.firstName = "John";  
+  contact.lastName = "Doe";  
+  contact.homePhone = "555-555-5555";  
+  contact.save(); 
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Constructor for a new Contact object.">
+        <param name="service" optional="true" type="blackberry.identity.Service" comment="optional parameter specifying which service to create this contact for.  If not provided, the default device service is used."/>
+      </ctor>
+    </constructors>
+    
+    <functions comment="[Static]">
+      <func name="find" returns="Contact" static="true" array="true" comment="This function looks up the contacts that match the expression provided.">
+        <param name="fieldFilter" type="blackberry.find.FilterExpression" optional="true" comment="optional parameter that defines the search criteria for the find.  If no value is provided the method will return all the contacts on the device."/>
+        <param name="orderBy" type="String" optional="true" comment="optional 'orderBy' parameter specifying the field which the results will be sorted by. If 'isAscending' is not supplied or 'isAscending' is true, the sort results will be in an ascending order. If 'isAscending' is false, the sort results will be in a descending order."/>
+        <param name="maxReturn" type="Number" optional="true" comment="optional integer parameter specifying the maximum number of results to return from the find.  If not supplied or set to -1, it will return all results found."/>
+        <param name="service" type="blackberry.identity.Service" optional="true" comment="optional parameter specifying which service you wish to search for contacts.  If not supplied, the default service for contacts will be used."/>
+        <param name="isAscending" type="Boolean" optional="true" comment="optional 'isAscending' parameter specifying whether the sort order is ascending or descending. If not supplied or set to true, the results sorted by the field specified by 'orderBy' will be in an ascending order. If set to false, the sort results will be in a descending order. If no 'orderBy' value is specified, 'isAscending' is neglected."/>
+        <details>
+          The function returns list of Contacts that match search criteria.
+        </details>
+      </func>
+    </functions>
+    
+    <functions>
+      <func name="setPicture" returns="void" static="false" comment="This function sets the picture for the contact.">
+        <param name="picture" type="Blob" comment="The blob object represents the image."/>
+      </func>
+      <func name="save" returns="void" static="false" comment="This method will save the changes made to the contact object.">
+        <details>
+          On a successful save of a new contact the uid attribute will be filled in with its new value.
+        </details>
+      </func>
+      <func name="remove" returns="void" static="false" comment="This method will remove a contact from the PIM storage.">
+        <details>
+          If the contact has not been previously saved, an exception will be thrown.
+        </details>
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="title" type="String" static="false" comment="Contains the title of the contact."/>
+      <property name="firstName" type="String" static="false" comment="Contains the first name of the contact."/>
+      <property name="lastName" type="String" static="false" comment="Contains the last name of the contact."/>
+      <property name="homeAddress" type="Address" static="false" comment="Contains the home address of the contact."/>
+      <property name="workAddress" type="Address" static="false" comment="Contains the work address of the contact."/>
+      <property name="email1" type="String" static="false" comment="Contains the first email of the contact."/>
+      <property name="email2" type="String" static="false" comment="Contains the second email of the contact. After save() is called, if there is no email1 specified, email2 will replace email1 and email2 will be empty."/>
+      <property name="email3" type="String" static="false" comment="Contains the third email for the contact. After save() is called, if there is no email1 or email2 specified, email3 will replace email1 or email2 and email3 will be empty."/>
+      <property name="company" type="String" static="false" comment="Contains the company name of the contact."/>
+      <property name="jobTitle" type="String" static="false" comment="Contains the job title of the contact."/>
+      <property name="homePhone" type="String" static="false" comment="Contains the home telephone number of the contact."/>
+      <property name="homePhone2" type="String" static="false" comment="Contains the second home telephone number of the contact."/>
+      <property name="workPhone" type="String" static="false" comment="Contains the work telephone number of the contact."/>
+      <property name="workPhone2" type="String" static="false" comment="Contains the second work telephone number of the contact."/>
+      <property name="mobilePhone" type="String" static="false" comment="Contains the mobile telephone number of the contact."/>
+      <property name="faxPhone" type="String" static="false" comment="Contains the fax number of the contact."/>
+      <property name="pagerPhone" type="String" static="false" comment="Contains the pager number of the contact."/>
+      <property name="otherPhone" type="String" static="false" comment="Contains other telephone number of the contact."/>
+      <property name="note" type="String" static="false" comment="Contains any note or description related to the contact."/>
+      <property name="webpage" type="String" static="false" comment="Contains the web page URL of the contact."/>
+      <property name="birthday" type="Date" static="false" comment="The date of the contact's birthday."/>
+      <property name="anniversary" type="Date" static="false" comment="The date of the contact's anniversary."/>
+      <property name="user1" type="String" static="false" comment="The first user-defined field that contains extra information for the contact."/>
+      <property name="user2" type="String" static="false" comment="The second user-defined field that contains extra information for the contact."/>
+      <property name="user3" type="String" static="false" comment="The third user-defined field that contains extra information for the contact."/>
+      <property name="user4" type="String" static="false" comment="The fourth user-defined field that contains extra information for the contact."/>
+      <property name="pin" type="String" static="false" comment="The contact's device PIN."/>
+      <property name="uid" type="String" readonly="true" static="false" comment="The unique identifier for this contact."/>
+      <property name="picture" type="String" readonly="true" static="false" comment="It contains the base64-encoded string of the image object of the contact."/>
+      <property name="categories" type="String" array="true" static="false" readonly="false" comment="The list of categories associated to the contact."/>
+    </properties>
+    
+  </object>
+</library>
+
+
+

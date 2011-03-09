@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,9 +20,10 @@ import java.util.Hashtable;
 import javax.microedition.media.Player;
 
 import net.rim.device.api.script.ScriptableFunction;
-import common.util.ArgumentValidationUtil;
+import blackberry.core.FunctionSignature;
+import blackberry.core.ScriptableFunctionBase;
 
-public class PlayerListenerObject extends ScriptableFunction {
+public class PlayerListenerObject extends ScriptableFunctionBase {
     public static final String NAME = "addPlayerListener";
 
     private PlayerListenerController _playerListenerCtrl = null;
@@ -35,15 +36,6 @@ public class PlayerListenerObject extends ScriptableFunction {
         PlayerListenerObject.playersHashed.put(player, playerObject);
     }
 
-    /* @Override */
-    public Object invoke(final Object thiz, final Object[] args) throws Exception {
-        final int[] validParamNumber = { 0, 1 };
-
-        ArgumentValidationUtil.validateParameterNumber(validParamNumber, args);
-
-        return formatSetCallback_Output(_playerListenerCtrl.setCallback((args == null ? null : (ScriptableFunction) args[0])));
-    }
-
     private Object formatSetCallback_Output(final boolean setCallback) {
         if (setCallback == true) {
             return Boolean.TRUE;
@@ -53,4 +45,19 @@ public class PlayerListenerObject extends ScriptableFunction {
         }
     }
 
+    /* @Override */
+	protected Object execute(Object thiz, Object[] args) throws Exception {
+		return formatSetCallback_Output(_playerListenerCtrl.setCallback((args == null ? null : (ScriptableFunction) args[0])));
+	}
+
+	/* @Override */
+	protected FunctionSignature[] getFunctionSignatures() {
+		FunctionSignature playerListenerSig = new FunctionSignature(1);
+		playerListenerSig.addNullableParam(ScriptableFunction.class, false);
+		return new FunctionSignature[]{playerListenerSig};
+	}
+	
+	
+
 }
+

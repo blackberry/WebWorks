@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.CalendarArguments" shortName="CalendarArguments" introduced="1.0.0" comment="The CalendarArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Calendar application.">
+    <details>
+      The CalendarArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.CalendarArguments" version="1.0.0"/>
+      <feature id="blackberry.pim.Appointment" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+  var appt = new blackberry.pim.Appointment();
+  appt.summary = 'Get Together For lunch';
+    
+  var args = new blackberry.invoke.CalendarArguments(appt);
+  args.view = 0;
+   
+  blackberry.invoke.invoke(blackberry.invoke.APP_CALENDAR, args);  // Calendar
+</script>]]></example>
+    
+    <constants comment="View">
+      <const name="VIEW_NEW" type="Number" value="0" readonly="true" static="true" comment="New/Compose View"/>
+      <const name="VIEW_VIEW" type="Number" value="1" readonly="true" static="true" comment="Read Only View"/>
+      <const name="VIEW_AGENDA" type="Number" value="2" readonly="true" static="true" comment="Agenda View"/>
+      <const name="VIEW_DAY" type="Number" value="3" readonly="true" static="true" comment="Single Day View"/>
+      <const name="VIEW_DEFAULT" type="Number" value="4" readonly="true" static="true" comment="User's Default View"/>
+      <const name="VIEW_MONTH" type="Number" value="5" readonly="true" static="true" comment="Month View"/>
+      <const name="VIEW_WEEK" type="Number" value="6" readonly="true" static="true" comment="Week View"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new CalendarArguments object.">
+      </ctor>
+      <ctor comment="Constructor for a new CalendarArguments object.">
+        <param name="date" type="Date" comment="Date to open into the Calendar View."/>
+      </ctor>
+      <ctor comment="Constructor for a new CalendarArguments object ">
+        <param name="appointment" type="blackberry.pim.Appointment" comment="Appointment to view in Calendar application."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="date" type="Date" readonly="true" static="false" comment="Date to open into the Calendar View."/>
+      <property name="appointment" type="Appointment" readonly="true" static="false" comment="Value specifying which view to show in the Calendar application."/>
+      <property name="view" type="Number" readonly="false" static="false" comment="Appointment to view in Calendar application. NOTE: appointment is only available in the Browser when used in a new view mode."/>
+    </properties>
+    
+  </object>
+</library>
+

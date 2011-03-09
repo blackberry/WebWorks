@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.MapsArguments" shortName="MapsArguments" introduced="1.0.0" comment="The MapsArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Maps application.">
+    <details>
+      The MapsArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.MapsArguments" version="1.0.0"/>
+      <feature id="blackberry.pim.Address" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+   var args = new blackberry.invoke.MapsArguments(43.26, -80.30);
+   blackberry.invoke.invoke(blackberry.invoke.APP_MAPS, args);
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Constructor for a new MapsArguments object.">
+      </ctor>
+      <ctor comment="Constructor for a new MapsArguments object.">
+        <param name="latitude" type="Number" comment="Specifies the latitude for display."/>
+        <param name="longitude" type="Number" comment="Specifies the longitude for display."/>
+      </ctor>
+      <ctor comment="Constructor for a new MapsArguments object. Supported in 5.0.0 only." supportedIn="5.0.0">
+        <param name="locationDocument" type="Document" comment="Xml document that contains map information."/>
+      </ctor>
+      <ctor comment="Constructor for a new MapsArguments object.">
+        <param name="locationDocument" type="String" comment="Xml document string that contains map information."/>
+      </ctor>
+      <ctor comment="Constructor for a new MapsArguments object.">
+        <param name="address" type="blackberry.pim.Address" comment="Address for display in Maps application."/>
+      </ctor>
+    </constructors>
+    
+  </object>
+</library>
+

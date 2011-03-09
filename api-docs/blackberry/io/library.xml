@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <extension id="blackberry.io">
+    <entryClass>blackberry.io.IOExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  <features>
+    <feature id="blackberry.io.dir" version="1.0.0">blackberry.io.dir</feature>
+    <feature id="blackberry.io.file" version="1.0.0">blackberry.io.file</feature>
+  </features>
+</library>

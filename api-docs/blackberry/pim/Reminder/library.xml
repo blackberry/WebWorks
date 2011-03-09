@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Reminder" shortName="Reminder" introduced="1.0.0" comment="The Reminder object is used to represent the reminder rule for an appointment or a task.">
+    <details>
+      The Reminder object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.pim.Reminder" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  // Create our Event 
+  var newAppt = new blackberry.pim.Appointment();
+  newAppt.location = "Your office";
+  newAppt.summary = "Talk about new project";
+  newAppt.freeBusy = 0; // Free
+    
+  // Create our hour time slot
+  var start = new Date();
+  newAppt.start = start;
+  var end = start.setHours(start.getHours() + 1);
+  newAppt.end = end;
+
+  // Create Reminder
+  newAppt.reminder = new blackberry.pim.Reminder();
+  newAppt.reminder.type = blackberry.pim.Reminder.RELATIVE;
+  newAppt.reminder.relativeHours = 0.25; // 15 minutes
+  newAppt.save();
+</script>]]></example>
+
+    <constants comment="[Decline Reasons]">
+      <const name="DATE" type="Number" value="0" comment="Indicates that this reminder is set by date"/>
+      <const name="RELATIVE" type="Number" value="1" comment="Indicates that this reminder is set by relative time to the appointment or task"/>
+    </constants>
+    <constructors>
+      <ctor comment="Constructor for a new Reminder object.">
+      </ctor>
+    </constructors>
+    <properties>
+      <property name="type" type="Number" readonly="false" comment="What type of reminder it is, possible values:\n0 - By Date\n1 - Relative."/>
+      <property name="relativeHours" type="Number" readonly="false" comment="Represents the relative timing of the reminder in hours. For example 0.25 would be 15 minutes, where 24 would be the equivalent to 1 day. This is only valid for a type of Relative(1)."/>
+      <property name="date" type="Date" readonly="false" comment="Specifies the exact date when the reminder will fire. This is only valid for a type of By Date(0)."/>
+    </properties>
+    
+  </object>
+</library>

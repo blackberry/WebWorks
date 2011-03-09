@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="true">
+  <object name="blackberry.phone.PhoneLogs" shortName="PhoneLogs" comment="A container to maintain a list of CallLog objects that together represent the call log for phone calls stored in the message list.">
+    <features>
+      <feature id="blackberry.phone.Find" version="1.0.0.0" required="true">Find Object</feature>
+      <feature id="blackberry.phone.PhoneLogs" version="1.0.0.0" required="true">Phone Logs Object</feature>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Display the number of 'missed' call logs
+  var res = blackberry.phone.PhoneLogs.numberOfCalls(blackberry.phone.PhoneLogs.FOLDER_MISSED_CALLS);
+  alert("Number of missed calls: " + res);
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  //Display if 'normal' call log was successfully deleted at index specified
+  var index = 1;
+  var res = blackberry.phone.PhoneLogs.deleteCallAt(index, blackberry.phone.PhoneLogs.FOLDER_NORMAL_CALLS);
+  alert("Is deleting normal call at index: " + index + " succeeded? " + res);
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Display 'normal' call log retrieved at index specified
+  var index = 1;
+  var res = blackberry.phone.PhoneLogs.callAt(index, blackberry.phone.PhoneLogs.FOLDER_NORMAL_CALLS);
+  alert("CallLog retreived: " + res);
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Register with phone log listener to be notified with its events
+  // Here, we are interested to get notified regarding all possible events other than phone log removal 
+  alert("Registering for phone log events.. ");
+  var res = blackberry.phone.PhoneLogs.addPhoneLogListener(OnCallLogAdded, /*OnCallLogRemoved*/ null, OnCallLogUpdated, OnReset);
+  alert("Registered for phone log events: " + res);
+
+  // Invoked when a new call log added
+  function OnCallLogAdded(callLog) {
+    alert("Call Log Added!");
+  }
+
+  // Invoked when a call log has been updated
+  function OnCallLogUpdated(newCallLog, oldCallLog) {
+    alert("Call Log Updated!");
+  }
+
+  // Invoked to reset the log
+  function OnReset() {
+    alert("Log Reset!");
+  }
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Iterating through array of 'normal' call logs matching the find criteria
+  var filter = new blackberry.phone.Find.FilterExpression("duration", ">", 3);
+  var found = blackberry.phone.PhoneLogs.find(filter, blackberry.phone.PhoneLogs.FOLDER_NORMAL_CALLS, "duration", 6, false);
+  if (found) {
+    alert("Length of find return is: " + found.length);
+
+    for (i = 0; i < found.length; i++) {
+        alert((i + 1) + "->duration: Duration=" + found[i].duration + ", name:" + found[i].name);
+    }
+  }
+</script>]]></example>
+    
+    <constants comment="Phone logs folder ID.">
+      <const name="FOLDER_MISSED_CALLS" type="Number" value="0" static="true" comment="Folder ID for the missed call folder."/>
+      <const name="FOLDER_NORMAL_CALLS" type="Number" value="1" static="true" comment="Folder ID for other (not missed) calls."/>
+    </constants>
+    
+    <functions>
+      <func name="numberOfCalls" returns="Number" static="true" comment="Retrieves the number of calls in a given phone log folder.">
+        <param name="folderID" type="Number" comment="ID of the folder to check (one of the FOLDER_* values)."/>
+      </func>
+      <func name="deleteCallAt" returns="Boolean" static="true" comment="Deletes a call from the log. The call will be removed from the appropriate list.">
+        <param name="index" type="Number" comment="Index of the call log to delete, from 0 to numberOfCalls(folderID) - 1"/>
+        <param name="folderID" type="Number" comment="ID of the folder containing the call log to delete (one of the FOLDER_* values)."/>
+      </func>
+      <func name="callAt" returns="CallLog" static="true" comment="Retrieves a particular call from the appropriate log folder by index.">
+        <param name="index" type="Number" comment="The index of the call in the phone log, from 0 to numberOfCalls(folderID) - 1"/>
+        <param name="folderID" type="Number" comment="ID of the folder from which to retrieve the call, (one of the FOLDER_* constants)"/>
+      </func>
+      <func name="find" returns="CallLog" static="true" array="true" comment="This method lookup the CallLog that match the expression provided.">
+        <param name="filter" type="FilterExpression" optional="true" comment="optional expression parameter that defines the search criteria for the find. If no value is provided all the Logs are suitable."/>
+        <param name="folderID" type="Number" optional="true" comment="optional 'folderID' parameter specifying the folder where to performed find. If 'folderID' is not supplied the search is made in the missed calls folder (FOLDER_MISSED_CALLS)."/>
+        <param name="orderBy" type="String" optional="true" comment="optional 'orderBy' parameter specifying the field which the results will be sorted by. If 'isAscending' is not supplied or 'isAscending' is true, the sort results will be in an ascending order. If 'isAscending' is false, the sort results will be in a descending order."/>
+        <param name="maxReturn" type="Number" optional="true" comment="optional integer parameter specifying the maximum number of results to return from the find.  If not supplied or set to -1, it will return all results found."/>
+        <param name="isAscending" type="Boolean" optional="true" comment="optional 'isAscending' parameter specifying whether the sort order is ascending or descending. If not supplied or set to true, the results sorted by the field specified by 'orderBy' will be in an ascending order. If set to false, the sort results will be in a descending order. If no 'orderBy' value is specified, 'isAscending' is neglected."/>
+        <details>
+          The function returns list of CallLogs that match search criteria.
+        </details>
+      </func>
+      <func name="addPhoneLogListener" returns="Boolean" static="true" comment="Registers PhoneLogListener to listen for call log events.">
+        <param name="callback" type="OnCallLogAdded" comment="Invoked when a new call log added. When invoked gets added CallLog object as a parameter."/>
+        <param name="callback" type="OnCallLogRemoved" comment="Invoked when a call log has been removed. When invoked gets removed CallLog object as a parameter."/>
+        <param name="callback" type="OnCallLogUpdated" comment="Invoked when a call log has been updated. When invoked gets updated and an old version of CallLog object as parameters."/>
+        <param name="callback" type="OnCallLogReset" comment="Invoked to reset the log, when a batch operation occurs. Implementations should release all held CallLog references and rebuild the current set."/>
+        <details>
+          Register listeners when interested in receiving call log events.
+          When you subscribe more than one callback function, every new callback set will overwrite each previous.
+          To unsubscribe from all callbacks, pass null as a parameter.
+        </details>
+      </func>
+    </functions>
+    
+    <subclasses>
+      <object name="OnCallLogAdded" shortName="OnCallLogAdded Interface" interface="true" comment="Invoked when a new call log added.">
+        <param name="addedCallLog" type="CallLog" comment="Expected to get added CallLog."/>
+        <details>
+          This is the interface that must be available on the callback function to receive the added CallLog.
+        </details>
+      </object>
+      <object name="OnCallLogRemoved" shortName="OnCallLogRemoved Interface" interface="true" comment="Invoked when a call log has been removed.">
+        <param name="removedCallLog" type="CallLog" comment="Expected to get removed CallLog."/>
+        <details>
+          This is the interface that must be available on the callback function to receive the removed CallLog.
+        </details>
+      </object>
+      <object name="OnCallLogUpdated" shortName="OnCallLogUpdated Interface" interface="true" comment="Invoked when a call log has been updated.">
+        <param name="newCallLog" type="CallLog" comment="Expected to get a new CallLog."/>
+        <param name="oldCallLog" type="CallLog" comment="Expected to get an old CallLog."/>
+        <details>
+          This is the interface that must be available on the callback function to receive the new and old CallLog after an update operation.
+        </details>
+      </object>
+      <object name="OnCallLogReset" shortName="OnCallLogReset Interface" interface="true" comment="Invoked to reset the log.">
+        <details>
+          This is the interface that must be available on the callback function to get notified when a logs reset occurs.
+        </details>
+      </object>
+    </subclasses>
+    
+  </object>
+</library>

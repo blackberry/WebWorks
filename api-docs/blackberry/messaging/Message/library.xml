@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.message.Message" whitelistName="blackberry.message" shortName="Email Message" comment="The Email Message object represents a message on the BlackBerry device. This class can be created to be used when launching the new message screen using the invoke API or for direct interaction with the message list storage itself.">
+    <details>
+      The Message object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.message" version="1.0.0"/>
+      <feature id="blackberry.identity" version="1.0.0"/>
+      <feature id="blackberry.find" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  var message = new blackberry.message.Message();
+  message.toRecipients = "noone@blackberryWidgets.com";
+  message.subject = "Hello";
+  message.body = "World";
+  message.send();
+</script>]]></example>
+    <constants comment="Status">
+      <const name="STATUS_UNKNOWN" type="Number" value="-1" readonly="true" static="true" comment="Constant representing the UNKNOWN status. The current status cannot be determined."/>
+      <const name="STATUS_SAVED" type="Number" value="0" readonly="true" static="true" comment="Constant representing the SAVED status"/>
+      <const name="STATUS_DRAFT" type="Number" value="1" readonly="true" static="true" comment="Constant representing the DRAFT status"/>
+      <const name="STATUS_SENT" type="Number" value="2" readonly="true" static="true" comment="Constant representing the SENT status"/>
+      <const name="STATUS_ERROR_OCCURED" type="Number" value="3" readonly="true" static="true" comment="Constant representing the ERROR status"/>
+    </constants>
+    
+    <constants comment="Priority">
+      <const name="PRIORITY_HIGH" type="Number" value="0" readonly="true" static="true" comment="Constant representing a HIGH priority"/>
+      <const name="PRIORITY_MEDIUM" type="Number" value="1" readonly="true" static="true" comment="Constant representing a MEDIUM priority"/>
+      <const name="PRIORITY_LOW" type="Number" value="2" readonly="true" static="true" comment="Constant representing a LOW priority"/>
+    </constants>
+    
+    <constants comment="Folder">
+      <const name="FOLDER_INBOX" type="Number" value="0" readonly="true" static="true" comment="Constant representing the INBOX folder"/>
+      <const name="FOLDER_SENT" type="Number" value="1" readonly="true" static="true" comment="Constant representing the SENT folder"/>
+      <const name="FOLDER_DRAFT" type="Number" value="2" readonly="true" static="true" comment="Constant representing the DRAFT folder"/>
+      <const name="FOLDER_OUTBOX" type="Number" value="3" readonly="true" static="true" comment="Constant representing the OUTBOX folder"/>
+      <const name="FOLDER_DELETED" type="Number" value="4" readonly="true" static="true" comment="Constant representing the DELETED folder"/>
+      <const name="FOLDER_OTHER" type="Number" value="5" readonly="true" static="true" comment="Constant representing an OTHER folder"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="The constructor will create a new instance of the Message for the proper targeted recipient.">
+        <param name="service" optional="true" type="blackberry.identity.Service" comment="optional parameter that specifies the type of service that is expected.  This value can specify the email service to create an email message for.  If no parameter is specified the default email service will be used."/>
+      </ctor>
+    </constructors>
+    
+    <functions comment="[Static]">
+      <func name="find" returns="Message" static="true" array="true" comment="This method looks up the messages that match the expression provided.">
+        <param name="filter" type="blackberry.find.FilterExpression" optional="true" comment="optional parameter that defines the search criteria for the find.  If no value is provided the method will return all the Messages on the device for the service provided."/>
+        <param name="maxReturn" type="Number" optional="true" comment="optional integer parameter specifying the maximum number of results to return from the find.  If no value is specified, it will return all results found."/>
+        <param name="service" type="blackberry.identity.Service" optional="true" comment="optional parameter to define which service you wish to search for your messages. If not provided the default service for messages will be used."/>
+        <details>
+          The function returns list of Messages that match search criteria.
+        </details>
+      </func>
+    </functions>
+    
+    <functions>
+      <func name="save" returns="void" static="false" comment="This method will save the changes made to the message object.">
+        <details>
+          On a successful save of a new message the uid attribute will be filled in with its new value.
+        </details>
+      </func>
+      <func name="send" returns="void" static="false" comment="This method will send the message to its recipients.">
+        <details>
+          If the message isn't a new message or a draft, an exception will be thrown. On a successful save of a new message the uid attribute will be filled in with its new value. If the message has invalid fields an exception will be thrown.
+        </details>
+      </func>
+      <func name="remove" returns="void" static="false" comment="This method will remove a message from the PIM storage.">
+        <details>
+          If the message has not been previously saved, an exception will be thrown.
+        </details>
+      </func>
+    </functions>
+    <properties>
+      <property name="toRecipients" type="String" static="false" comment="Contains a list of the addresses that this message should be sent to; they are delimited by any white spaces (for example, space or '\n'), a semicolon, or a comma."/>
+      <property name="ccRecipients" type="String" static="false" comment="Contains a list of the addresses that this message should be cc'd to; they are delimited by any white spaces (for example, space or '\n'), a semicolon, or a comma."/>
+      <property name="bccRecipients" type="String" static="false" comment="Contains a list of the addresses that this message should be bcc'd to; they are delimited by any white spaces (for example, space or '\n'), a semicolon, or a comma."/>
+      <property name="subject" type="String" static="false" comment="Contains the subject of the message."/>
+      <property name="body" type="String" static="false" comment="Contains the body of the message."/>
+      <property name="from" type="String" readonly="true" static="false" comment="Contains the address that this message is sent from. This field is read-only; it is automatically filled in for created messages once they are sent."/>
+      <property name="replyTo" type="String" readonly="true" static="false" comment="Contains the address that the reply to this message should be sent to."/>
+      <property name="folder" type="Number" static="false" comment="Specifies which folder this message is in. This field is read-only. Created messages that are sent are put in the Sent folder. Can be one of the the FOLDER_* constants."/>
+      <property name="priority" type="Number" static="false" comment="Specifies the priority of the message. Can be one of the PRIORITY_* constants."/>
+      <property name="status" type="Number" readonly="true" static="false" comment="Specifies the status of the message. Can be one of the STATUS_* constants."/>
+      <property name="uid" type="Number" readonly="true" static="false" comment="Contains the unique identifier for this message."/>
+    </properties>
+    
+  </object>
+</library>
+

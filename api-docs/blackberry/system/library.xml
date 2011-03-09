@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.system">
+    <entryClass>blackberry.system.SystemExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  
+  <features>
+    <feature id="blackberry.system" version="1.0.0"/>
+    <feature id="blackberry.system.event" version="1.0.0"/>
+  </features>
+  
+  <object name="blackberry.system" shortName="System" introduced="1.0.0" comment="The System object allows you to get access to system level functions and attributes of the BlackBerry device.">
+    <details>
+      The System object is static; all of its functions and properties are used directly from the object.
+    </details>
+    <example><![CDATA[<script type="text/javascript">
+  // See if we are in coverage 
+  if (!blackberry.system.hasDataCoverage()) {
+    alert("you are not in coverage, we will attempt to send later");
+  }
+  else if ((blackberry.network == "GPRS") && (blackberry.system.hasCapability("network.wlan"))) {
+    if (confirm("You are in coverage, but it is a lot of data to send over GPRS, do you want to wait until you are connected to a WiFi hotspot before transmitting?")) {
+      // Do Transmit
+    } else {
+      // Wait until later
+    }
+  }   
+</script>]]></example>
+    <constants comment="">
+      <const name="ALLOW" type="Number" readonly="true" value="0" comment="Returned by hasPermission() indicating that the module requested is accessible."/>
+      <const name="DENY" type="Number" readonly="true" value="1" comment="Returned by hasPermission() indicating that the module is not accessible."/>
+      <const name="PROMPT" type="Number" readonly="true" value="2" comment="Returned by hasPermission() indicating that the user will be prompted when accessing the requested module."/>
+    </constants>
+    <functions>
+      <func name="hasPermission" returns="Number" static="true" comment="Determines the level of access to the requested module.">
+        <param name="module" type="String" comment="which BlackBerry Widget Toolkit namespace or class to check for access.  For example blackberry.system, blackberry.pim.Contact."/>
+        <details>
+          The possible return values:
+          0 - ALLOW
+          1 - DENY
+          2 - PROMPT
+        </details>
+      </func>
+      <func name="hasCapability" returns="Boolean" static="true" comment="This method will determine if the device is capable of the given service.">
+        <param name="capability " type="String" comment="The capability being checked for."/>
+        <details>
+          hasCapability() returns true if the device is capable of the service; false otherwise.
+          
+          The supported string values for 'capability' are:
+          
+          input.keyboard.issuretype  (returns if the user is currently using SureType),
+          input.touch,
+          media.audio.capture,
+          media.video.capture,
+          media.recording,
+          location.gps,
+          location.maps,
+          storage.memorycard (checks for an EXTERNAL SD card only),
+          network.bluetooth,
+          
+          network.wlan (WLAN wireless family includes 802.11, 802.11a, 802.11b, 802.11g),
+          network.3gpp (3GPP wireless family includes GPRS, EDGE, UMTS, GERAN, UTRAN, and GAN),
+          
+          network.cdma (CDMA wireless family includes CDMA1x and EVDO),
+          and network.iden.
+        </details>
+      </func>
+      <func name="setHomeScreenBackground" returns="void" static="true" comment="Sets the background of the home screen to the specified image.">
+        <param name="filePath" type="String" comment="specifies the local file path of the image to set as the desktop image."/>
+        <details>
+          The filePath must be an image file residing in flash memory or SD Card. The typical format for the URI would be file:///store/home/user/pictures/file.jpg.
+        </details>
+      </func>
+      
+      <func name="hasDataCoverage" returns="Boolean" static="true" comment="Returns true if the device is in coverage, otherwise returns false. This can be used in conjunction with the blackberry.network property to find out what kind of coverage it is in.">
+      </func>
+      
+      <func name="isMassStorageActive" returns="Boolean" static="true" comment="Returns whether USB MassStorage is active.">
+      </func>
+      
+    </functions>
+    
+    <properties>
+      <property name="hasDataCoverage" type="Boolean" readonly="true" static="true" comment="Returns true if the device is in coverage.  This can be used in conjunction with the blackberry.network property to find out what kind of coverage it is in."/>
+      <property name="softwareVersion" type="String" readonly="true" static="true" comment="Returns the current version of the operating system, for example, 4.6.0.190."/>
+      <property name="model" type="String" readonly="true" static="true" comment="Returns the model number of the device, for example, 8800 or 8110."/>
+    </properties>
+    
+  </object>
+</library>

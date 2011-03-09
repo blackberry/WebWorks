@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.invoke">
+    <entryClass>blackberry.invoke.InvokeExtension</entryClass>
+
+    <dependencies>
+      <extension id="blackberry.identity"/>
+      <extension id="blackberry.message"/>
+      <extension id="blackberry.pim"/>
+    </dependencies>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  
+  <features>
+    <feature id="blackberry.invoke" version="1.0.0" required="true">blackberry.invoke</feature>
+    <feature id="blackberry.invoke.AddressBookArguments" version="1.0.0" required="true">blackberry.invoke.AddressBookArguments</feature>
+    <feature id="blackberry.invoke.BrowserArguments" version="1.0.0" required="true">blackberry.invoke.BrowserArguments</feature>
+    <feature id="blackberry.invoke.CalendarArguments" version="1.0.0" required="true">blackberry.invoke.CalendarArguments</feature>
+    <feature id="blackberry.invoke.CameraArguments" version="1.0.0" required="true">blackberry.invoke.CameraArguments</feature>
+    <feature id="blackberry.invoke.JavaArguments" version="1.0.0" required="true">blackberry.invoke.JavaArguments</feature>
+    <feature id="blackberry.invoke.MapsArguments" version="1.0.0" required="true">blackberry.invoke.MapsArguments</feature>
+    <feature id="blackberry.invoke.MemoArguments" version="1.0.0" required="true">blackberry.invoke.MemoArguments</feature>
+    <feature id="blackberry.invoke.MessageArguments" version="1.0.0" required="true">blackberry.invoke.MessageArguments</feature>
+    <feature id="blackberry.invoke.PhoneArguments" version="1.0.0" required="true">blackberry.invoke.PhoneArguments</feature>
+    <feature id="blackberry.invoke.SearchArguments" version="1.0.0" required="true">blackberry.invoke.SearchArguments</feature>
+    <feature id="blackberry.invoke.TaskArguments" version="1.0.0" required="true">blackberry.invoke.TaskArguments</feature>
+  </features>
+  
+  <object name="blackberry.invoke" shortName="Invoke" introduced="1.0.0" comment="The Invoke object contains methods that interact with other applications on a BlackBerry smartphone.">
+    <details>
+      <![CDATA[
+The invoke() method on the invoke object allows you to pass arguments to the target application.  The types of arguments can be one of: AddressBookArguments, CalendarArguments, MapsArguments, MemoArguments, MessageArguments, PhoneArguments, SearchArguments, TaskArguments, CameraArguments, BrowserArguments, and JavaArguments.
+      ]]>
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0" required="true">blackberry.invoke</feature>
+      <feature id="blackberry.invoke.AddressBookArguments" version="1.0.0" required="true">blackberry.invoke.AddressBookArguments</feature>
+      <feature id="blackberry.invoke.BrowserArguments" version="1.0.0" required="true">blackberry.invoke.BrowserArguments</feature>
+      <feature id="blackberry.invoke.CalendarArguments" version="1.0.0" required="true">blackberry.invoke.CalendarArguments</feature>
+      <feature id="blackberry.invoke.CameraArguments" version="1.0.0" required="true">blackberry.invoke.CameraArguments</feature>
+      <feature id="blackberry.invoke.JavaArguments" version="1.0.0" required="true">blackberry.invoke.JavaArguments</feature>
+      <feature id="blackberry.invoke.MapsArguments" version="1.0.0" required="true">blackberry.invoke.MapsArguments</feature>
+      <feature id="blackberry.invoke.MemoArguments" version="1.0.0" required="true">blackberry.invoke.MemoArguments</feature>
+      <feature id="blackberry.invoke.MessageArguments" version="1.0.0" required="true">blackberry.invoke.MessageArguments</feature>
+      <feature id="blackberry.invoke.PhoneArguments" version="1.0.0" required="true">blackberry.invoke.PhoneArguments</feature>
+      <feature id="blackberry.invoke.SearchArguments" version="1.0.0" required="true">blackberry.invoke.SearchArguments</feature>
+      <feature id="blackberry.invoke.TaskArguments" version="1.0.0" required="true">blackberry.invoke.TaskArguments</feature>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+  var contact = new blackberry.pim.Contact();
+  contact.firstName = 'John';
+  contact.lastName = 'Smith';
+          
+  var args = new blackberry.invoke.AddressBookArguments(contact);
+  args.view = blackberry.invoke.AddressBookArguments.VIEW_NEW;
+
+  blackberry.invoke.invoke(blackberry.invoke.APP_ADDRESSBOOK, args);      
+</script>]]></example>
+    
+    <constants comment="Application Type">
+      <const name="APP_ADDRESSBOOK" type="Number" value="0" readonly="true" static="true" comment="Address Book"/>
+      <const name="APP_BLUETOOTH_CONFIG" type="Number" value="1" readonly="true" static="true" comment="Bluetooth Configuration"/>
+      <const name="APP_CALCULATOR" type="Number" value="2" readonly="true" static="true" comment="Calculator"/>
+      <const name="APP_CALENDAR" type="Number" value="3" readonly="true" static="true" comment="Calendar"/>
+      <const name="APP_CAMERA" type="Number" value="4" readonly="true" static="true" comment="Camera"/>
+      <const name="APP_MAPS" type="Number" value="5" readonly="true" static="true" comment="BlackBerry Maps"/>
+      <const name="APP_MEMOPAD" type="Number" value="6" readonly="true" static="true" comment="MemoPad"/>
+      <const name="APP_MESSAGES" type="Number" value="7" readonly="true" static="true" comment="Messages"/>
+      <const name="APP_PHONE" type="Number" value="8" readonly="true" static="true" comment="Phone"/>
+      <const name="APP_SEARCH" type="Number" value="9" readonly="true" static="true" comment="Search"/>
+      <const name="APP_TASKS" type="Number" value="10" readonly="true" static="true" comment="Tasks"/>
+      <const name="APP_BROWSER" type="Number" value="11" readonly="true" static="true" comment="Browser"/>
+      <const name="APP_JAVA" type="Number" value="12" readonly="true" static="true" comment="Java Application"/>
+    </constants>
+    
+    <functions comment="[Static]">
+      <func name="invoke" returns="void" static="true" comment="Invokes another application on the BlackBerry smartphone.">
+        <param name="appType" type="Number" comment="an integer value representing the type of application to launch. Can be one of the 'APP_*' constants."/>
+        <param name="args" type="Object" optional="true" comment="An arguments object specifying information for the application being invoked."/>
+        <details>
+          Throws an Exception if values supplied are not correct.
+        </details>
+      </func>
+    </functions>
+    
+  </object>
+</library>
+
+
+
+
+
+

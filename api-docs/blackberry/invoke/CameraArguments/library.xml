@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.CameraArguments" shortName="CameraArguments" version="1.0.0" comment="The CameraArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Camera application or Recorder application.">
+    <details>
+      The CameraArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.CameraArguments" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">    
+  var args = new blackberry.invoke.CameraArguments();
+  args.view = 1; // Video Recorder
+     
+  blackberry.invoke.invoke(blackberry.invoke.APP_CAMERA, args);  // Video Recorder Application
+</script>]]></example>
+    <constants comment="View">
+      <const name="VIEW_CAMERA" type="Number" value="0" comment="Photo Camera"/>
+      <const name="VIEW_RECORDER" type="Number" value="1" comment="Video Recorder"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new CameraArguments object.">
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="view" type="Number" static="false" comment="Value that specifies what kind of camera application you want to open."/>
+    </properties>
+    
+  </object>
+</library>

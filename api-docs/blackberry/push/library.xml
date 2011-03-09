@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.push">
+    <entryClass>blackberry.push.PushExtension</entryClass>
+    
+    <dependencies>
+      <extension id="blackberry.identity"/>
+    </dependencies>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR"/>
+      <target version="5.0" config="JAVA_XHR_BlackBerry"/>
+    </platform>
+  </platforms>
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript"/>
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript"/>
+    </configuration>
+  </configurations>
+  <features>
+    <feature id="blackberry.push" version="1.0.0"/>
+  </features>
+  
+  <object name="blackberry.push" shortName="Push" introduced="1.0.0" comment="The Push object allows you to leverage the BlackBerry push architecture to receive push data in your application.">
+    <example><![CDATA[<script  type="text/javascript">
+  var port = 1234; 
+
+  function doMySubscription() {
+    //See if they have a BIS transport.. if so use it
+    var transports = blackberry.system.getTransportList();
+    found = false;
+    for (var i = 0; i < transports.length; i++) {
+      if (transports[i].name == "BIS") {
+        found = true;
+        blackberry.push.openPushListener(handleMyReturnData, port, transport[i]);
+        break;
+      }
+    }
+    if (!found)
+      blackberry.push.openPushListener(handleMyReturnData, port);
+  }
+
+  function handleMyReturnData(data) {
+    if (data != null) {
+      var myRecievedData= blackberry.utils.blobToString(data.payload)
+      alert(myRecievedData);
+    }
+    else
+      alert("No data from the push");
+  }
+
+  function cancelSubscription() {
+    blackberry.push.closePushListener(port);
+  }
+</script>]]></example>
+    
+    <subclasses>
+      <object name="OnData" shortName="OnData Interface" interface="true" comment="Interface to implement on the callback function when data is received.">
+        <param name="data" type="blackberry.push.Data" comment="Object that contains the data that was just received"/>
+        <details>
+          This is the interface that must be available on the callback function to receive push data
+        </details>
+      </object>
+    </subclasses>
+    
+    <functions>
+      <func name="openPushListener" returns="void" static="true" comment="Registers a callback method that will be called when new data has been pushed to the device.">
+        <param name="callback" type="OnData" comment="JavaScript function to be called when new data arrives."/>
+        <param name="port" type="Number" comment="Integer port number to listen on for push data."/>
+        <param name="transport" type="blackberry.identity.Transport" optional="true" comment="optional parameter where you can choose which communications transport you wish to listen on."/>
+        <param name="maxQueueCap" type="Number" optional="true" comment="optional parameter that specifies how many messages the widget should queue if the port was not closed, but a function handler was lost (for example, during a page transition). See details."/>
+        <details>
+          The function that is assigned as the callback function will be called with one parameter passed to it. The object passed to the callback function is of type blackberry.push.Data which has a payload property that is a Blob as described in Gears. The developer can then retrieve the data either as the Blob or use .toString() if the data contained in the blob is a string.  Furthermore, the callback function must return an integer (one of constants described in blackberry.push.Data) indicating if the push message is accepted or declined.
+          
+          Since the state for JavaScript for a web page is only as long as the web page is being viewed, there is a need for the widget to maintain the open port for push information.  This allows this listening for push data to remain open between page transitions.
+          
+          If no current active callback is assigned to the push listener, the widget will queue the push data (limiting the number of messages using maxQueueCap if available) for the application until a subsequent openPushListener call is made for that port.  At that point it will then pass the data to the subscribed callback function.
+          
+          To subscribe to the same previously opened push port on a new web page, a secondary call to openPushListener is called.  In this scenario it will re-assign the callback provided to the already open port.  If calling openPushListener on a page where the port is already open, the callback will be updated to use the latest one passed in.  NOTE: In such cases where consecutive calls to openPushListener occurs on the page, the transport argument will only be used on the first call, and ignored for all others.
+          Any calls to openPushListener should have matching calls to closePushListener to ensure ports are not left open accidentally.
+        </details>
+      </func>
+      <func name="closePushListener" static="true" returns="void" comment="Closes the listening connection for an already open push channel.">
+        <param name="port" type="Number" comment="Unique listener integer port used in the original openPushListener method."/>
+        <details>
+          When this close is called, it will stop listening for incoming data on the push port.
+        </details>
+      </func>
+    </functions>
+    
+  </object>
+</library>

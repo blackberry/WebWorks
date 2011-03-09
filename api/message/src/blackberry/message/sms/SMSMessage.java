@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -45,30 +45,61 @@ public class SMSMessage {
 
     private Date _date;
 
-    public SMSMessage(String body, String phoneNumber) {
-        this(body, phoneNumber, new Date());
+    /**
+     * Constructs a SMSMessage object.
+     * 
+     * @param body
+     *            The message body
+     * @param phoneNumber
+     *            The phone number
+     */
+    public SMSMessage( String body, String phoneNumber ) {
+        this( body, phoneNumber, new Date() );
     }
 
-    public SMSMessage(String body, String phoneNumber, Date date) {
+    /**
+     * Constructs a SMSMessage object.
+     * 
+     * @param body
+     *            The message body
+     * @param phoneNumber
+     *            The phone number
+     * @param date
+     *            The date
+     */
+    public SMSMessage( String body, String phoneNumber, Date date ) {
         _body = body;
         _phoneNumber = phoneNumber;
         _date = date;
     }
 
-    public SMSMessage() {
-    }
-
+    /**
+     * Returns the message content.
+     * 
+     * @return The message content
+     */
     public String getContent() {
         return _body;
     }
 
+    /**
+     * Returns the message address.
+     * 
+     * @return The message address
+     */
     public String getAddress() {
         return _phoneNumber;
     }
 
+    /**
+     * Returns the message date.
+     * 
+     * @return The message date
+     */
     public Date getDate() {
         return _date;
     }
+
     /**
      * Returns a Message object representing this SMS message
      * 
@@ -76,10 +107,10 @@ public class SMSMessage {
      *            The MessageConnection source with which to create the Message from
      * @return The Message object representing the SMS message
      */
-    public Message toMessage(MessageConnection mc) {
+    public Message toMessage( MessageConnection mc ) {
         String addressString = "//" + _phoneNumber;
-        TextMessage m = (TextMessage) mc.newMessage(MessageConnection.TEXT_MESSAGE, addressString);
-        m.setPayloadText(_body);
+        TextMessage m = (TextMessage) mc.newMessage( MessageConnection.TEXT_MESSAGE, addressString );
+        m.setPayloadText( _body );
         return m;
     }
 
@@ -90,15 +121,15 @@ public class SMSMessage {
      *            The DatagramConnectionBase object with which to create the Datagram from
      * @return The Datagram object representing the SMS message
      */
-    public Datagram toDatagram(DatagramConnectionBase datagramConnectionBase) throws IOException {
+    public Datagram toDatagram( DatagramConnectionBase datagramConnectionBase ) throws IOException {
         DatagramBase datagram = null;
-        byte[] data = _body.getBytes("ISO-8859-1");
+        byte[] data = _body.getBytes( "ISO-8859-1" );
         datagram = (DatagramBase) datagramConnectionBase.newDatagram();
-        SmsAddress smsAddress = new SmsAddress("//" + _phoneNumber);
+        SmsAddress smsAddress = new SmsAddress( "//" + _phoneNumber );
         SMSPacketHeader smsPacketHeader = smsAddress.getHeader();
-        smsPacketHeader.setMessageCoding(SMSPacketHeader.MESSAGE_CODING_ISO8859_1);
-        datagram.setAddressBase(smsAddress);
-        datagram.write(data, 0, data.length);
+        smsPacketHeader.setMessageCoding( SMSPacketHeader.MESSAGE_CODING_ISO8859_1 );
+        datagram.setAddressBase( smsAddress );
+        datagram.write( data, 0, data.length );
 
         return datagram;
     }

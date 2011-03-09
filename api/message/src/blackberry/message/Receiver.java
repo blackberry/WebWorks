@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,15 +19,23 @@ import java.io.IOException;
 
 import javax.microedition.io.Connection;
 
+/**
+ * Message receiver thread.
+ * 
+ * @author dmeng
+ *
+ */
 public abstract class Receiver extends Thread {
     protected Connection _connection;
-
     protected ReceiveListenerRegistry listenerRegistry;
-
     private boolean running = false;
-
     public abstract String getProtocol();
 
+    /**
+     * Starts or pauses the receiver.
+     * 
+     * @param letRun <code>true</code> to run the start the receiver; <code>false</code> to pause it.
+     */
     public void signal(boolean letRun) {
         if (letRun && !isRunning()) {
             start();
@@ -37,6 +45,9 @@ public abstract class Receiver extends Thread {
         }
     }
     
+    /**
+     * @see java.laung.Thread#run()
+     */
     public void run() {
         try {
             listenForMessages();
@@ -54,20 +65,41 @@ public abstract class Receiver extends Thread {
         }
     }
 
+    /**
+     * Listens for messages.
+     * 
+     * @throws Exception exception occur during the listening
+     */
     protected abstract void listenForMessages() throws Exception;
 
-    public Object addReceiveListener() throws Exception {
+    /**
+     * Adds a message listener.
+     * 
+     * @return The <code>ScriptableFunction</code> to be executed.
+     */
+    public Object addReceiveListener() {
         return listenerRegistry.add();
     }
 
+    /**
+     * Removes a message listener.
+     * 
+     * @return The <code>ScriptableFunction</code> to be executed.
+     */
     public Object removeReceiveListener() {
         return listenerRegistry.remove();
     }
 
+    /**
+     * Pauses the message receiver.
+     */
     public void pause() {
         running = false;
     }
 
+    /**
+     * Starts the message receiver.
+     */
     public void start() {
         running = true;
         if (!isAlive()) {
@@ -75,6 +107,11 @@ public abstract class Receiver extends Thread {
         }
     }
 
+    /**
+     * Returns if the message receiver is running.
+     * 
+     * @return <code>true</code> if yes; <code>false</code> otherwise
+     */
     public boolean isRunning() {
         return isAlive() && running;
     }

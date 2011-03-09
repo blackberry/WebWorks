@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.MemoArguments" shortName="MemoArguments" introduced="1.0.0" comment="The MemoArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Memo application.">
+    <details>
+      The MemoArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.MemoArguments" version="1.0.0"/>
+      <feature id="blackberry.pim.Memo" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+  var memo = new blackberry.pim.Memo();
+  memo.title = 'Oranges I like';
+  memo.note = 'Sunkist';
+  
+  var args = new blackberry.invoke.MemoArguments(memo);
+  args.view = 0; // New
+   
+  blackberry.invoke.invoke(blackberry.invoke.APP_MEMOPAD, args);  // Memo Pad
+</script>]]></example>
+    
+    <constants comment="View">
+      <const name="VIEW_NEW" type="Number" value="0" comment="New View"/>
+      <const name="VIEW_EDIT" type="Number" value="1" comment="Edit View"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new MemoArguments object.">
+        <param name="memo" optional="true" type="blackberry.pim.Memo" comment="Memo to view in MemoPad application."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="view" type="Number" static="false" comment="Value that specifies what kind of view you want to view the memo in MemoPad application."/>
+    </properties>
+    
+  </object>
+</library>

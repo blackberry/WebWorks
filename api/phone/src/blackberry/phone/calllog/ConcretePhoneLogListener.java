@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,16 +25,16 @@ public class ConcretePhoneLogListener extends ScriptableFunction implements Phon
 
     public static final String NAME = "addPhoneLogListener";
 
-    private final UiApplication _uiAppliation = UiApplication.getUiApplication();
+    private final UiApplication _uiApplication = UiApplication.getUiApplication();
 
     private ScriptableFunction[] _callbackArray = null;
     private boolean _listenerOn = false;
 
-    private final int CB_CALL_LOG_ADDED_INDEX = 0;
-    private final int CB_CALL_LOG_REMOVED_INDEX = 1;
-    private final int CB_CALL_LOG_UPDATED_INDEX = 2;
-    private final int CB_CALL_LOG_RESET_INDEX = 3;
-    private final int CALLBACK_SIZE = 4;
+    private static final int CB_CALL_LOG_ADDED_INDEX = 0;
+    private static final int CB_CALL_LOG_REMOVED_INDEX = 1;
+    private static final int CB_CALL_LOG_UPDATED_INDEX = 2;
+    private static final int CB_CALL_LOG_RESET_INDEX = 3;
+    private static final int CALLBACK_SIZE = 4;
 
     private static ConcretePhoneLogListener _instance;
 
@@ -97,8 +97,7 @@ public class ConcretePhoneLogListener extends ScriptableFunction implements Phon
     public void callLogAdded(final CallLog callLog) {
         if (_callbackArray != null && _callbackArray[CB_CALL_LOG_ADDED_INDEX] != null) {
             final CallLogObject callLogObject = new CallLogObject(callLog);
-
-            _uiAppliation.invokeLater(new Runnable() {
+            _uiApplication.invokeLater(new Runnable() { 
                 public void run() {
                     try {
                         new Thread(new Runnable() {
@@ -120,7 +119,7 @@ public class ConcretePhoneLogListener extends ScriptableFunction implements Phon
     public void callLogRemoved(final CallLog callLog) {
         if (_callbackArray != null && _callbackArray[CB_CALL_LOG_REMOVED_INDEX] != null) {
             final CallLogObject callLogObject = new CallLogObject(callLog);
-            _uiAppliation.invokeLater(new Runnable() {
+            _uiApplication.invokeLater(new Runnable() {
                 public void run() {
                     try {
                         new Thread(new Runnable() {
@@ -143,7 +142,7 @@ public class ConcretePhoneLogListener extends ScriptableFunction implements Phon
         if (_callbackArray != null && _callbackArray[CB_CALL_LOG_UPDATED_INDEX] != null) {
             final CallLogObject newCallLogObject = new CallLogObject(newCallLog);
             final CallLogObject oldCallLogObject = new CallLogObject(oldCallLog);
-            _uiAppliation.invokeLater(new Runnable() {
+            _uiApplication.invokeLater(new Runnable() {
                 public void run() {
                     try {
                         new Thread(new Runnable() {
@@ -164,7 +163,7 @@ public class ConcretePhoneLogListener extends ScriptableFunction implements Phon
     /* @Override */
     public void reset() {
         if (_callbackArray != null && _callbackArray[CB_CALL_LOG_RESET_INDEX] != null) {
-            _uiAppliation.invokeLater(new Runnable() {
+            _uiApplication.invokeLater(new Runnable() {
                 public void run() {
                     try {
                         new Thread(new Runnable() {

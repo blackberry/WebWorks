@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.message.sms" shortName="SMS" comment="Provides static functions to send SMS messages">
+    <detail>
+      Provides static functions to send and receiveSMS messages
+    </detail>
+    
+    <features>
+      <feature id="blackberry.message.sms" version="1.0.0.0" required="true"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  blackberry.message.sms.send("hello world", "987654321");
+
+  var listener = function (msg, from, date) {
+    alert(from+" "+msg+" "+date);
+  }
+
+  blackberry.message.sms.isListeningForMessage = true;
+  blackberry.message.sms.addReceiveListener(listener);
+
+  if (blackberry.message.sms.removeReceiveListener()){
+    alert("Listener removed successfully.");
+    blackberry.message.sms.isListeningForMessage = false;
+  }
+</script>]]></example>
+    
+    <properties>
+      <property name="isListeningForMessage" type="Boolean" readonly="false" static="true" comment="determine whether the message listeners are activated"/>
+    </properties>
+    <functions>
+      <func name="send" static="true" returns="Undefined"
+       comment="Static function to send out an SMS message">
+        <param name="message" type="String"
+         comment="The text that should be sent"/>
+        
+        <param name="address" type="String"
+         comment="Address where the message should be delivered to."/>
+      </func>
+      
+      <func name="addReceiveListener" static="true" returns="Undefined"
+       comment="SMS listener to receive a message when it arrives">
+        <param name="callback" type="function(String, String, Date)"
+         comment="Callback function that is invoked when a new SMS message is received. Overwrites the previous callback. The parameters are: message, sender, and date."/>
+      </func>
+      
+      <func name="removeReceiveListener" static="true" returns="Boolean"
+       comment="Remove the registered listener. Return false if there is no listener"/>
+    </functions>
+  </object>
+</library>

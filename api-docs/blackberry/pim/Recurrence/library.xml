@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Recurrence" shortName="Recurrence" introduced="1.0.0" comment="The Recurrence object is used to represent the repetition rules for an appointment or a task.">
+    <details>
+      Examples of this rule could be to setup an appointment on a weekly or monthly basis. The Recurrence object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.pim.Recurrence" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  // Create our Event 
+  var newAppt = new blackberry.pim.Appointment();
+  newAppt.location = "Your office";
+  newAppt.summary = "Talk about project";
+  newAppt.freeBusy = 0; // Free
+
+  // Create Recurrence
+  newAppt.recurrence = new blackberry.pim.Recurrence();
+  newAppt.recurrence.frequency = blackberry.pim.Recurrence.DAILY;
+  newAppt.save();
+</script>]]></example>
+
+    <constants comment="Frequency">
+      <const name="NO_REPEAT" type="Number" value="0" comment="Indicates no recurrence"/>
+      <const name="DAILY" type="Number" value="1" comment="Indicates repetition daily"/>
+      <const name="WEEKLY" type="Number" value="2" comment="Indicates repetition weekly"/>
+      <const name="MONTHLY" type="Number" value="3" comment="Indicates repetition monthly"/>
+      <const name="YEARLY" type="Number" value="4" comment="Indicates repetition yearly"/>
+    </constants>
+    <constants comment="Constant for the month used with monthInYear">
+      <const name="JANUARY" type="Number" value="0x20000" comment="Constant representing the month of January"/>
+      <const name="FEBRUARY" type="Number" value="0x40000" comment="Constant representing the month of February"/>
+      <const name="MARCH" type="Number" value="0x80000" comment="Constant representing the month of March"/>
+      <const name="APRIL" type="Number" value="0x100000" comment="Constant representing the month of April"/>
+      <const name="MAY" type="Number" value="0x200000" comment="Constant representing the month of May"/>
+      <const name="JUNE" type="Number" value="0x400000" comment="Constant representing the month of June"/>
+      <const name="JULY" type="Number" value="0x800000" comment="Constant representing the month of July"/>
+      <const name="AUGUST" type="Number" value="0x1000000" comment="Constant representing the month of August"/>
+      <const name="SEPTEMBER" type="Number" value="0x2000000" comment="Constant representing the month of September"/>
+      <const name="OCTOBER" type="Number" value="0x4000000" comment="Constant representing the month of October"/>
+      <const name="NOVEMBER" type="Number" value="0x8000000" comment="Constant representing the month of November"/>
+      <const name="DECEMBER" type="Number" value="0x10000000" comment="Constant representing the month of December"/>
+    </constants>
+    <constants comment="Constant for the day of week used with weekInMonth">
+      <const name="FIRST" type="Number" value="0x1" comment="Constant for the FIRST day of the week used with weekInMonth"/>
+      <const name="SECOND" type="Number" value="0x2" comment="Constant for the SECOND day of the week used with weekInMonth"/>
+      <const name="THIRD" type="Number" value="0x4" comment="Constant for the THIRD day of the week used with weekInMonth"/>
+      <const name="FOURTH" type="Number" value="0x8" comment="Constant for the FOURTH day of the week used with weekInMonth"/>
+      <const name="FIFTH" type="Number" value="0x10" comment="Constant for the FIFTH day of the week used with weekInMonth"/>
+      <const name="LAST" type="Number" value="0x20" comment="Constant for the LAST day of the week used with weekInMonth"/>
+      <const name="SECONDLAST" type="Number" value="0x40" comment="Constant for the SECONDLAST day of the week used with weekInMonth"/>
+      <const name="THIRDLAST" type="Number" value="0x80" comment="Constant for the THIRDLAST day of the week used with weekInMonth"/>
+      <const name="FOURTHLAST" type="Number" value="0x100" comment="Constant for the FOURTHLAST day of the week used with weekInMonth"/>
+      <const name="FIFTHLAST" type="Number" value="0x200" comment="Constant for the FIFTHLAST day of the week used with weekInMonth"/>
+    </constants>
+    <constants comment="Constant for the day of week used with dayInWeek">
+      <const name="SUNDAY" type="Number" value="0x10000" comment="Constant for SUNDAY used with dayInWeek"/>
+      <const name="MONDAY" type="Number" value="0x8000" comment="Constant for MONDAY used with dayInWeek"/>
+      <const name="TUESDAY" type="Number" value="0x4000" comment="Constant for TUESDAY used with dayInWeek"/>
+      <const name="WEDNESDAY" type="Number" value="0x2000" comment="Constant for WEDNESDAY used with dayInWeek"/>
+      <const name="THURSDAY" type="Number" value="0x1000" comment="Constant for THURSDAY used with dayInWeek"/>
+      <const name="FRIDAY" type="Number" value="0x800" comment="Constant for FRIDAY used with dayInWeek"/>
+      <const name="SATURDAY" type="Number" value="0x400" comment="Constant for SATURDAY used with dayInWeek"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new Recurrence object">
+      </ctor>
+    </constructors>
+    <properties>
+      <property name="frequency" type="Number" readonly="false" comment="Specifies the frequency of the event repetition. Value can be:">
+        <details>
+          <![CDATA[
+0 - No repeats, single event only
+1 - Event happens daily
+2 - Event happens weekly
+3 - Event happens monthly
+4 - Event happens yearly
+          ]]>
+        </details>
+      </property>
+      <property name="count" type="Number" readonly="false" comment="Specifies the number of times this event repeats including the first time, starting from the first time the event starts (derived from the 'start' property of the event) and continuing to the last date of the repeat (defined by the 'end' property). "/>
+      <property name="interval" type="Number" readonly="false" comment="Specifies the number of iterations of the frequency between occurring dates, or how often the frequency repeats."/>
+      <property name="end" type="Date" readonly="false" comment="Specifies the date when the event repetition would end."/>
+      <property name="monthInYear" type="Number" readonly="false" comment="Specifies the month in which an event occurs. Value can be one of the 'MONTH' constants. "/>
+      <property name="weekInMonth" type="Number" readonly="false" comment="Specifies which week in a month a particular event occurs. Value can be one of the 'WEEK' constants. "/>
+      <property name="dayInWeek" type="Number" readonly="false" comment="Specifies the days of the week an event occurs. Value can be one of the 'DAY' constants. "/>
+      <property name="dayInMonth" type="Number" readonly="false" comment="Specifies the day of the month an event occurs. Value can be 1-31."/>
+      <property name="dayInYear" type="Number" readonly="false" comment="Specifies the day of the year an event occurs. Value can be 1-366."/>
+    </properties>
+    
+  </object>
+</library>

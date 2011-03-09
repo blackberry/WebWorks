@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.category" shortName="Category" introduced="1.0.0" comment="The Category object defines APIs necessary to access and manipulate categories in the Personal Information Management (PIM) database.">
+    <details>
+      The functionality in this namespace allows you to access and manipulate categories defined for the PIM database.
+    </details>
+    <features>
+      <feature id="blackberry.pim.category" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  function createNewCategory(newCategoryName) {
+    blackberry.pim.addCategory(newCategoryName);
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="getCategories" returns="String" array="true" static="true" comment="Returns the categories defined for the PIM database. If there are no categories defined for the PIM database, then a zero length array is returned."/>
+      <func name="addCategory" returns="void" static="true" comment="Adds the provided category to the PIM database. Category names are case sensitive.">
+        <param name="categoryName" type="String" comment="String representing a category."/>
+      </func>
+      <func name="deleteCategory" returns="void" static="true" comment="Deletes the indicated category from the PIM database. If the indicated category is not in the PIM database, this method is treated as successfully completing. Category names are case sensitive.">
+        <param name="categoryName" type="String" comment="String category."/>
+      </func>
+    </functions>
+    
+  </object>
+</library>

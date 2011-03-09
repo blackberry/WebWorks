@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="true">
+  <extension id="blackberry.audio">
+    <entryClass>blackberry.audio.AudioExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>
+  
+  <features>
+    <feature id="blackberry.audio" version="1.0.0.0"/>
+    <feature id="blackberry.audio.Player" version="1.0.0.0"/>
+  </features>
+  
+  <object name="blackberry.audio" shortName="Audio" comment="The audio object provides information about supported audio functionality on the device.">
+    <features>
+      <feature id="blackberry.audio" version="1.0.0.0"/>
+      <feature id="blackberry.audio.Player" version="1.0.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Display supported content types for specified protocol 
+  var protocol = "file";
+  var contentTypes = blackberry.audio.supportedContentTypes(protocol);
+
+  if (contentTypes) {
+    var printingContentTypesList = "";
+    for (i = 0; i < contentTypes.length; i++) {
+      printingContentTypesList += contentTypes[i] + "\n";
+    }
+    
+    alert("List of " + contentTypes.length + " supported content-types for '" + protocol + "' :\n" + printingContentTypesList);
+  }    
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Display all supported protocols
+  var protocols = blackberry.audio.supportedProtocols(null);
+
+  if (protocols) {
+    var printingProtocolsList = "";
+    for (i = 0; i < protocols.length; i++) {
+      printingProtocolsList += protocols[i] + "\n";
+    }
+    
+    alert("List of " + protocols.length + " supported protocols:\n" + printingProtocolsList);  
+  }    
+</script>]]></example>
+    
+    <functions>
+      <func name="supportedContentTypes" returns="String" static="true" array="true" comment="Return the list of supported content types for the given protocol.">
+        <param name="protocol" type="String" comment="The input protocol for the supported content types."/>
+        <details>
+          If null is passed in as the protocol, all the supported content types for this implementation will be returned. The returned array must not be empty.
+          If the given protocol is an invalid or unsupported protocol, then an empty array will be returned.
+        </details>
+      </func>
+      <func name="supportedProtocols" returns="String" static="true" array="true" comment="Return the list of supported protocols given the content type.">
+        <param name="content_type" type="String" comment="The content type for the supported protocols."/>
+        <details>
+          If null is passed in as the content_type, all the supported protocols for this implementation will be returned. The returned array must not be empty.
+          If the given content_type is an invalid or unsupported content type, then an empty array will be returned.
+        </details>
+      </func>
+    </functions>
+  </object>
+</library>
