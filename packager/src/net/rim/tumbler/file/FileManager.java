@@ -1,10 +1,23 @@
+/*
+* Copyright 2010-2011 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package net.rim.tumbler.file;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.util.zip.Adler32;
@@ -21,34 +37,30 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import net.rim.tumbler.WidgetPackager;
+import net.rim.tumbler.config.FeatureManager;
+import net.rim.tumbler.config.WidgetAccess;
+import net.rim.tumbler.config.WidgetFeature;
 import net.rim.tumbler.exception.PackageException;
+import net.rim.tumbler.log.LogType;
+import net.rim.tumbler.log.Logger;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 public class FileManager {
-    private BBWPProperties           _bbwpProperties;
-    private Vector<String>           _outputFiles;
-    private Vector<String>           _extensionClasses;
+    private BBWPProperties      _bbwpProperties;
+    private Vector<String>      _outputFiles;
+    private FeatureManager      _featureManager;
+
+    private static final String NL              = System.getProperty("line.separator");
+    private static final String FILE_SEP        = System.getProperty("file.separator");
+    private static final String STANDARD_OUTPUT = "StandardInstall";
+    private static final String OTA_OUTPUT      = "OTAInstall";
     
-    private static final String         EOL = System.getProperty("line.separator");
-    private static final String         FILE_SEP = System.getProperty("file.separator");
-    private static final String         STANDARD_OUTPUT = "StandardInstall";
-    private static final String         OTA_OUTPUT = "OTAInstall";
-    private static final String         EXTENSION_DIRECTORY = "extension";
-    
-    public FileManager(BBWPProperties bbwpProperties) {
+    public FileManager(BBWPProperties bbwpProperties, Hashtable<WidgetAccess, Vector<WidgetFeature>> accessTable) {
         _bbwpProperties = bbwpProperties;
         _outputFiles = new Vector<String>();
-        _extensionClasses = new Vector<String>();
+        _featureManager = new FeatureManager(bbwpProperties, accessTable);
     }
     
     public List<String> getFiles() {
@@ -60,8 +72,14 @@ public class FileManager {
         String archiveName = SessionManager.getInstance().getArchiveName();
         deleteDirectory(new File(outputDir + FILE_SEP + FileManager.OTA_OUTPUT));
         deleteDirectory(new File(outputDir + FILE_SEP + FileManager.STANDARD_OUTPUT));
-        (new File(outputDir + FILE_SEP + archiveName + ".jar")).delete();
-        (new File(outputDir + FILE_SEP + archiveName + ".rapc")).delete();
+        File jarFile = new File(outputDir + FILE_SEP + archiveName + ".jar");
+        if ( jarFile.exists() && jarFile.delete() == false ) {
+            Logger.logMessage( LogType.WARNING, "EXCEPTION_DELETING_FILE", jarFile.getAbsolutePath());
+        }
+        File rapcFile = new File(outputDir + FILE_SEP + archiveName + ".rapc");
+        if ( rapcFile.exists() && rapcFile.delete() == false ) {
+            Logger.logMessage( LogType.WARNING, "EXCEPTION_DELETING_FILE", rapcFile.getAbsolutePath());
+        }
     }
     
     public void cleanSource() {
@@ -69,11 +87,16 @@ public class FileManager {
     }
     
     public void prepare() throws Exception {
-        // clean out source folder
+        // Clean out source folder
         deleteDirectory(new File(SessionManager.getInstance().getSourceFolder()));
-        (new File(SessionManager.getInstance().getSourceFolder())).mkdirs();
         
-        // copy templates
+        File f = new File(SessionManager.getInstance().getSourceFolder());
+        if ( !(f.exists() && f.isDirectory()) ) {
+	        if ( f.mkdirs() == false ) {
+	            Logger.logMessage( LogType.WARNING, "EXCEPTION_MAKING_DIRECTORY");
+	        }  
+        }
+        // Copy templates
         try {
             TemplateWrapper templateWrapper = new TemplateWrapper(_bbwpProperties);
             _outputFiles.addAll(templateWrapper.writeAllTemplates(
@@ -82,12 +105,14 @@ public class FileManager {
             throw new PackageException("EXCEPTION_IO_TEMPLATES");
         }
         
-        // extract archive
+        // Extract archive
         ZipFile zip = new ZipFile(new File(SessionManager.getInstance().getWidgetArchive()).getAbsolutePath());
         Enumeration<?> en = zip.entries();
         String sourceFolder = SessionManager.getInstance().getSourceFolder();
+        HashSet<ZipEntry> extJars = new HashSet<ZipEntry>();
+        
         while (en.hasMoreElements()) {
-            // create output file name
+            // Create output file name
             ZipEntry ze = (ZipEntry) en.nextElement();
 			if (ze.isDirectory())
 				continue;            
@@ -97,29 +122,67 @@ public class FileManager {
             boolean isRoot = zipEntryFile.getParent() == null;
             String fname = sourceFolder + FILE_SEP + zipEntryFile.getPath();
             
-            // extract file
-			InputStream is = zip.getInputStream(ze);
-			File fi = new File(fname);
-			if (!fi.getParentFile().isDirectory() || !fi.getParentFile().exists())
-				fi.getParentFile().mkdirs();
-			FileOutputStream fos = new FileOutputStream(fname);
-			int bytesRead;
-			while ((bytesRead = is.read()) != -1)
-				fos.write(bytesRead);
-			fos.close();				
-            
-			if (zipEntryName.startsWith("ext") && zipEntryName.endsWith(".jar")) {
-				populateExtension(fname);
-			} else { 
-	            // HACK for icon files not displayed properly if similar named files exist in sub folders
-	            if (!isRoot) {
-	                _outputFiles.add(0, fname);
-	            } else {
-	                _outputFiles.add(fname);
-	            }
-			}
+            if (zipEntryName.startsWith("ext") && zipEntryName.endsWith(".jar")) {
+            	extJars.add(ze);
+            } else {            
+	            // Extract file
+            	copyZipEntry(zip, ze, sourceFolder + FILE_SEP);
+	            
+				// Hack for icon files not displayed properly if similar named
+				// files exist in sub folders
+				if (!isRoot) {
+					_outputFiles.add(0, fname);
+				} else {
+					_outputFiles.add(fname);
+				}
+            }
         }
+                
+        copyExtensionFiles(zip, extJars);
     }
+    
+	/**
+	 * @param zip
+	 *            WebWorks application archive
+	 * @param extJars
+	 *            extension JAR zip entries found in archive's "ext" folder
+	 * @throws Exception
+	 *             if there is extensions cannot be resolved
+	 */
+    private void copyExtensionFiles(ZipFile zip, HashSet<ZipEntry> extJars) throws Exception {
+		HashSet<String> resolvedExtensionPaths = _featureManager
+				.resolveFeatures(zip, extJars);
+
+		_outputFiles.addAll(resolvedExtensionPaths);
+		
+		for (String path : _featureManager.getCommonAPIPaths()) {
+			_outputFiles.add(0, path);
+		}
+    }
+    
+	public static File copyZipEntry(ZipFile zipFile, ZipEntry zipEntry,
+			String dest) throws IOException {
+		String fname = dest;
+		if (dest.endsWith(FILE_SEP)) {
+			fname = dest + new File(zipEntry.getName()).getPath();
+		}
+		InputStream is = zipFile.getInputStream(zipEntry);
+		File fi = new File(fname);
+		if (!fi.getParentFile().isDirectory() || !fi.getParentFile().exists()) {
+            if (fi.getParentFile().mkdirs() == false) {
+                Logger.logMessage(LogType.WARNING,
+                        "EXCEPTION_MAKING_DIRECTORY", fi.getParentFile().toString());
+            }
+		}
+		FileOutputStream fos = new FileOutputStream(fname);
+		int bytesRead;
+		while ((bytesRead = is.read()) != -1) {
+			fos.write(bytesRead);
+		}
+		fos.close();
+
+		return fi;
+	}	
     
     // Generate .jdp and .jdw files
     public void generateProjectFiles(
@@ -143,127 +206,131 @@ public class FileManager {
         fileName = sourceDir + FILE_SEP + codName + ".jdw";
         writer = new BufferedWriter(new FileWriter(fileName));
 
-        writer.write("## RIM Java Development Environment" + EOL);
-        writer.write("# RIM Workspace file" + EOL);
-        writer.write("#" + EOL);
-        writer.write("# This file is generated and managed by BlackBerry developer tools."+ EOL);
-        writer.write("# It SHOULD NOT BE modified manually." + EOL);
-        writer.write("#" + EOL);
-        writer.write("[BuildConfigurations" + EOL);
-        writer.write("Debug" + EOL);
-        writer.write("Release" + EOL);
-        writer.write("]" + EOL);
-        writer.write("DependenciesInWorkspace=0" + EOL);
-        writer.write("[ImplicitRules" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[Imports" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[Projects" + EOL);
-        writer.write(codName + ".jdp" + EOL);
+        writer.write("## RIM Java Development Environment" + NL);
+        writer.write("# RIM Workspace file" + NL);
+        writer.write("#" + NL);
+        writer.write("# This file is generated and managed by BlackBerry developer tools."+ NL);
+        writer.write("# It SHOULD NOT BE modified manually." + NL);
+        writer.write("#" + NL);
+        writer.write("[BuildConfigurations" + NL);
+        writer.write("Debug" + NL);
+        writer.write("Release" + NL);
+        writer.write("]" + NL);
+        writer.write("DependenciesInWorkspace=0" + NL);
+        writer.write("[ImplicitRules" + NL);
+        writer.write("]" + NL);
+        writer.write("[Imports" + NL);
+        writer.write("]" + NL);
+        writer.write("[Projects" + NL);
+        writer.write(codName + ".jdp" + NL);
         
         // Alternate entry project
         if(backgroundSource!=null&&isStartupEnabled) {
-        	writer.write("runOnStartup.jdp" + EOL);
+        	writer.write("runOnStartup.jdp" + NL);
         }
         
-        writer.write("]" + EOL);
-        writer.write("[ReleaseActiveProjects" + EOL);
-        writer.write(codName + ".jdp" + EOL);
-        writer.write("]" + EOL);
+        writer.write("]" + NL);
+        writer.write("[ReleaseActiveProjects" + NL);
+        writer.write(codName + ".jdp" + NL);
+        writer.write("]" + NL);
         writer.close();
 
         // jdp file
         fileName = sourceDir + FILE_SEP + codName + ".jdp";
         writer = new BufferedWriter(new FileWriter(fileName));
 
-        writer.write("## RIM Java Development Environment" + EOL);
-        writer.write("# RIM Project file" + EOL);
-        writer.write("#" + EOL);
-        writer.write("# This file is generated and managed by BlackBerry developer tools."+ EOL);
-        writer.write("# It SHOULD NOT BE modified manually." + EOL);
-        writer.write("#" + EOL);
-        writer.write("AddOn=0" + EOL);
-        writer.write("AlwaysBuild=0" + EOL);
-        writer.write("[AlxImports" + EOL);
-        writer.write("]" + EOL);
-        writer.write("AutoRestart=0" + EOL);
-        writer.write("[ClassProtection" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[CustomBuildFiles" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[CustomBuildRules" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[DefFiles" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[DependsOn" + EOL);
-        writer.write("]" + EOL);
-        writer.write("ExcludeFromBuildAll=0" + EOL);
-        writer.write("Exported=0" + EOL);
+        writer.write("## RIM Java Development Environment" + NL);
+        writer.write("# RIM Project file" + NL);
+        writer.write("#" + NL);
+        writer.write("# This file is generated and managed by BlackBerry developer tools."+ NL);
+        writer.write("# It SHOULD NOT BE modified manually." + NL);
+        writer.write("#" + NL);
+        writer.write("AddOn=0" + NL);
+        writer.write("AlwaysBuild=0" + NL);
+        writer.write("[AlxImports" + NL);
+        writer.write("]" + NL);
+        writer.write("AutoRestart=0" + NL);
+        writer.write("[ClassProtection" + NL);
+        writer.write("]" + NL);
+        writer.write("[CustomBuildFiles" + NL);
+        writer.write("]" + NL);
+        writer.write("[CustomBuildRules" + NL);
+        writer.write("]" + NL);
+        writer.write("[DefFiles" + NL);
+        writer.write("]" + NL);
+        writer.write("[DependsOn" + NL);
+        writer.write("]" + NL);
+        writer.write("ExcludeFromBuildAll=0" + NL);
+        writer.write("Exported=0" + NL);
 
-        writer.write("[Files" + EOL);
+        writer.write("[Files" + NL);
         for (int i = 0; i < inputFiles.size(); ++i) {
             String inputFile = inputFiles.get(i);
             inputFile = inputFile.substring(sourceDir.length() + 1);
-            writer.write(inputFile + EOL);
+            writer.write(inputFile + NL);
         }
-        writer.write("]" + EOL);
+        writer.write("]" + NL);
 
-        writer.write("HaveAlxImports=0" + EOL);
-        writer.write("HaveDefs=0" + EOL);
-        writer.write("HaveImports=1" + EOL);
+        writer.write("HaveAlxImports=0" + NL);
+        writer.write("HaveDefs=0" + NL);
+        writer.write("HaveImports=1" + NL);
 
-        writer.write("[Icons" + EOL);
+        writer.write("[Icons" + NL);
         if (icons != null) {
             for (int i = 0; i < icons.size(); ++i) {
-                writer.write(icons.elementAt(i) + EOL);
+                writer.write(icons.elementAt(i) + NL);
             }
         }
-        writer.write("]" + EOL);
+        writer.write("]" + NL);
 
-        writer.write("[ImplicitRules" + EOL);
-        writer.write("]" + EOL);
+        writer.write("[ImplicitRules" + NL);
+        writer.write("]" + NL);
 
-        writer.write("[Imports" + EOL);
+        writer.write("[Imports" + NL);
         for (int i = 0; i < libraryFiles.size(); ++i) {
             String libraryFile = libraryFiles.get(i);
-            writer.write(libraryFile + EOL);
+            writer.write(libraryFile + NL);
         }
-        writer.write("]" + EOL);
+        
+        for (String file : _featureManager.getCompiledJARDependencies()) {
+        	writer.write(file + NL);
+        }
+        writer.write("]" + NL);
 
-        writer.write("Listing=0" + EOL);
+        writer.write("Listing=0" + NL);
         if(contentSource!=null) {
-        	writer.write("MidletClass=rim:foreground"+EOL);
+        	writer.write("MidletClass=rim:foreground"+NL);
     	} else {
-    		writer.write("MidletClass="+EOL);
+    		writer.write("MidletClass="+NL);
     	}
-        writer.write("Options=-quiet -deprecation" + EOL);
-        writer.write("OutputFileName=" + codName + EOL);
-        writer.write("[PackageProtection" + EOL);
-        writer.write("]" + EOL);
-        writer.write("Platform=0" + EOL);
-        writer.write("RibbonPosition=0" + EOL);
+        writer.write("Options=-quiet -deprecation" + NL);
+        writer.write("OutputFileName=" + codName + NL);
+        writer.write("[PackageProtection" + NL);
+        writer.write("]" + NL);
+        writer.write("Platform=0" + NL);
+        writer.write("RibbonPosition=0" + NL);
 
-        writer.write("[RolloverIcons" + EOL);
+        writer.write("[RolloverIcons" + NL);
         if (hoverIcons != null) {
             for (int i = 0; i < hoverIcons.size(); ++i) {
-                writer.write(hoverIcons.elementAt(i) + EOL);
+                writer.write(hoverIcons.elementAt(i) + NL);
             }
         }
-        writer.write("]" + EOL);
+        writer.write("]" + NL);
 
-        writer.write("RunOnStartup=0" + EOL);
-        writer.write("StartupTier=7" + EOL); 
+        writer.write("RunOnStartup=0" + NL);
+        writer.write("StartupTier=7" + NL); 
         
         if(contentSource!=null&&contentSource.length()!=0) {
-        	writer.write("SystemModule=0" + EOL);
+        	writer.write("SystemModule=0" + NL);
         } else {
-        	writer.write("SystemModule=1" + EOL);
+        	writer.write("SystemModule=1" + NL);
         }
         
-        writer.write("Title=" + appName + EOL);
-        writer.write("Type=0" + EOL);
-        if (appVendor != null) { writer.write("Vendor=" + appVendor + EOL); }
-        writer.write("Version=" + appVersion + EOL);
+        writer.write("Title=" + appName + NL);
+        writer.write("Type=0" + NL);
+        if (appVendor != null) { writer.write("Vendor=" + appVendor + NL); }
+        writer.write("Version=" + appVersion + NL);
 
         writer.close();
         
@@ -277,71 +344,71 @@ public class FileManager {
         fileName = sourceDir + FILE_SEP + "runOnStartup.jdp";
         writer = new BufferedWriter(new FileWriter(fileName));
 
-        writer.write("## RIM Java Development Environment" + EOL);
-        writer.write("# RIM Project file" + EOL);
-        writer.write("#" + EOL);
-        writer.write("# This file is generated and managed by BlackBerry developer tools."+ EOL);
-        writer.write("# It SHOULD NOT BE modified manually." + EOL);
-        writer.write("#" + EOL);
-        writer.write("AddOn=0" + EOL);
-        writer.write("AlwaysBuild=0" + EOL);
-        writer.write("[AlxImports" + EOL);
-        writer.write("]" + EOL);
-        writer.write("AutoRestart=0" + EOL);
-        writer.write("[ClassProtection" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[CustomBuildFiles" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[CustomBuildRules" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[DefFiles" + EOL);
-        writer.write("]" + EOL);
-        writer.write("[DependsOn" + EOL);
-        writer.write("]" + EOL);
-        writer.write("EntryFor="+codName+EOL);
-        writer.write("ExcludeFromBuildAll=0" + EOL);
-        writer.write("Exported=0" + EOL);
+        writer.write("## RIM Java Development Environment" + NL);
+        writer.write("# RIM Project file" + NL);
+        writer.write("#" + NL);
+        writer.write("# This file is generated and managed by BlackBerry developer tools."+ NL);
+        writer.write("# It SHOULD NOT BE modified manually." + NL);
+        writer.write("#" + NL);
+        writer.write("AddOn=0" + NL);
+        writer.write("AlwaysBuild=0" + NL);
+        writer.write("[AlxImports" + NL);
+        writer.write("]" + NL);
+        writer.write("AutoRestart=0" + NL);
+        writer.write("[ClassProtection" + NL);
+        writer.write("]" + NL);
+        writer.write("[CustomBuildFiles" + NL);
+        writer.write("]" + NL);
+        writer.write("[CustomBuildRules" + NL);
+        writer.write("]" + NL);
+        writer.write("[DefFiles" + NL);
+        writer.write("]" + NL);
+        writer.write("[DependsOn" + NL);
+        writer.write("]" + NL);
+        writer.write("EntryFor="+codName+NL);
+        writer.write("ExcludeFromBuildAll=0" + NL);
+        writer.write("Exported=0" + NL);
 
-        writer.write("[Files" + EOL);
-        writer.write("]" + EOL);
+        writer.write("[Files" + NL);
+        writer.write("]" + NL);
 
-        writer.write("HaveAlxImports=0" + EOL);
-        writer.write("HaveDefs=0" + EOL);
-        writer.write("HaveImports=1" + EOL);
+        writer.write("HaveAlxImports=0" + NL);
+        writer.write("HaveDefs=0" + NL);
+        writer.write("HaveImports=1" + NL);
 
-        writer.write("[Icons" + EOL);
-        writer.write("]" + EOL);
+        writer.write("[Icons" + NL);
+        writer.write("]" + NL);
 
-        writer.write("[ImplicitRules" + EOL);
-        writer.write("]" + EOL);
+        writer.write("[ImplicitRules" + NL);
+        writer.write("]" + NL);
 
-        writer.write("[Imports" + EOL);
-        writer.write("]" + EOL);
+        writer.write("[Imports" + NL);
+        writer.write("]" + NL);
 
-        writer.write("Listing=0" + EOL);
+        writer.write("Listing=0" + NL);
         
-        writer.write("MidletClass=rim:runOnStartup"+EOL);
-        writer.write("Options=-quiet -deprecation" + EOL);
-        writer.write("OutputFileName=" + codName + EOL);
-        writer.write("[PackageProtection" + EOL);
-        writer.write("]" + EOL);
-        writer.write("Platform=0" + EOL);
-        writer.write("RibbonPosition=0" + EOL);
+        writer.write("MidletClass=rim:runOnStartup"+NL);
+        writer.write("Options=-quiet -deprecation" + NL);
+        writer.write("OutputFileName=" + codName + NL);
+        writer.write("[PackageProtection" + NL);
+        writer.write("]" + NL);
+        writer.write("Platform=0" + NL);
+        writer.write("RibbonPosition=0" + NL);
 
-        writer.write("[RolloverIcons" + EOL);
+        writer.write("[RolloverIcons" + NL);
         if (hoverIcons != null) {
         	for (int i = 0; i < hoverIcons.size(); ++i) {
-        		writer.write(hoverIcons.elementAt(i) + EOL);
+        		writer.write(hoverIcons.elementAt(i) + NL);
         	}
         }
-        writer.write("]" + EOL);
-        writer.write("RunOnStartup=1" + EOL);
-        writer.write("StartupTier=7" + EOL);
-        writer.write("SystemModule=1" + EOL);
-        writer.write("Title=" + appName + EOL);
-        writer.write("Type=3" + EOL);
-        if (appVendor != null) { writer.write("Vendor=" + appVendor + EOL); }
-        writer.write("Version=" + appVersion + EOL);
+        writer.write("]" + NL);
+        writer.write("RunOnStartup=1" + NL);
+        writer.write("StartupTier=7" + NL);
+        writer.write("SystemModule=1" + NL);
+        writer.write("Title=" + appName + NL);
+        writer.write("Type=3" + NL);
+        if (appVendor != null) { writer.write("Vendor=" + appVendor + NL); }
+        writer.write("Version=" + appVersion + NL);
 
         writer.close();
         
@@ -352,7 +419,12 @@ public class FileManager {
         try {
             String s = SessionManager.getInstance().getSourceFolder() + FILE_SEP + relativeFile;
             if (!new File(s).exists()) {
-                new File(s).getParentFile().mkdirs();
+            	File pf = (new File(s)).getParentFile();
+            	if ( pf != null && !(pf.exists() && pf.isDirectory()) ) {
+	                if ( pf.mkdirs() == false ) {
+	                    Logger.logMessage( LogType.WARNING, "EXCEPTION_MAKING_DIRECTORY");
+	                }  
+            	}
             }       
             FileOutputStream fos = new FileOutputStream(s);
             fos.write(fileToWrite);   
@@ -392,29 +464,32 @@ public class FileManager {
     
     private void expandCod(File codFile) throws Exception {
 
-        // if the codFile can be unzipped,
-        // then the cod is too big and actually in the zip format with smaller
-        // cods inside
-        // otherwise, the cod is already a good cod
+        // If the codFile can be unzipped, then the cod is too big 
+        // and actually in the zip format with smaller (sibling) cods 
+        // inside. Otherwise, the cod is already a good cod.
 
         ZipFile zipFile;
 
-        // check for file's existence
-        if (!codFile.exists()) {
+        // Check for file's existence
+        if (!codFile.exists())
             throw new PackageException("EXCEPTION_COD_NOT_FOUND");
-        } else {
-            try {
-                zipFile = new ZipFile(codFile);
-                zipFile.close();
-            } catch (Exception e) {
-                return; // this is a not a zip file and thus, not a big cod
-            }
+        
+        boolean containsSiblingCods;
+
+        try {
+            zipFile = new ZipFile(codFile);
+            zipFile.close();
+            containsSiblingCods = true;
+        } catch (Exception e) {
+            containsSiblingCods = false;
         }
+        
+        if(!containsSiblingCods)
+            return;
 
         FileInputStream fis = new FileInputStream(codFile);
         CheckedInputStream checksum = new CheckedInputStream(fis, new Adler32());
-        ZipInputStream zis = new ZipInputStream(new BufferedInputStream(
-                checksum));
+        ZipInputStream zis = new ZipInputStream(new BufferedInputStream(checksum));
 
         ZipEntry entry;
         BufferedOutputStream dest = null;
@@ -431,10 +506,17 @@ public class FileManager {
                     + "OTAInstall" 
                     + FILE_SEP + entry.getName());
             
-            f.getParentFile().mkdirs();
-            f.createNewFile();
+            if( f.getParentFile() != null && !(f.getParentFile().exists() && f.getParentFile().isDirectory()) ) {
+	            if( f.getParentFile().mkdirs() == false ) {
+	                Logger.logMessage( LogType.WARNING, "EXCEPTION_MAKING_DIRECTORY", f.toString());
+	            } 
+            }
             
-            // write the files to the disk
+            if( !f.exists() && f.createNewFile() == false ) {
+                Logger.logMessage( LogType.WARNING, "EXCEPTION_CREATING_FILE", f.toString());
+            }            
+            
+            // Write the files to the disk
             FileOutputStream fos = new FileOutputStream(f);
             dest = new BufferedOutputStream(fos, BUFFER_SIZE);
             while ((count = zis.read(data, 0, BUFFER_SIZE)) != -1) {
@@ -452,7 +534,7 @@ public class FileManager {
         FileChannel inChannel = new FileInputStream(in).getChannel();
         FileChannel outChannel = new FileOutputStream(out).getChannel();
         try {
-            // windows is limited to 64mb chunks
+            // Windows is limited to 64mb chunks
             long size = inChannel.size();
             long position = 0;
             while (position < size)
@@ -466,23 +548,28 @@ public class FileManager {
         }
     }
     
-    private void createOutputDirs(String outputFolder)
-    {
+    private void createOutputDirs(String outputFolder) {
         File standardInstallDir = new File(outputFolder + File.separator + FileManager.STANDARD_OUTPUT);
         File otaInstallDir = new File(outputFolder + File.separator + FileManager.OTA_OUTPUT);
         
         if (!(standardInstallDir.exists() && standardInstallDir.isDirectory())) {
-            standardInstallDir.mkdirs();
+            if (standardInstallDir.mkdirs() == false) {
+                Logger.logMessage(LogType.WARNING, "EXCEPTION_MAKING_DIRECTORY",
+                        standardInstallDir.toString());
+            }
         }
 
         if (!(otaInstallDir.exists() && otaInstallDir.isDirectory())) {
-            otaInstallDir.mkdirs();         
+            if (otaInstallDir.mkdirs() == false) {
+                Logger.logMessage(LogType.WARNING, "EXCEPTION_MAKING_DIRECTORY",
+                        otaInstallDir.toString());
+            }
         }      
     }
 
-    // delete a dir
-    private boolean deleteDirectory(File dir) {
-        // remove files first
+    // Delete a dir
+    public static boolean deleteDirectory(File dir) {
+        // Remove files first
         if (dir.exists() && dir.isDirectory()) {
             String[] children = dir.list();
             for (String child : children) {
@@ -491,94 +578,21 @@ public class FileManager {
             }
         }
         if (dir.exists()) {
-            // then remove the directory
+            // Then remove the directory
             return dir.delete();
         }
         return false;
     }    
-    
-	private void populateExtension(String extensionArchive) throws Exception {
-		// create the extension directory
-		String extensionPath = SessionManager.getInstance().getSourceFolder() + FILE_SEP + EXTENSION_DIRECTORY  + FILE_SEP;
-		(new File(extensionPath)).mkdirs();
-		
-		// extract all resource files in archive
-		ZipFile zip = new ZipFile(new File(extensionArchive).getAbsolutePath());
-		Enumeration<?> en = zip.entries();
-		while (en.hasMoreElements()) {
-			ZipEntry ze = (ZipEntry) en.nextElement();
-			if (ze.isDirectory())
-				continue;
-			
-			String zipEntryName = ze.getName();
-			File zipEntryFile = new File(zipEntryName);
-			String fname = extensionPath + zipEntryFile.getPath();
-
-			InputStream is = zip.getInputStream(ze);
-			File fi = new File(fname);
-			if (!fi.getParentFile().isDirectory() || !fi.getParentFile().exists())
-				fi.getParentFile().mkdirs();
-			FileOutputStream fos = new FileOutputStream(fname);
-			int bytesRead;
-			while ((bytesRead = is.read()) != -1)
-				fos.write(bytesRead);
-			fos.close();
-			
-			_outputFiles.add(fname);
-			
-			if (zipEntryName.equals("library.xml")) {
-				is = zip.getInputStream(ze);
-				
-				int size;
-				byte[] buffer = new byte[4096];
-
-				ByteArrayOutputStream os = new ByteArrayOutputStream();
-				BufferedOutputStream bos = new BufferedOutputStream(os, buffer.length);
-
-				while ((size = is.read(buffer, 0, buffer.length)) != -1) {
-					bos.write(buffer, 0, size);
-				}
-
-				bos.flush();
-				bos.close();
-				
-				try {
-					byte[] bytes = os.toString().trim().getBytes();
-            
-					DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder builder = builderFactory.newDocumentBuilder();
-
-					// parse the xml file
-					Document doc = builder.parse(new ByteArrayInputStream(bytes));
-					doc.getDocumentElement().normalize();
-					
-			        Node nodeExtension = (Node) doc.getElementsByTagName("extension").item(0);
-			        NodeList childNodes = nodeExtension.getChildNodes();
-			        for (int i = 0; i < childNodes.getLength(); i++) {
-			            Node node = childNodes.item(i);
-
-			            if (node.getNodeType() == Node.ELEMENT_NODE) {
-			                if (node.getNodeName().equals("entryClass")) {
-			                    NodeList list = node.getChildNodes();
-			                    for (int j = 0; j < list.getLength(); j++) {
-			                        Node n = list.item(j);
-			                        if (n.getNodeType() == Node.TEXT_NODE) {
-			                            if (!n.getNodeValue().trim().equals("")) {
-			                            	_extensionClasses.add(n.getNodeValue().trim());
-			                            }
-			                        }
-			                    }
-			                }
-			            }
-			        }
-				} catch (SAXException saxEx) {
-					throw new Exception("EXCEPTION_LIBRARYXML_BADXML", saxEx);
-				}
-			}			
-		}
-	} 
 	
     public Vector<String> getExtensionClasses() {
-        return _extensionClasses;
-    }	
+    	Vector<String> extClasses = new Vector<String>();
+    	extClasses.addAll(_featureManager.getExtensionClasses());
+    	return extClasses;
+    }
+    
+    public List<String> getCompiledJARDependencies() {
+    	List<String> jarDependencies = new ArrayList<String>();
+    	jarDependencies.addAll(_featureManager.getCompiledJARDependencies());
+    	return jarDependencies;
+    }
 }

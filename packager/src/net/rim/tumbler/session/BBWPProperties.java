@@ -1,3 +1,18 @@
+/*
+* Copyright 2010-2011 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package net.rim.tumbler.session;
 
 import java.io.ByteArrayInputStream;
@@ -24,6 +39,7 @@ public class BBWPProperties {
     private static final String NODE_JAR = "jar";
     private static final String NODE_TEMPLATE = "wcp_template";
     private static final String NODE_ADDITIONAL = "additional";
+    private static final String NODE_REPOSITORY = "extension_repository";
     
     private String          _rapc;
     private String          _javac;
@@ -33,14 +49,15 @@ public class BBWPProperties {
     private String          _bbwpProperties;    
     private String          _sessionHome;
     private String        	_javaHome;
+    private String          _repositoryDir;    
     
     public BBWPProperties(String bbwpProperties, String sessionHome) throws Exception {
-        // parse bbwp.properties
+        // Parse bbwp.properties
         _bbwpProperties  = bbwpProperties;
         _sessionHome = sessionHome;
         parsePropertiesFile();
         
-        // quick validation of property file info
+        // Quick validation of property file info
         validate();
     }    
     
@@ -67,6 +84,10 @@ public class BBWPProperties {
     public String getAdditional() {
         return _additional;
     }
+    
+    public String getRepositoryDir() {
+    	return _repositoryDir;
+    }    
 
     private void validate() throws Exception {
         // Check template and archive
@@ -89,7 +110,7 @@ public class BBWPProperties {
         if (_javac == null || _javac.length() == 0 ) {
         	// For tooling, they will set _javac to empty if they find javac.exe in "Path" environment variable 
         	// Rapc doesn't depend on this value to locate javac.exe, either
-        	//throw new ValidationException("EXCEPTION_JAVAC_NOT_FOUND");
+        	// throw new ValidationException("EXCEPTION_JAVAC_NOT_FOUND");
         } else {        
 	        if (!_javac.equals("javac.exe") && !_javac.equals("javac")) {
 	        	String javac = _javac; 
@@ -109,11 +130,15 @@ public class BBWPProperties {
         FileInputStream fisProperties = null;
         Document docProperties = null;
 
-        fisProperties = new FileInputStream(_bbwpProperties);
-        byte[] data = new byte[(int) (new File(_bbwpProperties)).length()];
-        fisProperties.read(data);
-        docProperties = createPropertiesDocument(data);
-        getProperties(docProperties);
+        try {
+            fisProperties = new FileInputStream(_bbwpProperties);
+            byte[] data = new byte[(int) (new File(_bbwpProperties)).length()];
+            fisProperties.read(data);
+            docProperties = createPropertiesDocument(data);
+            getProperties(docProperties);
+        } finally {
+            fisProperties.close();
+        }
 
         return;
     }
@@ -209,6 +234,19 @@ public class BBWPProperties {
                             _additional = childlist.item(j).getNodeValue();
                         }
                     }
+                } else if (nodename.equals(NODE_REPOSITORY)) {
+                    NodeList childlist = node.getChildNodes();
+                    for (int j = 0; j < childlist.getLength(); j++) {
+                        if (childlist.item(j).getNodeType() == Node.TEXT_NODE) {
+                            _repositoryDir = childlist.item(j).getNodeValue();
+                            
+                            if (new File(_repositoryDir).isAbsolute()) {
+                            	_repositoryDir = getAbsolutePath(_repositoryDir);
+                            } else {
+                            	_repositoryDir = _sessionHome + "\\" + _repositoryDir;
+                            }
+                        }
+                    }                	
                 }
             }
         }
