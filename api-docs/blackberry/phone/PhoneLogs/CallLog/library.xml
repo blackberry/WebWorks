@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="false">
+  <object name="blackberry.phone.PhoneLogs.CallLog" shortName="CallLog" comment="The CallLog object represents an entry in the call log of the phone application.">
+    <features>
+      <feature id="blackberry.phone.PhoneLogs" version="1.0.0.0" required="true"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Display the details of 'missed' call log retreived at index specified
+  var index = 1;
+  var res = blackberry.phone.PhoneLogs.callAt(index, blackberry.phone.PhoneLogs.FOLDER_MISSED_CALLS);
+  displayLogDetails(res);
+
+  function displayLogDetails(callLog) {
+    alert(("Date: " + callLog.date + "\n") +
+    ("Duration: " + callLog.duration + "\n") +
+    ("Notes: " + callLog.notes + "\n") +
+    ("Status: " + callLog.status + "\n") +
+    ("Type: " + callLog.type + "\n") +
+    ("Name: " + callLog.name + "\n") +
+    ("Number: " + callLog.number + "\n") +
+    ("AddressBookNumber: " + callLog.addressBookNumber + "\n") +
+    ("AddressBookType: " + callLog.addressBookType));
+  }    
+</script>]]></example>
+    
+    <constants comment="Call's Status List">
+      <const name="STATUS_NORMAL" type="Number" value="0" comment="Normal call status (no errors)."/>
+      <const name="STATUS_BUSY" type="Number" value="1" comment="Busy call status."/>
+      <const name="STATUS_CONGESTION" type="Number" value="2" comment="Error due to congestion."/>
+      <const name="STATUS_PATH_UNAVAILABLE" type="Number" value="3" comment="Error due to path unavailability."/>
+      <const name="STATUS_NUMBER_UNOBTAINABLE" type="Number" value="4" comment="Error due to number unobtainability."/>
+      <const name="STATUS_AUTHENTICATION_FAILURE" type="Number" value="5" comment="Error due to call authorization failure."/>
+      <const name="STATUS_EMERGENCY_CALLS_ONLY" type="Number" value="6" comment="Emergency calls only."/>
+      <const name="STATUS_HOLD_ERROR" type="Number" value="7" comment="Call hold error."/>
+      <const name="STATUS_OUTGOING_CALLS_BARRED" type="Number" value="8" comment="Outgoing calls barred."/>
+      <const name="STATUS_GENERAL_ERROR" type="Number" value="9" comment="General error."/>
+      <const name="STATUS_MAINTENANCE_REQUIRED" type="Number" value="10" comment="Maintenance required."/>
+      <const name="STATUS_SERVICE_NOT_AVAILABLE" type="Number" value="11" comment="Service not available."/>
+      <const name="STATUS_CALL_FAIL_DUE_TO_FADING" type="Number" value="12" comment="Call failed due to fading."/>
+      <const name="STATUS_CALL_LOST_DUE_TO_FADING" type="Number" value="13" comment="Call lost due to fading."/>
+      <const name="STATUS_CALL_FAILED_TRY_AGAIN" type="Number" value="14" comment="Call failed, try again."/>
+      <const name="STATUS_FDN_MISMATCH" type="Number" value="15" comment="An FDN mismatch occured."/>
+      <const name="STATUS_CONNECTION_DENIED" type="Number" value="16" comment="Call connection was denied."/>
+      <const name="STATUS_INCOMING_CALL_BARRED" type="Number" value="27" comment="Incoming call barred"/>
+    </constants>
+    <constants comment="Call's Types List">
+      <const name="TYPE_RECEIVED_CALL" type="Number" value="0" comment="Incoming call that was successfully received."/>
+      <const name="TYPE_PLACED_CALL" type="Number" value="1" comment="Successfully connected outgoing call."/>
+      <const name="TYPE_MISSED_CALL_UNOPENED" type="Number" value="2" comment="Call that was missed and has not been viewed yet."/>
+      <const name="TYPE_MISSED_CALL_OPENED" type="Number" value="3" comment="Call that was missed and that has been viewed."/>
+    </constants>
+    <properties>
+      <property name="date" type="Date" readonly="true" comment="The call log's date."/>
+      <property name="duration" type="Number" readonly="true" comment="The call log's duration in seconds."/>
+      <property name="status" type="Number" readonly="true" comment="The call log's one of the STATUS_* values indicating the status of this logged call."/>
+      <property name="notes" type="String" readonly="true" comment="The call log's notes."/>
+      <property name="type" type="Number" readonly="true" comment="Type for this call; one of the TYPE_* values."/>
+      <property name="name" type="String" readonly="true" comment="Name associated with this call."/>
+      <property name="number" type="String" readonly="true" comment="The original phone number for this call."/>
+      <property name="addressBookNumber" type="String" readonly="true" comment="The address book phone number for this call. If not found, the raw phone number is returned"/>
+      <property name="addressBookType" type="String" readonly="true" comment="Type of the caller ID as stored in the contact list.">
+        <details>
+          If there is a phone number in the address book that can be matched
+          with the raw phone number from this PhoneCallLogID, then the type of the number
+          (for example, home or work) is returned. If not, a default type is returned (for example, &quot; Phone&quot;).
+          Otherwise, an empty string is returned. "
+        </details>
+      </property>
+    </properties>
+  </object>
+</library>

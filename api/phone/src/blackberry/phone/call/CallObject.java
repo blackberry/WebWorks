@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import net.rim.device.api.script.ScriptableFunction;
 
 public class CallObject extends Scriptable {
 
-    private final String FIELD_CALL_OUTGOING = "outgoing";
-    private final String FIELD_RECIPIENT_NAME = "recipientName";
-    private final String FIELD_RECIPIENT_NUMBER = "recipientNumber";
+    private static final String FIELD_CALL_OUTGOING = "outgoing";
+    private static final String FIELD_RECIPIENT_NAME = "recipientName";
+    private static final String FIELD_RECIPIENT_NUMBER = "recipientNumber";
 
     // Fields to be set in constructor.
     private final int _callid;

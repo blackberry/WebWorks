@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <features>
+    <feature id="blackberry.app.event" version="1.0.0">The Application Event object allows you to access events triggered by the application.</feature>
+  </features>
+  
+  <object name="blackberry.app.event" shortName="Application Event" introduced="1.0.0" comment="The Application Event object allows you to access events triggered by the application.">
+    <details>
+      The Application Event Object is static; all of its functions and properties are used directly from the object.
+    </details>
+    <example><![CDATA[<script type="text/javascript">  
+  function trapForApplicationExit() {
+    blackberry.app.event.onExit(handleExit);
+  }
+
+  function handleExit() {
+    var answer = confirm("Leave this application?");
+    if (answer) {
+      blackberry.app.exit();
+    }
+  }  
+</script>]]></example>
+    
+    <subclasses>
+      <object name="OnAppEvent" shortName="OnAppEvent Interface" interface="true" comment="Interface for application event callbacks.">
+        <details>
+          This is the interface that must be available on the application event callback function provided.
+        </details>
+      </object>
+    </subclasses>
+    
+    <functions>
+      <func name="onExit" static="true" returns="void" comment="Assigns a listener for when the application is about to exit.">
+        <param name="callback" type="OnAppEvent" comment="Function to be called when the application is about to exit.  "/>
+        <details>
+          Only one function can be assigned to this event. To unregister the callback, simply call the onExit method and pass in null for the callback parameter.
+          This event will be fired when the application is about to exit.  When you trap for the onExit event you must control the exit of the application
+          in your JavaScript.  If you choose to allow the application to exit, you must call blackberry.app.exit() to terminate the application.
+        </details>
+      </func>
+      <func name="onForeground" static="true" returns="void" comment="Assigns a listener for when the application comes to the foreground.">
+        <param name="callback" type="OnAppEvent" comment="Function to be called when the application comes to the foreground.  "/>
+        <details>
+          Only one function can be assigned to this event. To unregister the callback simply call the onForeground method and pass in null for the callback parameter.
+          This event is fired whenever the application comes to the foreground, for example, when the user re-opens the application from the application list.
+        </details>
+      </func>
+      <func name="onBackground" static="true" returns="void" comment="Assigns a listener for when the application goes to the background.">
+        <param name="callback" type="OnAppEvent" comment="Function to be called when the application goes to the background.  "/>
+        <details>
+          Only one function can be assigned to this event. To unregister the callback, simply call the onBackground method and pass in null for the callback parameter.
+          This event is fired whenever the application goes to the background, but has not ended.  For example, if the user uses the END_CALL key to close the application,
+          the application is still running, but in the background.
+        </details>
+      </func>
+    </functions>
+    
+  </object>
+</library>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Appointment" shortName="Appointment" introduced="1.0.0" comment="The Appointment object represents an appointment in your calendar.">
+    <details>
+      This Appointment object can be used for manipulating calendar appointments. The Appointment object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.pim.Appointment" version="1.0.0"/>
+      <feature id="blackberry.pim.Attendee" version="1.0.0"/>
+      <feature id="blackberry.pim.Recurrence" version="1.0.0"/>
+      <feature id="blackberry.pim.Reminder" version="1.0.0"/>
+      <feature id="blackberry.find" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  //Create our Event
+  var newAppt = new blackberry.pim.Appointment();
+  newAppt.location = "Your office";
+  newAppt.summary = "Talk about new project";
+  newAppt.freeBusy = blackberry.pim.Appointment.FREE;
+
+  // Create our hour time slot
+  var start = new Date();
+  newAppt.start = start;
+  var end = start.setHours(start.getHours() + 1);
+  newAppt.end = end;
+
+  // Create Attendee
+  var attendees = new Array();
+  var onlyAttendee = new blackberry.pim.Attendee();
+  onlyAttendee.address = "john@foo.com";
+  onlyAttendee.type = blackberry.pim.Attendee.INVITED;
+  attendees.push(onlyAttendee);
+
+  newAppt.attendees = attendees;
+  newAppt.save();
+</script>]]></example>
+    
+    <constants comment="[FreeBusy Options]">
+      <const name="FREE" type="Number" value="0" comment="Marks time as free in calendar"/>
+      <const name="TENTATIVE" type="Number" value="1" comment="Mark time as tentative in calendar"/>
+      <const name="BUSY" type="Number" value="2" comment="Mark time as busy in calendar"/>
+      <const name="OUT_OF_OFFICE" type="Number" value="3" comment="Mark time as out of office in calendar"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new Appointment object.">
+        <param name="service" type="Service" optional="true" comment="optional parameter specifying which service to create this appointment for.  If not provided, the default device service is used."/>
+      </ctor>
+    </constructors>
+    
+    <functions>
+      <func name="find" returns="Appointment" static="true" array="true" optional="true" comment="Looks up the appointments that match the regular expression provided.">
+        <param name="filter" type="FilterExpression" optional="true" comment="optional parameter that defines the search criteria for the find.  If no value is provided the method will return all the appointments on the device.">
+        </param>
+        <param name="orderBy" type="String" optional="true" comment="optional 'orderBy' parameter specifying the field which the results will be sorted by. If 'isAscending' is not supplied or 'isAscending' is true, the sort results will be in an ascending order. If 'isAscending' is false, the sort results will be in a descending order."/>
+        <param name="maxReturn" type="Number" optional="true" comment="optional integer parameter specifying the maximum number of results to return from the find.  If not supplied or set to -1, it will return all results found."/>
+        <param name="service" type="Service" optional="true" comment="optional parameter to define which service you wish to search for your appointments. If not provided the default service for appointments will be used.">
+        </param>
+        <param name="isAscending" type="Boolean" optional="true" comment="optional 'isAscending' parameter specifying whether the sort order is ascending or descending. If not supplied or set to true, the results sorted by the field specified by 'orderBy' will be in an ascending order. If set to false, the sort results will be in a descending order. If no 'orderBy' value is specified, 'isAscending' is neglected."/>
+        <details>
+          List of appointments that match search criteria.
+        </details>
+      </func>
+      <func name="save" returns="void" comment="Saves the changes made to the Appointment object.">
+        <details>
+          If save is called after the new creation of an Appointment object, the uid field will be filled in with its value after save.
+        </details>
+      </func>
+      <func name="remove" returns="void" comment="Removes an event from the PIM storage.">
+        <details>
+          If the event has not been previously saved, an exception will be thrown.
+        </details>
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="location" type="String" readonly="false" comment="Holds the location information for this appointment, for example, a meeting room name."/>
+      <property name="summary" type="String" readonly="false" comment="Contains a brief description of the appointment."/>
+      <property name="note" type="String" readonly="false" comment="Contains a more complete description than the summary field."/>
+      <property name="start" type="Date" readonly="false" comment="The start date for this appointment."/>
+      <property name="end" type="Date" readonly="false" comment="The end date for this appointment."/>
+      <property name="recurrence" type="Recurrence" readonly="false" comment="This is the rule to store how this appointment should be repeated if any."/>
+      <property name="reminder" type="Reminder" readonly="false" comment="This is the rule to store how the user should be reminded about the appointment."/>
+      <property name="attendees" type="Attendee" array="true" readonly="false" comment="The list of attendees that will be invited to this appointment."/>
+      <property name="freeBusy" type="Number" readonly="false" comment="The free/busy status for the appointment. Value can be one of the FreeBusy options."/>
+      <property name="allDay" type="Boolean" readonly="false" comment="Boolean field denoting whether the appointment is an all day event."/>
+      <property name="uid" type="String" readonly="true" comment="Represents the unique ID of the appointment."/>
+    </properties>
+    
+  </object>
+</library>

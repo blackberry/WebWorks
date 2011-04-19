@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -40,9 +40,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import java.io.InputStreamReader;
-import java.io.InputStream;
-import org.xml.sax.InputSource;
 
 public class ConfigXMLParser implements XMLParser {
 
@@ -117,15 +114,12 @@ public class ConfigXMLParser implements XMLParser {
         
         // Check for verbose mode
 		if (SessionManager.getInstance().isVerbose()) {
-			Logger.logMessage(LogType.INFO,
-					"PROGRESS_VALIDATING_CONFIG_XML_WIDGET_NAME");
-			Logger.logMessage(LogType.INFO,
-					"PROGRESS_VALIDATING_CONFIG_XML_WIDGET_AUTHOR");
+			Logger.logMessage(LogType.INFO, "PROGRESS_VALIDATING_CONFIG_XML_WIDGET_NAME");
+			Logger.logMessage(LogType.INFO,	"PROGRESS_VALIDATING_CONFIG_XML_WIDGET_AUTHOR");
 		}
 		
         // Validate that an application name/author was specified
         if (_widgetConfig.getName() == null) {
-        	//exception
         	throw new ValidationException("EXCEPTION_CONFIGXML_MISSING_WIDGET_NAME");
         }
         
@@ -135,12 +129,11 @@ public class ConfigXMLParser implements XMLParser {
         	Logger.logMessage(LogType.WARNING, "VALIDATION_CONFIGXML_MISSING_AUTHOR");
         }     
 
-        if (_widgetConfig.getContent() == null || _widgetConfig.getContent().length() == 0) {
+        if (_widgetConfig.getContent() == null || _widgetConfig.getContent().isEmpty()) {
             // No content page found in config.xml, how about in zip?
             if (archive.getIndexFile() == null) {
                 Logger.logMessage(LogType.WARNING, "VALIDATION_MISSING_STARTUP_PAGE");
-            }
-            else {
+            } else {
                 _widgetConfig.setContent(archive.getIndexFile());
             }
         }
@@ -149,17 +142,20 @@ public class ConfigXMLParser implements XMLParser {
             _widgetConfig.addIcon(archive.getIconFile());
         }
         
-        // Invalid Configurations.      
+        // Invalid Configurations...
         
         // If both source attributes are empty the developer did something wrong.
-        if((_widgetConfig.getForegroundSource()==null||_widgetConfig.getForegroundSource().length()==0)&&_widgetConfig.getBackgroundSource()==null) {
-        	throw new PackageException("EXCEPTION_CONFIGXML_INVALID_CONTENT","Invalid source or souce not specified.");
+        if ((_widgetConfig.getForegroundSource() == null || _widgetConfig.getForegroundSource().isEmpty()) 
+                && _widgetConfig.getBackgroundSource() == null) {
+            throw new PackageException( "EXCEPTION_CONFIGXML_INVALID_CONTENT",
+                    "Invalid source or the source is not specified." );
         }
-        
-        if(!_widgetConfig.isStartupEnabled()) {
-        	if(_widgetConfig.getForegroundSource().length()!=0&&_widgetConfig.getBackgroundSource()!=null) {
-        		throw new PackageException("EXCEPTION_CONFIGXML_INVALID_CONTENT","Invalid source or souce not specified.");
-        	}
+
+        if (!_widgetConfig.isStartupEnabled()
+                && !_widgetConfig.getForegroundSource().isEmpty()
+                && _widgetConfig.getBackgroundSource() != null) {
+            throw new PackageException( "EXCEPTION_CONFIGXML_INVALID_CONTENT",
+                    "Invalid source or the source is not specified." );
         }
         
         return _widgetConfig;
@@ -171,6 +167,9 @@ public class ConfigXMLParser implements XMLParser {
 
         // version        
         Node versionAttr = attrs.getNamedItem("version");
+		if (versionAttr == null) {
+			throw new ValidationException("VALIDATION_CONFIGXML_MISSING_VERSION");
+		}
         _widgetConfig.setVersion(getTextValue(versionAttr));
 
         // id
@@ -279,7 +278,6 @@ public class ConfigXMLParser implements XMLParser {
                 // id
                 Node id = nodeAttributes.getNamedItem("id");
                 if (id != null) {
-                	
                     name = id.getNodeValue();
                     
                     // required
@@ -298,8 +296,7 @@ public class ConfigXMLParser implements XMLParser {
                     }
 
                     if (name.length() > 0) {
-                        WidgetFeature wf = new WidgetFeature(name, isRequired,
-                                version, null);
+                        WidgetFeature wf = new WidgetFeature(name, isRequired, version, null);
                         featureList.addElement(wf);
                     }
                 } else {
@@ -332,12 +329,12 @@ public class ConfigXMLParser implements XMLParser {
         }
         
         Node invokeParamAttr = attrs.getNamedItem("rim:allowInvokeParams");
-        if (invokeParamAttr!=null&&invokeParamAttr.getNodeValue().equalsIgnoreCase("true")) {
+        if (invokeParamAttr != null && invokeParamAttr.getNodeValue().equalsIgnoreCase("true")) {
         	_widgetConfig.setAllowInvokeParams(true);
         }
         
         //Process Child "background"      
-        for(int i=0;i<listLength;i++) {
+        for(int i = 0; i < listLength; i++) {
         	Node startupNode = list.item(i);
         	String nodeName = startupNode.getNodeName(); 
         	if(nodeName.equalsIgnoreCase("rim:background")) {
@@ -345,8 +342,8 @@ public class ConfigXMLParser implements XMLParser {
         		NamedNodeMap startupAttrs = startupNode.getAttributes();
         		Node srcNode = startupAttrs.getNamedItem("src");
         		Node runOnStartup = startupAttrs.getNamedItem("runOnStartup");
-        		if(srcNode!=null) {
-        			if(runOnStartup!=null && runOnStartup.getNodeValue().equalsIgnoreCase("false")) {
+        		if (srcNode != null) {
+        			if (runOnStartup != null && runOnStartup.getNodeValue().equalsIgnoreCase("false")) {
         				_widgetConfig.setStartup(false);
         			}
         			_widgetConfig.setBackgroundSource(getURIValue(srcNode));
@@ -357,11 +354,10 @@ public class ConfigXMLParser implements XMLParser {
     
     // <license>
     private void processLicenseNode(Node licenseNode) throws Exception {
-
-        String license = getTextValue(licenseNode);
-        if (license != null) {
-            _widgetConfig.setLicense(license.trim());
-        }
+        // license
+        _widgetConfig.setLicense(getTextValue(licenseNode).trim());
+        
+        //license URL
         NamedNodeMap attrs = licenseNode.getAttributes();
         Node hrefAttr = attrs.getNamedItem("href");
         if (hrefAttr != null) {
@@ -372,8 +368,7 @@ public class ConfigXMLParser implements XMLParser {
     // <author>
     private void processAuthorNode(Node authorNode) throws Exception {
         // author
-        String name = getTextValue(authorNode);
-        _widgetConfig.setAuthor( name == null ? name : name.trim());
+        _widgetConfig.setAuthor(getTextValue(authorNode).trim());
 
         // author URL
         NamedNodeMap attrs = authorNode.getAttributes();
@@ -520,19 +515,22 @@ public class ConfigXMLParser implements XMLParser {
 
         attr = attrs.getNamedItem("duration");
         if (attr != null) {
-            try {// Check if the value is valid
-                int duration;
-                duration = Integer.parseInt(getTextValue(attr));
-                if (duration < 250) {
-                	_widgetConfig.setTransitionDuration(250);
-                } else  if (duration <= 1000) {
-                    _widgetConfig.setTransitionDuration(duration);
-                } else { // duration > 1000
-                	_widgetConfig.setTransitionDuration(1000);
-                }
-            } catch (Exception e) { // keep going
+            // Check if the duration value is valid
+            int duration = -1;
+            try {
+                duration = Integer.parseInt(getTextValue(attr).trim());
+            } catch (NumberFormatException ignore) {
+                // duration remains -1;
             }
-        }      
+            if (duration >= 0) {
+                if (duration < 250 ) {
+                    duration = 250;
+                } else if(duration > 1000) {
+                    duration = 1000;
+                }
+                _widgetConfig.setTransitionDuration( duration );
+            }
+        }    
         
         attr = attrs.getNamedItem("direction");
         if (attr != null) {
@@ -570,13 +568,15 @@ public class ConfigXMLParser implements XMLParser {
         NamedNodeMap attrs = connElement.getAttributes();
         Node timeoutAttr = attrs.getNamedItem("timeout");
         if (timeoutAttr != null) {
-            try {// Check if the value is valid
-                int timeoutValue;
+            // Check if the timeout value is valid
+            int timeoutValue = -1;
+            try {
                 timeoutValue = Integer.parseInt(getTextValue(timeoutAttr));
-                if (timeoutValue >= 0) {
-                    _widgetConfig.setTransportTimeout(timeoutValue);
-                }
-            } catch (Exception e) { // keep going
+            } catch (NumberFormatException ignore) {
+                // timeoutValue remains -1
+            }
+            if (timeoutValue >= 0) {
+                _widgetConfig.setTransportTimeout(timeoutValue);
             }
         }
 
@@ -626,7 +626,7 @@ public class ConfigXMLParser implements XMLParser {
         	try{
         		int aCacheAgeValue = Integer.parseInt(aCacheAgeAttrNode.getNodeValue());
         		_widgetConfig.setAggressiveCacheAge(aCacheAgeValue);
-        	}catch(Exception e){
+        	} catch (Exception e){
         		// Default values are used if an error happens        		
         	}
         }
@@ -652,37 +652,37 @@ public class ConfigXMLParser implements XMLParser {
         	try{
         		int maxCacheItemValue = Integer.parseInt(maxCacheItemAttrNode.getNodeValue());
         		// Convert from kilobytes to bytes
-        		if(maxCacheItemValue!=-1) {
+        		if (maxCacheItemValue != -1) {
         			_widgetConfig.setMaxCacheItemSize(maxCacheItemValue * 1024);
         		} else {
         			_widgetConfig.setMaxCacheItemSize(maxCacheItemValue);
         		}
-        	}catch(Exception e){
-        		// Default values are used if an error happens        		
+        	} catch (Exception e){
+        		// Default values are used if an error happens
         	}
         }
-        
     }    
     
     private String processText(String text) {
-    	
-    	if (text == null) return null;        
+    	if (text == null) {
+    	    return "";        
+    	}
         return text.replaceAll("\t", "").replaceAll("\n", "").trim();                    
-        
     }
 
+    /** Returns an empty string upon a null node argument or null node value */
     private String getTextValue(Node node) {
-        if (node == null)
+        if (node == null) {
             return "";
-
+        }
         if (node.getNodeType() == Node.ATTRIBUTE_NODE) {
             return processText(node.getNodeValue());
         }
         NodeList list = node.getChildNodes();
         for (int i = 0; i < list.getLength(); i++) {
-            Node chilNode = list.item(i);
-            if (chilNode.getNodeType() == Node.TEXT_NODE) {
-                return processText(chilNode.getNodeValue());
+            Node childNode = list.item(i);
+            if (childNode.getNodeType() == Node.TEXT_NODE) {
+                return processText(childNode.getNodeValue());
             }
         }
         return "";
@@ -712,7 +712,7 @@ public class ConfigXMLParser implements XMLParser {
         return "";
     }
     
-    class MyErrorHandler implements ErrorHandler {
+    static class MyErrorHandler implements ErrorHandler {
         @Override
         public void error(SAXParseException arg0) throws SAXException {
             printErrorMessage();

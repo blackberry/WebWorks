@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.io.file" shortName="File" introduced="1.0.0" comment="The File object provides functions for interacting with the file system.">
+    <features>
+      <feature id="blackberry.io.file" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  var xmlString = "<test>IO functions</test>";
+  var filePath = "file:///store/home/user/sample.xml";
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(xmlString, "text/xml");
+  var blob_data = blackberry.utils.documentToBlob(doc);
+     
+  blackberry.io.file.saveFile(filePath, blob_data);
+                
+  if (blackberry.io.file.exists(filePath)) {
+    blackberry.io.file.copy(filePath, "file:///SDCard/myxmlfile2.xml");
+    blackberry.io.file.readFile(filePath,handleOpenedFile);
+  }
+     
+  function handleOpenedFile(fullPath, blobData) {
+    alert("file opened was: " + fullPath + " which contained " + blobData.length + " bytes");
+  }
+</script>]]></example>
+    
+    <subclasses>
+      <object name="OnFileOpened" shortName="OnFileOpened Interface" interface="true" comment="Interface to implement on the callback function when all the file data has been retrieved.">
+        <param name="fullPath" type="String" comment="Full path of the file that was just opened"/>
+        <param name="blobData" type="Blob" comment="Blob that contains the file's contents"/>
+        <details>
+          This is the interface that must be available on the callback function to receive file data.
+        </details>
+      </object>
+    </subclasses>
+    
+    <functions>
+      <func name="getFileProperties" static="true" returns="FileProperties" comment="Get the FileProperties object for a given file.">
+        <param name="path" type="String" comment="local storage file path to the file"/>
+        <details>
+          Exception will be thrown if the path is to a directory.
+        </details>
+      </func>
+      <func name="exists" static="true" returns="Boolean" comment="Check whether or not a given file exists.">
+        <param name="path" type="String" comment="local storage file path to the file"/>
+        <details>
+          Note: If the path is an existing directory (not a file), the method will still return false.
+        </details>
+      </func>
+      <func name="open" static="true" returns="Boolean" comment="Open the specified file with the registered content handler.">
+        <param name="path" type="String" comment="file path to the file to be opened."/>
+        <details>
+          Note: If the path is an existing directory (not a file), the method will still return false.
+        </details>
+      </func>
+      <func name="rename" static="true" returns="void" comment="Rename a given file.">
+        <param name="path" type="String" comment="local storage file path to the file"/>
+        <param name="newFileName" type="String" comment="the new file name."/>
+        <details>
+          Exception will be thrown if the path is to a directory, or if the file name already exists.
+        </details>
+      </func>
+      <func name="copy" static="true" returns="void" comment="Copy a file to a given destination.">
+        <param name="sourcePath" type="String" comment="local storage file path to the file to be copied"/>
+        <param name="targetPath" type="String" comment="local storage file path to the new copied file. The name of the copied file should be specified at the end of the targetPath."/>
+        <details>
+          Exception will be thrown if the sourcePath is to a directory, or if the targetPath already exists.
+        </details>
+      </func>
+      <func name="deleteFile" static="true" returns="void" comment="Delete a given file.">
+        <param name="path" type="String" comment="local storage file path to the file to be deleted"/>
+        <details>
+          Exception will be thrown if the path is to a directory, or if the file doe not exist.
+        </details>
+      </func>
+      <func name="saveFile" static="true" returns="void" comment="Save a Blob to the local file system.">
+        <param name="path" type="String" comment="Local storage file path to the file that is going to store the data"/>
+        <param name="data" type="Blob" comment="The Blob to be saved."/>
+        <details>
+          Exception will be thrown if the path is to a existing file.
+        </details>
+      </func>
+      <func name="readFile" static="true" returns="void" comment="Reads in a file from the local file system.">
+        <param name="path" type="String" comment="local storage file path to the file to be opened into a Blob"/>
+        <param name="callback" type="OnFileOpened" comment="Javascript function to call on completion of loading the file from the file system."/>
+        <param name="async" optional="true" type="Boolean" comment="an optional parameter specifying if the call to read should be asynchronous or synchronous.  If this parameter is not supplied the default of true will be used."/>
+        <details>
+          The Javascript callback function will be provided two paramters. The first is a string representing the full path of the file. The second is the Blob that contains the contents of the file opened.
+        </details>
+      </func>
+    </functions>
+    
+  </object>  
+</library>

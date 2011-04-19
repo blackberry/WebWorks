@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,44 +22,56 @@ import javax.wireless.messaging.TextMessage;
 import blackberry.message.ReceiveListenerRegistry;
 import blackberry.message.util.MessageUtil;
 
+/**
+ * SMS message receiver registry implmentation.
+ * 
+ * @author dmeng
+ *
+ */
 public class SMSReceiveListenerRegistry extends ReceiveListenerRegistry {
 
-    protected boolean isTheRightTypeOfMessage(Object msg) {
+    /**
+     * @see ReceiveListenerRegistry#isTheRightTypeOfMessage( Object )
+     */
+    protected boolean isTheRightTypeOfMessage( Object msg ) {
         return msg instanceof TextMessage;
     }
 
+    /**
+     * @see ReceiveListenerRegistry#fireAll()
+     */
     public void fireAll() {
-        while (!messages.isEmpty()) {
-            final TextMessage msg = (TextMessage) messages.elementAt(0);
-            uiApplication.invokeLater(new Runnable() {
+        while( !messages.isEmpty() ) {
+            final TextMessage msg = (TextMessage) messages.elementAt( 0 );
+            uiApplication.invokeLater( new Runnable() {
                 public void run() {
-                    new callbackDispatchThread(msg).start();
+                    new callbackDispatchThread( msg ).start();
                 }
-            });
-            messages.removeElementAt(0);
+            } );
+            messages.removeElementAt( 0 );
         }
     }
 
     private class callbackDispatchThread extends Thread {
         private TextMessage _msg;
 
-        callbackDispatchThread(TextMessage msg) {
+        callbackDispatchThread( TextMessage msg ) {
             _msg = msg;
         }
 
         public void run() {
             try {
-                listener.invoke(null, getParameters());
-            } catch (Exception e1) {
-                throw new RuntimeException(e1.getMessage());
+                listener.invoke( null, getParameters() );
+            } catch( Exception e1 ) {
+                throw new RuntimeException( e1.getMessage() );
             }
         }
 
         private Object[] getParameters() {
-            String address = MessageUtil.getFormattedAddress(SMSMessage.PROTOCOL, _msg.getAddress());
-            Date date =_msg.getTimestamp();
-            if (date == null){
-                date = new Date(); //Date is not set, so use the received date
+            String address = MessageUtil.getFormattedAddress( SMSMessage.PROTOCOL, _msg.getAddress() );
+            Date date = _msg.getTimestamp();
+            if( date == null ) {
+                date = new Date(); // Date is not set, so use the received date
             }
             return new Object[] { _msg.getPayloadText(), address, date };
         }

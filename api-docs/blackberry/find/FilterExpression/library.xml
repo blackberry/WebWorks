@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.find.FilterExpression" whitelistName="blackberry.find" shortName="FilterExpression" introduced="1.0.0" comment="The FilterExpression object represents the expression that is used to 'find' an item that matches its defined condition. A FilterExpression object contains two fields, an operator and optional a boolean flag that indicates whether the condition should be evaluated negatively.">
+    <details>
+      The FilterExpression object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.find" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+  
+  // Find all appointments with "start" date later than current time   
+  var d = new Date();
+  var fe1 = new blackberry.find.FilterExpression("start", ">", d);  
+  var appt = blackberry.pim.Appointment.find(fe1, 10);   
+
+  // Find all contacts with "firstName" lead by "John"   
+  var fe2 = new blackberry.find.FilterExpression("firstName", "REGEX", "John[a-zA-Z_0-9 ]*");  
+  var result = blackberry.pim.Contact.find(fe2);
+  for (i = 0; i < result.length; i++) {
+    alert(result[i].firstName);
+  }
+</script>]]></example>
+    <example><![CDATA[<script type="text/javascript">      
+     
+  // Find all contacts except "John Smith" 
+  var feFirst = new blackberry.find.FilterExpression("firstName", "==", "John");   
+  var feLast = new blackberry.find.FilterExpression("lastName", "==", "Smith");   
+
+  // Create a FilterExpression with "feFirst && feLast", with negateExpression set to "true" 
+  var feNotJohnSmith = new blackberry.find.FilterExpression(feFirst, "AND", feLast, true); 
+
+  // result contains all contacts except "John Smith" 
+  var result = blackberry.pim.Contact.find(feNotJohnSmith ); 
+  for (i = 0; i < result.length; i++) { 
+    alert(result[i].firstName); 
+  } 
+</script>]]></example>
+    <example><![CDATA[<script type="text/javascript">
+
+  // Create a FilterExpression with "firstName" equals to "John" and "lastName" equals to "Smith"
+  var feFirst = new blackberry.find.FilterExpression("firstName", "==", "John");   
+  var feLast = new blackberry.find.FilterExpression("lastName", "==", "Smith");  
+  var feJohnSmith =  new blackberry.find.FilterExpression(feFirst, "AND", feLast);
+
+  // Create a FilterExpression with "firstName" equals to "Jack" and "lastName" equals to "Brown" 
+  var feJackBrown = new blackberry.find.FilterExpression
+                          (new blackberry.find.FilterExpression("firstName", "==", "Jack"),  
+                           "AND",
+                           new blackberry.find.FilterExpression("lastName", "==", "Brown")); 
+
+  // FilterExpression can be nested or combined 
+  var feCombined = new blackberry.find.FilterExpression(feJohnSmith, "OR", feJackBrown); 
+  
+  // Find all contacts either "John Smith" or "Jack Brown" 
+  var result = blackberry.pim.Contact.find(feCombined); 
+  for (i = 0; i < result.length; i++) { 
+    alert(result[i].firstName); 
+  } 
+</script>]]></example>
+    <example><![CDATA[<script type="text/javascript">  
+
+  // Create a FilterExpression with "firstName" equals to "John" and "lastName" equals to "Smith"
+  var feFirst = new blackberry.find.FilterExpression("firstName", "==", "John");
+  var feLast = new blackberry.find.FilterExpression("lastName", "==", "Smith");
+  var feJohnSmith = new blackberry.find.FilterExpression(feFirst, "AND", feLast);
+
+  // Find all contacts either "John Smith" or with the firstName of "Jack" 
+  var feCombined2 = new blackberry.find.FilterExpression(feJohnSmith, "OR", new blackberry.find.FilterExpression("firstName", "==", "Jack"));
+  var result2 = blackberry.pim.Contact.find(feCombined2);
+  for (i = 0; i < result2.length; i++) {
+    alert(result2[i].firstName);
+  }
+</script>]]></example>
+    <example><![CDATA[<script type="text/javascript">  
+
+  // Create a FilterExpression with "Business" being one of the categories
+  var fe = new blackberry.find.FilterExpression("categories", "CONTAINS", "Business");
+
+  // Find all contacts that belong to the "Business" category
+  var result = blackberry.pim.Contact.find(fe);
+  for (i = 0; i < result.length; i++) {
+    alert(result[i].firstName);
+  }
+</script>]]></example>
+    <example><![CDATA[<script type="text/javascript">  
+
+  // Create a FilterExpression for uncategorized items
+  var fe = new blackberry.find.FilterExpression("categories", "==", null);
+
+  // Find all uncategorized tasks
+  var result = blackberry.pim.Task.find(fe);
+  for (i = 0; i < result.length; i++) {
+    alert(result[i].summary);
+  }
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Constructor for a new FilterExpression object.">
+        <param name="leftField" type="object" comment="an object of String or FilterExpression class."/>
+        <param name="operator" type="object" comment="the operator used for comparing or combining."/>
+        <param name="rightField" type="object" comment="a value of to be comared or an object of FilterExpression class to be combined."/>
+        <param name="negate" optional="true" type="Boolean" comment="optional (default value is false), the flag that indicates whether the condition of the FilterExpression object should be evaluated negatively."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="leftField" type="object" readonly="true" static="false" comment="">
+        <details>
+          <![CDATA[
+1. (Either) contains the interested field for "Find."  
+It supports "." to define the subfield to be matched, 
+  for example "homeAddress.zipPostal" for a find towards pim.Contact; 
+It also supports the JAM predefined fields for the attribute of Date type (using "."), 
+so the user can "find" towards a Date attribute to match "any appointments that start at 12 o'clock" or 
+"all reminders that will alarm in Oct" without creating complex expression objects. 
+  For example, for a find towards pim.Appointment, if its "start" attribute is a Date of "Dec. 4, 2008 16:30:00" 
+start.Year - returns a string of 4 digits of the Year value of the date attribute: "2008" 
+start.Month - returns a string of the Month value: "12" 
+start.Day - returns a string of the Date value: "4" 
+start.Hour - returns a string of the Hour value: "16" 
+start.Minute - returns a string of the Minute value: "30" 
+start.Second - returns a string of the Second value: "00" 
+
+2. (Or) contains another FilterExpression object to be combined with "rightField."         
+        ]]>
+        </details>
+      </property>
+      
+      <property name="operator" type="object" readonly="true" static="false" comment="">
+        <details>
+          <![CDATA[
+Contains the operator, which is either an integer or a string, used for comparing or combining: 
+0, "!="        - Not equal 
+1, "=="        - Equal 
+2, "<"         - Less than 
+4, ">"         - Greater than 
+3, "<="        - Equal | Less than (Less or Equal) 
+5, ">="        - Equal | Greater than (Greater or Equal) 
+8, "REGEX"     - Regular expression. Please refer to java.lang.String.matches() API for details of how to create the correct regular expression and expected behavior.
+16, "AND"      - AND 
+32, "OR"       - OR
+64, "CONTAINS" - CONTAINS   
+        ]]>
+        </details>
+      </property>
+      
+      <property name="rightField" type="object" readonly="true" static="false" comment="">
+        <details>
+          <![CDATA[
+1. (Either) contains the value that used for comparing with the field that is specified by "leftField." 
+2. (Or) contains another FilterExpression object to be combined with "leftField."         
+        ]]>
+        </details>
+      </property>
+      
+      <property name="negate" type="Boolean" readonly="true" static="false" comment="The boolean flag that indicates whether the condition of the FilterExpression object should be evaluated negatively.  This should only be used when you have nested expressions.  On regular field/value comparisons, negate isn't necessary as the != is sufficient."/>
+    </properties>
+    
+  </object>
+</library>

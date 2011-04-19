@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.ui.menu">
+    <entryClass>blackberry.ui.menu.MenuExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>    
+  <features>
+    <feature id="blackberry.ui.menu" version="1.0.0"/>
+  </features>
+  <object name="blackberry.ui.menu" shortName="Menu" introduced="1.0.0" comment="The Menu object contains functionality for manipulating menu items for the application.">
+    <details>
+      The functionality in this object allows you to manipulate the dynamically created menu items for the application.  This will not allow you to remove the default menu items for the application.
+      To create a separator simply pass the appropriate parameters into the MenuItem constructor.
+    </details>
+    
+    <example><![CDATA[<script type="text/javascript">
+  function loadCustomMenuItemsForPage() {
+    if (blackberry.ui.menu.getMenuItems().length > 0) {
+      blackberry.ui.menu.clearMenuItems();
+    }
+    
+    var item = new blackberry.ui.menu.MenuItem(false, 1, "Click Me", customMenuItemClick);
+    blackberry.ui.menu.addMenuItem(item);         
+  }
+
+    function customMenuItemClick() {
+      alert("user just clicked me");
+    }
+</script>]]></example>
+    
+    <functions>
+      <func name="setDefaultMenuItem" returns="void" static="true" comment="Sets which item on the menu should be selected by default.">
+        <param name="item" type="blackberry.ui.menu.MenuItem" comment="The menu item to set as the default."/>
+      </func>
+      <func name="getMenuItems" returns="blackberry.ui.menu.MenuItem" static="true" array="true" comment="This method will return an array representing the menu items for the screen.">
+        <details>
+          This will return the dynamically created items not including the Switch Application, Close, and context menu items.  Removing a menu item from the resultant array will not remove the menu item from the menu.  You must call the removeMenuItem() method to remove a menu.
+        </details>
+      </func>
+      <func name="open" static="true" returns="void" comment="Opens the current screen's menu."/>
+      <func name="clearMenuItems" static="true" returns="void" comment="Removes all menu items from the current menu."/>
+      <func name="removeMenuItem" static="true" returns="void" comment="Removes the specified menu item from the menu.">
+        <param name="item" type="blackberry.ui.menu.MenuItem" comment="The menu item to remove."/>
+      </func>
+      <func name="addMenuItem" static="true" returns="void" comment="Adds the supplied menu item to the menu.">
+        <param name="item" type="blackberry.ui.menu.MenuItem" comment="The menu item to add."/>
+      </func>
+      <func name="hasMenuItem" static="true" returns="Boolean" comment="determine whether the menu contains the specified MenuItem.">
+        <param name="item" type="blackberry.ui.menu.MenuItem" comment="The menu item to be checked."/>
+      </func>
+    </functions>
+    
+  </object>
+</library>

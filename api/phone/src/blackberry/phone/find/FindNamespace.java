@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,13 +19,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
-import common.util.StringTokenizer;
-
 import net.rim.device.api.script.Scriptable;
+import blackberry.common.util.StringTokenizer;
 
-/**
- *
- */
 public class FindNamespace extends Scriptable {
 
     public static final String NAME = "blackberry.phone.Find";
@@ -61,7 +57,7 @@ public class FindNamespace extends Scriptable {
         String optional = "";
         String key = fieldName;
         if (key.indexOf('.') >= 0) {
-            final StringTokenizer st = new StringTokenizer(key, '.');
+            final StringTokenizer st = new StringTokenizer(key, ".");
             while (true) {
                 key = st.nextToken();
                 if (!st.hasMoreTokens()) {
@@ -81,9 +77,6 @@ public class FindNamespace extends Scriptable {
 
                 if (field instanceof Scriptable) {
                     o = (Scriptable) field;
-                    if (o == null) {
-                        return null;
-                    }
                 }
                 else if (field instanceof Date) {
                     optional = st.nextToken();

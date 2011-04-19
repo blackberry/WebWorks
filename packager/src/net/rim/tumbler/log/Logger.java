@@ -1,3 +1,18 @@
+/*
+* Copyright 2010-2011 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package net.rim.tumbler.log;
 
 import java.text.MessageFormat;
@@ -6,8 +21,7 @@ import java.util.ResourceBundle;
 
 public class Logger {
     
-    private static final Locale             LOCALE_EN_CA = new Locale("en","CA");
-    
+    private static final Locale             LOCALE_EN_CA = new Locale("en", "CA");
     private static ResourceBundle           _bundle;
     
     static {
@@ -20,7 +34,11 @@ public class Logger {
     }
     
     public static void logMessage(LogType logType, Exception exception) {
-        printMessage(logType, _bundle.getString(exception.getMessage()), null);
+        printMessage(logType, exception.getMessage(), null);
+    }
+    
+    public static void logMessage(LogType logType, Exception exception, String info) {
+        printMessage(logType, exception.getMessage(), info);
     }
     
     public static void logMessage(LogType logType, String messageID, String info) {
@@ -32,7 +50,7 @@ public class Logger {
             String result = MessageFormat.format( _bundle.getString(messageID), info );
             printMessage(logType, result, null);
         } catch (Exception e) {
-            // if the pattern/args fail - ignore
+            // If the pattern/args fail - ignore
         }
     }
     
@@ -44,8 +62,7 @@ public class Logger {
         String output = message + ((info != null && info.length() > 0) ? "(" + info + ")" : "");
         if (logType != LogType.NONE) {
             System.out.printf("%-12s\t\t%s\n", "[" + logType.toString() + "]", output);
-        }
-        else {
+        } else {
             System.out.println(output);
         }
     }

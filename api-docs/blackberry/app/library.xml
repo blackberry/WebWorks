@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.app">
+    <entryClass>blackberry.app.AppExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  
+  <features>
+    <feature id="blackberry.app" version="1.0.0">The Application object provides functions and properties for the currently running application.</feature>
+    <feature id="blackberry.app.event" version="1.0.0">The Application Event object allows you to access events triggered by the application.</feature>
+  </features>
+  
+  <object name="blackberry.app" shortName="Application" introduced="1.0.0" comment="The Application object provides functions and properties for the currently running application.">
+    <example><![CDATA[<script type="text/javascript">
+  function newData(isNewData) {
+    if (isNewData && !blackberry.app.isForeground) {
+      blackberry.app.setHomeScreenName("New data");
+    }
+    else {
+      alert("New data has arrived");
+    }
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="exit" static="true" returns="void" comment="This function will cause the application to exit."/>
+      <func name="setHomeScreenName" static="true" returns="void" comment="This method will set the text for the icon that appears in the Home Screen of the device.">
+        <param name="text" type="String" comment="Text to appear on the home screen icon."/>
+        <details>
+          Returns true if successful, false otherwise. Changes made using this API are NOT persisted across resets.
+        </details>
+      </func>
+      <func name="setHomeScreenIcon" static="true" returns="void" comment="This method will set the icon that appears in the Home Screen of the device.">
+        <param name="uri" type="String" comment="Location of the image to use for the icon.  The path to the image resource must be fully qualified.  An example of a fully qualified path is local:///resourceFolder/icons/icon.png.  The path to the resource must also be included in the whitelist.  For example, accessing an image on the file system requires 'file:///' to be whitelisted"/>
+        <param name="hover" type="Boolean" optional="true" comment="optional parameter.  If set to true then the hover icon for the application is changed.  By default this is false, so the icon that is changed is the default main icon for the application."/>
+        <details>
+          Returns true if successful, false otherwise. The hover icon can only be set when the application icon has been set first. Changes made using this API are NOT persisted across device resets.
+        </details>
+      </func>
+      <func name="requestForeground" static="true" returns="void" comment="This function will move the application to the foreground application.">
+      </func>
+      <func name="requestBackground" static="true" returns="void" comment="This function will move the application to the background.">
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="id" static="true" type="String" readonly="true" comment="A property representing the ID of the widget that is specified in the config.xml file."/>
+      <property name="name" static="true" type="String" readonly="true" comment="A property representing the name of the widget that is specified in the config.xml file."/>
+      <property name="description" static="true" type="String" readonly="true" comment="A property representing the description of the widget that is specified in the config.xml file."/>
+      <property name="author" static="true" type="String" readonly="true" comment="A property representing the ID of the author's name that is specified in the config.xml file."/>
+      <property name="authorEmail" static="true" type="String" readonly="true" comment="A property representing the author's email of the widget that is specified in the config.xml file."/>
+      <property name="authorURL" static="true" type="String" readonly="true" comment="A property representing the author's URL of the widget that is specified in the config.xml file."/>
+      <property name="version" static="true" type="String" readonly="true" comment="A property representing the version of the widget that is specified in the config.xml file."/>
+      <property name="license" static="true" type="String" readonly="true" comment="A property representing the license of the widget that is specified in the config.xml file."/>
+      <property name="copyright" static="true" type="String" readonly="true" comment="A property representing the copyright information of the widget that is specified in the config.xml file."/>
+      <property name="isForeground" static="true" type="Boolean" readonly="true" comment="A property that will return true if the widget is in the foreground."/>
+      <property name="licenseURL" static="true" type="String" readonly="true" comment="A property representing the license URL of the widget that is specified in the config.xml file."/>
+    </properties>
+    
+  </object>  
+</library>

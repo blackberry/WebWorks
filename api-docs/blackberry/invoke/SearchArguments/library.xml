@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.SearchArguments" shortName="SearchArguments" introduced="1.0.0" comment="The SearchArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Search application.">
+    <details>
+      The SearchArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.SearchArguments" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  var args = new blackberry.invoke.SearchArguments('build', 'Tim');
+  blackberry.invoke.invoke(blackberry.invoke.APP_SEARCH, args);  // Search
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Constructor for a new SearchArguments object.">
+      </ctor>
+      <ctor comment="Constructor for a new SearchArguments object.">
+        <param name="text" type="String" comment="Specifies the text for search."/>
+        <param name="name" type="String" comment="Specifies the name for search."/>
+      </ctor>
+    </constructors>
+    
+  </object>
+</library>
+

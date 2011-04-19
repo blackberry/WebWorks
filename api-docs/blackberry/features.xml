@@ -1,0 +1,39 @@
+<features>
+  <feature id="blackberry.app" version="1.0.0">The application feature provides functions and properties for the currently running application.</feature>
+  <feature id="blackberry.app.event" version="1.0.0">The application event feature allows you to access events triggered by the application.</feature>
+  <feature id="blackberry.find" version="1.0.0">The find feature represents the expression that is used to find an item that matches its defined condition.</feature>
+  <feature id="blackberry.identity" version="1.0.0">The identity feature contains information regarding the user's identity and accounts on a BlackBerry device.</feature>
+  <feature id="blackberry.identity.phone" version="1.0.0">The phone identity feature contains information regarding the user's phone lines on a BlackBerry device.</feature>
+  <feature id="blackberry.identity.Service" version="1.0.0">The service feature represents a service entry that describes specifics for a service on a BlackBerry device.</feature>
+  <feature id="blackberry.identity.Transport" version="1.0.0">The transport feature is used to store information about BlackBerry connections such as BES, BIS-B, and hotspots.</feature>
+  <feature id="blackberry.invoke" version="1.0.0">The invoke feature contains methods that interact with other applications on a BlackBerry device.</feature>
+  <feature id="blackberry.invoke.AddressBookArguments" version="1.0.0">The AddressBookArguments feature is used as a parameter to the invoke() method when invoking the Address Book application.</feature>
+  <feature id="blackberry.invoke.BrowserArguments" version="1.0.0">The BrowserArguments feature is used as a parameter to the invoke() method when invoking the BlackBerry Browser application.</feature>
+  <feature id="blackberry.invoke.CalendarArguments" version="1.0.0">The CalendarArguments feature is used as a parameter to the invoke() method when invoking the Calendar application.</feature>
+  <feature id="blackberry.invoke.CameraArguments" version="1.0.0">The CameraArguments feature is used as a parameter to the invoke() method when invoking the Camera application or Recorder application.</feature>
+  <feature id="blackberry.invoke.JavaArguments" version="1.0.0">The JavaArguments feature is used as a parameter to the invoke() method when invoking a Java application.</feature>
+  <feature id="blackberry.invoke.MapsArguments" version="1.0.0">The MapsArguments feature is used as a parameter to the invoke() method when invoking the Maps application.</feature>
+  <feature id="blackberry.invoke.MemoArguments" version="1.0.0">The MemoArguments feature is used as a parameter to the invoke() method when invoking the Memo application.</feature>
+  <feature id="blackberry.invoke.MessageArguments" version="1.0.0">The MessageArguments feature is used as a parameter to the invoke() method when invoking the Messaging application.</feature>
+  <feature id="blackberry.invoke.PhoneArguments" version="1.0.0">The PhoneArguments feature is used as a parameter to the invoke() method when invoking the Phone application.</feature>
+  <feature id="blackberry.invoke.SearchArguments" version="1.0.0">The SearchArguments feature is used as a parameter to the invoke() method when invoking the Search application.</feature>
+  <feature id="blackberry.invoke.TaskArguments" version="1.0.0">The TaskArguments feature is used as a parameter to the invoke() method when invoking the Tasks application.</feature>
+  <feature id="blackberry.io.dir" version="1.0.0">The directory feature provides functions for interacting with directories on the file system.</feature>
+  <feature id="blackberry.io.file" version="1.0.0">The file feature provides functions for interacting with the file system.</feature>
+  <feature id="blackberry.message" version="1.0.0">The message feature represents a messaging capability on the BlackBerry device. </feature>
+  <feature id="blackberry.pim.Address" version="1.0.0">The Address feature represents an address used for a contact or for use with launching the BlackBerry Maps application.</feature>
+  <feature id="blackberry.pim.Appointment" version="1.0.0">The Appointment feature represents an appointment in your calendar.</feature>
+  <feature id="blackberry.pim.Attendee" version="1.0.0">The Attendee feature is used to represent a person who is invited to a calendar appointment.</feature>
+  <feature id="blackberry.pim.category" version="1.0.0">The Category feature defines APIs necessary to access and manipulate categories in the Personal Information Management (PIM) database.</feature>
+  <feature id="blackberry.pim.Contact" version="1.0.0">The Contact feature represents a contact in the BlackBerry contacts list.</feature>
+  <feature id="blackberry.pim.Memo" version="1.0.0">The Memo feature is used to represent an entry in the MemoPad application.</feature>
+  <feature id="blackberry.pim.Recurrence" version="1.0.0">The Recurrence feature is used to represent the repetition rules for an appointment or a task.</feature>
+  <feature id="blackberry.pim.Reminder" version="1.0.0">The Reminder feature is used to represent the reminder rule for an appointment or a task.</feature>
+  <feature id="blackberry.pim.Task" version="1.0.0">The Task feature represents a task entry that would be in your BlackBerry tasks list.</feature>
+  <feature id="blackberry.push" version="1.0.0">The Push feature allows you to get leverage the BlackBerry push architecture to receive push data in your application.</feature>
+  <feature id="blackberry.system" version="1.0.0">The System feature allows you to get access to system level functions and attributes of the BlackBerry device.</feature>
+  <feature id="blackberry.system.event" version="1.0.0">The System Event feature allows you to get access to events triggered by system events on the BlackBerry device.</feature>
+  <feature id="blackberry.ui.dialog" version="1.0.0">The Dialog feature contains functions for manipulating system dialog boxes.</feature>
+  <feature id="blackbery.ui.menu" version="1.0.0">The Menu feature contains functionality for manipulating menu items for the application.</feature>
+  <feature id="blackberry.utils" version="1.0.0">The Utils feature provides useful utility functions and properties.</feature>
+</features>

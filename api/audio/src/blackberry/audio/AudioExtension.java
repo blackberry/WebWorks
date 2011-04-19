@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@ import net.rim.device.api.web.WidgetExtension;
 
 import org.w3c.dom.Document;
 
-import common.util.FeaturesHash;
-
 import blackberry.audio.Player.PlayerConstructor;
+import blackberry.common.util.FeaturesHash;
 
 public class AudioExtension implements WidgetExtension {
 

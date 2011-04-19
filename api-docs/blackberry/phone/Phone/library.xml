@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="true">
+  <object name="blackberry.phone.Phone" shortName="Phone" comment="Phone Object">
+    <features>
+      <feature id="blackberry.phone.Phone" version="1.0.0.0" required="true">Phone Object</feature>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Check if in active call
+  var res = blackberry.phone.Phone.inActiveCall();
+  alert("Currently in active call? " + res);
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Retrieve an array of active calls and display the details of the call at index specified
+  var res = blackberry.phone.Phone.activeCalls();
+  if (res == null || res.length == 0) {
+    alert("There are no active calls");
+  }
+  else {
+    alert("There are " + res.length + " active calls");
+    var index = 0;
+    displayCallDetails(res[index]);
+  }
+
+  function displayCallDetails(call) {
+    alert(("Is OnHold: " + call.isOnHold() + "\n") +
+    ("Is Outgoing: " + call.outgoing + "\n") +
+    ("Recipient name: " + call.recipientName + "\n") +
+    ("Recipient number: " + call.recipientNumber + "\n"));
+  }
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Adding three listeners differ by their type.
+  addListenerByType(callEndedByUserCB, blackberry.phone.Phone.CB_CALL_ENDED_BYUSER);
+  addListenerByType(callDisconnectedCB, blackberry.phone.Phone.CB_CALL_DISCONNECTED);
+  addListenerByType(callConnectedCB, blackberry.phone.Phone.CB_CALL_CONNECTED);
+
+  // Removing one of the previously added listeners
+  addListenerByType(null, blackberry.phone.Phone.CB_CALL_CONNECTED);
+
+  function addListenerByType(callback, type) {
+    var res = blackberry.phone.Phone.addPhoneListener(callback, type);
+    if (callback != null) {
+      alert("Registered for phone listener type " + type + " : " + res);
+    }
+    else {
+      alert("Unregistered from phone listener type " + type + " : " + res);
+    }
+  }
+
+  function callEndedByUserCB(id) {
+    alert("Call ended by user!");
+  }
+
+  function callDisconnectedCB(id) {
+    alert("The id of diconnected call is: " + id);
+  }
+
+  function callConnectedCB(id) {
+    alert("Call is connected!");
+  }
+</script>]]></example>
+    
+    <constants comment="Enumerated PhoneListener event types">
+      <const name="CB_CALL_INITIATED" type="Number" value="0" static="true" comment="Invoked when a call has been initiated by the device (outbound)."/>
+      <const name="CB_CALL_WAITING" type="Number" value="1" static="true" comment="Invoked when a call is waiting."/>
+      <const name="CB_CALL_INCOMING" type="Number" value="2" static="true" comment="Invoked when a new call is arriving."/>
+      <const name="CB_CALL_ANSWERED" type="Number" value="3" static="true" comment="Invoked when the user answers a call (user driven)."/>
+      <const name="CB_CALL_CONNECTED" type="Number" value="4" static="true" comment="Invoked when the network indicates a connected event (network driven)."/>
+      <const name="CB_CALL_CONFERENCECALL_ESTABLISHED" type="Number" value="5" static="true" comment="Invoked when a conference call has been established."/>
+      <const name="CB_CONFERENCECALL_DISCONNECTED" type="Number" value="6" static="true" comment="Invoked when a conference call is terminated (all members disconnected)."/>
+      <const name="CB_CALL_DISCONNECTED" type="Number" value="7" static="true" comment="Invoked when a call is disconnected."/>
+      <const name="CB_CALL_DIRECTCONNECT_CONNECTED" type="Number" value="8" static="true" comment="Invoked when a direct-connect call is connected."/>
+      <const name="CB_CALL_DIRECTCONNECT_DISCONNECTED" type="Number" value="9" static="true" comment="Invoked when a direct-connect call is disconnected."/>
+      <const name="CB_CALL_ENDED_BYUSER" type="Number" value="10" static="true" comment="Invoked when the user ends the call."/>
+      <const name="CB_CALL_FAILED" type="Number" value="11" static="true" comment="Invoked when a call fails."/>
+      <const name="CB_CALL_RESUMED" type="Number" value="12" static="true" comment="Invoked when a call goes from 'held' to 'resumed' state."/>
+      <const name="CB_CALL_HELD" type="Number" value="13" static="true" comment="Invoked when a call goes into the 'held' state."/>
+      <const name="CB_CALL_ADDED" type="Number" value="14" static="true" comment="Invoked when a call gets added to a conference call"/>
+      <const name="CB_CALL_REMOVED" type="Number" value="15" static="true" comment="Invoked when a call gets removed from a conference call."/>
+    </constants>
+    
+    <constants comment="Enumerated error types used to describe a reason when callFailed callback method is called.">
+      <const name="CALL_ERROR_SUBSCRIBER_BUSY" type="Number" value="1" static="true" comment="Subscriber busy."/>
+      <const name="CALL_ERROR_CONGESTION" type="Number" value="2" static="true" comment="Congestion."/>
+      <const name="CALL_ERROR_RADIO_PATH_UNAVAILABLE" type="Number" value="3" static="true" comment="Radio path unavailable."/>
+      <const name="CALL_ERROR_NUMBER_UNOBTAINABLE" type="Number" value="4" static="true" comment="Number unobtainable."/>
+      <const name="CALL_ERROR_AUTHORIZATION_FAILURE" type="Number" value="5" static="true" comment="Authorization failure."/>
+      <const name="CALL_ERROR_EMERGENCY_CALLS_ONLY" type="Number" value="6" static="true" comment="Emergency calls only."/>
+      <const name="CALL_ERROR_HOLD_ERROR" type="Number" value="7" static="true" comment="Hold error."/>
+      <const name="CALL_ERROR_OUTGOING_CALLS_BARRED" type="Number" value="8" static="true" comment="Outgoing call barred."/>
+      <const name="CALL_ERROR_GENERAL" type="Number" value="9" static="true" comment="General call error."/>
+      <const name="CALL_ERROR_MAINTENANCE_REQUIRED" type="Number" value="10" static="true" comment="Maintenance required."/>
+      <const name="CALL_ERROR_SERVICE_NOT_AVAILABLE" type="Number" value="11" static="true" comment="Service not available."/>
+      <const name="CALL_ERROR_DUE_TO_FADING" type="Number" value="12" static="true" comment="Call failed because of signal fading."/>
+      <const name="CALL_ERROR_LOST_DUE_TO_FADING" type="Number" value="13" static="true" comment="Call lost because of signal fading."/>
+      <const name="CALL_ERROR_TRY_AGAIN" type="Number" value="14" static="true" comment="Call failed, please try again."/>
+      <const name="CALL_ERROR_FDN_MISMATCH" type="Number" value="15" static="true" comment="Fixed dialing number mismatch."/>
+      <const name="CALL_ERROR_CONNECTION_DENIED_BY_NETWORK" type="Number" value="16" static="true" comment="Connection denied by network."/>
+      <const name="CALL_ERROR_NUMBER_NOT_IN_SERVICE" type="Number" value="17" static="true" comment="Number not in service (IDEN specific)."/>
+      <const name="CALL_ERROR_PLEASE_TRY_LATER" type="Number" value="18" static="true" comment="Please try call later (IDEN specific)."/>
+      <const name="CALL_ERROR_SERVICE_CONFLICT" type="Number" value="19" static="true" comment="Service conflict TI (IDEN specific)."/>
+      <const name="CALL_ERROR_SYSTEM_BUSY_TRY_LATER" type="Number" value="20" static="true" comment="System busy, try later (IDEN specific)."/>
+      <const name="CALL_ERROR_USER_BUSY_IN_PRIVATE" type="Number" value="21" static="true" comment="User busy in private (IDEN specific)."/>
+      <const name="CALL_ERROR_USER_BUSY_IN_DATA" type="Number" value="22" static="true" comment="User busy in data (IDEN specific)."/>
+      <const name="CALL_ERROR_USER_NOT_AUTHORIZED" type="Number" value="23" static="true" comment="User not authorized (IDEN specific)."/>
+      <const name="CALL_ERROR_USER_NOT_AVAILABLE" type="Number" value="24" static="true" comment="User not available (IDEN specific)."/>
+      <const name="CALL_ERROR_USER_UNKNOWN" type="Number" value="25" static="true" comment=" User unknown (IDEN specific)."/>
+      <const name="CALL_ERROR_USER_NOT_REACHABLE" type="Number" value="26" static="true" comment="User not reachable (IDEN specific)."/>
+      <const name="CALL_ERROR_INCOMING_CALL_BARRED" type="Number" value="27" static="true" comment="Incoming call barred."/>
+      <const name="CALL_ERROR_CALL_REPLACED_BY_STK" type="Number" value="28" static="true" comment="Call replaced by STK (GSM SIM specific)."/>
+      <const name="CALL_ERROR_STK_CALL_NOT_ALLOWED" type="Number" value="29" static="true" comment="Call blocked by STK error (GSM SIM specific)."/>
+    </constants>
+    
+    <functions>
+      <func name="inActiveCall" returns="Boolean" static="true" comment="Determines whether or not the phone is currently in an active call"/>
+      <func name="activeCalls" returns="Call" static="true" array="true" comment="Returns an array of current active calls.">
+        <details>
+          Active calls are tracked when the application is running. When launched, only the current active call might be retrieved.
+        </details>
+      </func>
+      <func name="addPhoneListener" returns="Boolean" static="true" comment="Registers PhoneListener of different type events">
+        <param name="callback" type="OnPhoneEvent" comment="This ScriptableFunction invoked when appropriate phone call event occured."/>
+        <param name="eventType" type="Number" optional="true" comment="One of constants defining phone call event type."/>
+        <details>
+          To subscribe to PhoneListener, a callback and an eventType (one of enumerated PhoneListener event types) should be specified.
+          When subscribing a different callback with the same eventType, the new callback will overwrite the previous one.
+          To unsubscribe from a phone call event, pass null as a callback parameter, along with proper eventType.
+          To unsubscribe from ALL events, pass null.
+          All invoked callback functions will receive a 'callid' of type 'int' as a parameter, which is the ID of the Call.
+          A callback registered with eventType 'CB_CALL_FAILED', in addition to the 'callid' parameter, will get code as a second parameter
+          describing the reason for the failure. It would be equal to one of CALL_ERROR_* constants.
+        </details>
+      </func>
+    </functions>
+    
+    <subclasses>
+      <object name="OnPhoneEvent" shortName="Phone's Event Interface" interface="true" comment="Interface to provide information for the phone events.">
+        <param name="callId" type="Number" comment="ID for the resumed call."/>
+        <param name="reason" type="Number" optional="true" comment="CALL_ERROR_* code describing the reason for the failure when callback for CB_CALL_FAILED is triggered"/>
+        <details>
+          This is the interface that must be available on the callback function to receive a phone's event data.
+        </details>
+      </object>
+    </subclasses>
+  </object>
+</library>

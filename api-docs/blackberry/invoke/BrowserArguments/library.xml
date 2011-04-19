@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.BrowserArguments" shortName="BrowserArguments" introduced="1.0.0" comment="The BrowserArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the BlackBerry Browser application.">
+    <details>
+      The BrowserArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.BrowserArguments" version="1.0.0"/>
+      <feature id="blackberry.identity" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  var args = new blackberry.invoke.BrowserArguments('http://www.blackberry.com');
+  blackberry.invoke.invoke(blackberry.invoke.APP_BROWSER, args);
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Open Browser application on the BlackBerry smartphone.">
+        <param name="url" type="String" comment="The desired url to bring up in the browser."/>
+        <param name="transport" optional="true" type="blackberry.identity.Transport" comment="an optional parameter representing the transport type that the browser should use.  If no parameter is specified the default browser configured for the device will be used."/>
+        <details>
+          Thows an Exception if values supplied are not correct.
+        </details>
+      </ctor>
+    </constructors>
+    
+  </object>
+</library>
+

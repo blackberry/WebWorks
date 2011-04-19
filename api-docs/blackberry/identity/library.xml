@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.identity">
+    <entryClass>blackberry.identity.IdentityExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  
+  <features>
+    <feature id="blackberry.identity" version="1.0.0"/>
+    <feature id="blackberry.identity.phone" version="1.0.0"/>
+  </features>
+  
+  <object name="blackberry.identity" shortName="Identity" comment="The Identity object contains information regarding the user's identity and accounts on a BlackBerry smartphone.">
+    <features>
+      <feature id="blackberry.identity" version="1.0.0"/>
+      <feature id="blackberry.identity.phone" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  var transportList = blackberry.identity.getTransportList();
+  for (var i = 0; i < transportList.length; i++) {
+    alert("Transport name is:" + transportList[i].name + "\ntransport type:" + transportList[i].type);
+  }
+  
+  alert("PIN: " + blackberry.identity.PIN);
+  alert("IMSI: " + blackberry.identity.IMSI);
+  alert("IMEI: " + blackberry.identity.IMEI);
+</script>]]></example>
+    
+    <functions>
+      <func name="getServiceList" static="true" returns="Service" array="true" comment="Returns the list of Service objects that describe each of the services that the user has for their device.">
+        <details>
+          Return a list of service objects describing all the services registered for the BlackBerry device. This list of services could include different accounts, such as their multiple BES/Unite accounts, Hotmail accounts, or Google accounts.
+        </details>
+      </func>
+      <func name="getTransportList" static="true" returns="Transport" array="true" comment="Returns a list of possible communications transports that can be used.">
+        <details>
+          Returns an array of transport objects that represent the available transports on the list.
+        </details>
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="PIN" static="true" type="String" readonly="true" comment="Contains the Personal Identification number for the smartphone."/>
+      <property name="IMSI" static="true" type="String" readonly="true" comment="Contains the IMSI number for the smartphone."/>
+      <property name="IMEI" static="true" type="String" readonly="true" comment="Contains the IMEI number for the smartphone."/>
+    </properties>
+    
+  </object>
+</library>

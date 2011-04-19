@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.utils">
+    <entryClass>blackberry.utils.UtilsExtension</entryClass>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  <features>
+    <feature id="blackberry.utils" version="1.0.0"/>
+  </features>
+  <object name="blackberry.utils" shortName="Utils" introduced="1.0.0" comment="The Utils object provides useful utility functions and properties.">
+    <features>
+      <feature id="blackberry.utils" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  var url = blackberry.utils.parseURL("http://www.foo.com:8080/index.html?COUNTER=3&FOO=BAR");
+</script>]]></example>
+    
+    <functions>
+      <func name="generateUniqueId" static="true" returns="Number" comment="This method will generate a unique numbers.">
+        <details>
+          returns a unique number.
+        </details>
+      </func>
+      <func name="documentToBlob" static="true" returns="Blob" comment="Convert a document into a Blob. Supported in 5.0.0 only." supportedIn="5.0.0">
+        <param name="doc" type="Document" comment="The document to be converted."/>
+        <details>
+          Convert a document into a Blob using the character encoding specified in the document.
+          The encoding type is part of the
+          <a href='http://www.w3.org/TR/2004/REC-xml-20040204#NT-XMLDecl'>
+            XML declaration
+          </a>
+          .
+          BlackBerry supports the following character encodings: ISO-8859-1, UTF-8, UTF-16BE, and US-ASCII.
+          If no encoding information is provided in the document, UTF-16BE encoding will be used by default.
+        </details>
+      </func>
+      <func name="blobToString" static="true" returns="String" comment="Construct a new String by converting the blob using the specified character encoding">
+        <param name="blob" type="Blob" comment="The Blob object to be converted."/>
+        <param name="encoding" type="String" optional="true" comment="The name of a supported character encoding."/>
+        <details>
+          BlackBerry supports the following character encodings: ISO-8859-1, UTF-8, UTF-16BE, US-ASCII.
+          Besides these encodings, Web API supports also supports BASE64 encoding.
+          Support of other encodings depends on the configuration of the BlackBerry device.
+          The default encoding is ISO-8859-1.
+        </details>
+      </func>
+      <func name="parseURL" static="true" returns="URL" comment="parse an URL string into an URL object.">
+        <param name="url" type="String" comment="The URL string to be parsed."/>
+        <details>
+          An exception will be thrown if an invalid URL string is given. There currently is a known issue if you attempt to parse a local:/// path with this method. It will throw an invalid URL error. To work around this limitation you should string replace "local:///" with "local://".
+        </details>
+      </func>
+      <func name="stringToBlob" static="true" returns="Blob" comment="Convert a string object into a Blob using the specified character encoding.">
+        <param name="str" type="String" comment="The string to be converted."/>
+        <param name="encoding" type="String" optional="true" comment="The name of a supported character encoding."/>
+        <details>
+          BlackBerry devices support the following character encodings: ISO-8859-1, UTF-8, UTF-16BE, and US-ASCII.
+          If encoding information is not provided in the parameter, UTF-16BE encoding will be used by default.
+        </details>
+      </func>
+    </functions>
+    
+  </object>
+</library>

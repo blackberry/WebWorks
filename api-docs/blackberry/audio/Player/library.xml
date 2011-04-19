@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="true">
+  <object name="blackberry.audio.Player" shortName="Player" comment="The object represents an audio player.">
+    <details>
+      The audio player is intended to play audio content only.
+      It is an instance object; if a new instance is desired, it must be created using the new keyword.
+    </details>
+    
+    <features>
+      <feature id="blackberry.audio.Player" version="1.0.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  function createPlayerFromMediaFileStoredInLocal() {
+    var playerInstance = new  blackberry.audio.Player("local:///res/filename.mid", "audio/mid", true);
+  }
+
+  function createPlayerFromMediaFileStoresInSystem() {
+    var playerInstance = new  blackberry.audio.Player("file:///store/home/user/music/filename.mid");
+  }
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Display some player static and non-static constants.
+  var playerInstance = new  blackberry.audio.Player("file:///store/home/user/music/filename.mid");
+  var res = blackberry.audio.Player.UNREALIZED;
+  alert("The value of UNREALIZED static constant is: " + res);
+  res = playerInstance.EVENT_DURATION_UPDATED;
+  alert("The value of EVENT_DURATION_UPDATED non-static constant is: " + res);
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  var playerInstance = new  blackberry.audio.Player("file:///store/home/user/music/filename.mp3");
+
+  // Setting new time for media
+  var newMediaTime = 10000;
+  playerInstance.mediaTime = newMediaTime;
+  alert("New media time: " + playerInstance.mediaTime);
+
+  // Setting new volume for media
+  var newVolumeLevel = 85;
+  playerInstance.volumeLevel = newVolumeLevel;
+  alert("New volume level: " + playerInstance.volumeLevel);    
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Playing the player
+  var playerInstance = new  blackberry.audio.Player("file:///store/home/user/music/filename.mp3");    
+  playerInstance.play();
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Pausing the player and then closing it
+  var playerInstance = new  blackberry.audio.Player("file:///store/home/user/music/filename.mp3");    
+  playerInstance.pause();
+  playerInstance.close();
+</script>]]></example>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Subscribing and unsubscribing with player's events
+  var playerInstance = new  blackberry.audio.Player("file:///store/home/user/music/filename.mp3");    
+  playerInstance.addPlayerListener(OnPlayerUpdate);
+
+  // Invoked when there is an update event for the player.
+  function OnPlayerUpdate(player, event, eventData) {
+    try {
+      alert("Player's duration is: " + player.duration)
+    } catch (e) {}
+    try {
+      alert("Event: " + event);
+    } catch (e) {}
+    try {
+      alert("Event Data:  " + eventData);
+    } catch (e) {}
+
+    playerInstance.addPlayerListener(null);
+  }
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Construct a new Player object.">
+        <param name="locator" type="String" comment="Media locator string in URI syntax that describes the media content."/>
+        <details>
+          <![CDATA[
+              Media locators are specified in URI syntax which is defined in the form:
+              '<scheme>:<scheme-specific-part>'.
+              If scheme is 'local', media type should be specified.
+            ]]>
+        </details>
+        <param name="type" type="String" optional="true" comment="The ContentType of the media."/>
+        <param name="async" type="Boolean" optional="true" comment="The parameter specifying whether the player should asynchronously advance to PREFETCHED state. If not provided set to false."/>
+      </ctor>
+    </constructors>
+    
+    <constants comment="Enumerated Player's constants.">
+      <const name="TIME_UNKNOWN" type="Number" value="-1" static="true" comment="The returned value indicating that the requested time is unknown."/>
+      <const name="CLOSED" type="Number" value="0" static="true" comment="The state of the Player indicating that the Player is closed."/>
+      <const name="UNREALIZED" type="Number" value="100" static="true" comment="The state of the Player indicating that it has not acquired the required information and resources to function."/>
+      <const name="REALIZED" type="Number" value="200" static="true" comment="The state of the Player indicating that it has acquired the required information but not the resources to function."/>
+      <const name="PREFETCHED" type="Number" value="300" static="true" comment="The state of the Player indicating that it has acquired all the resources to begin playing."/>
+      <const name="STARTED" type="Number" value="400" static="true" comment="The state of the Player indicating that the Player has already started."/>
+    </constants>
+    
+    <functions>
+      <func name="play" returns="Boolean" comment="Starts the Player. Returns true on success."/>
+      <func name="pause" returns="Boolean" comment="Pause the player's playback. Returns true on success."/>
+      <func name="close" returns="Boolean" comment="Closing the Player and releases most of its resources, it must not be used again."/>
+      <func name="addPlayerListener" returns="Boolean" comment="Add a player listener for this player.">
+        <param name="callback" type="OnPlayerUpdate" comment="This method is called to deliver an event to a registered listener when a Player event is observed."/>
+        <details>
+          All next callbacks will override the previous.
+          To unsubscribe from the PlayerListener, pass null as a callback parameter.
+        </details>
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="duration" type="Number" readonly="true" comment="The duration of the media in milliseconds."/>
+      <property name="state" type="Number" readonly="true" comment="The current state of this Player (one of Enumerated Player's constants)."/>
+      <property name="mediaTime" type="Number" comment="Get/Set Player's media time."/>
+      <details>
+        For some media types, setting the media time may not be very accurate. The returned value will indicate the actual media time set.
+        Setting the media time to negative values will effectively set the media time to zero. Setting the media time to beyond the duration of the media will set the time to the end of media.
+        There are some media types that cannot support the setting of media time. If the media time cannot be determined, getMediaTime returns TIME_UNKNOWN.
+      </details>
+      <property name="volumeLevel" type="Number" comment="Get/Set the player's volume level."/>
+      <details>
+        Volume level value varies between 0 and 100. If the given level is less than 0 or greater than 100, the level will be set to 0 or 100 respectively.
+        When the call results in a change in the volume level, a VOLUME_CHANGED event will be delivered through the OnPlayerUpdate.
+      </details>
+    </properties>
+    
+    <properties comment="Enumerated Player Listener types.">
+      <property name="EVENT_BUFFERING_STARTED" type="String" value="bufferingStarted" readonly="true" static="false" comment="Posted when the Player enters into a buffering mode.">
+        <details>
+          When this event is received, the eventdata parameter will be a number designating the media time when the buffering is started.
+        </details>
+      </property>
+      <property name="EVENT_BUFFERING_STOPPED" type="String" value="bufferingStopped" readonly="true" static="false" comment="Posted when the Player leaves the buffering mode.">
+        <details>
+          When this even is received, the eventData parameter will be a number designating the media time when the buffering stopped.
+        </details>
+      </property>
+      <property name="EVENT_CLOSED" type="String" value="closed" readonly="true" static="false" comment="Posted when a Player is closed.">
+        <details>
+          When this event is received, the eventData parameter is null.
+        </details>
+      </property>
+      <property name="EVENT_DEVICE_AVAILABLE" type="String" value="deviceAvailable" readonly="true" static="false" comment=" Posted when the system or another higher priority application has released an exclusive device which is now available to the Player.">
+        <details>
+          The eventData parameter is a string specifying the name of the device.
+        </details>
+      </property>
+      <property name="EVENT_DEVICE_UNAVAILABLE" type="String" value="deviceUnavailable" readonly="true" static="false" comment="Posted when the system or another higher priority application has temporarily taken control of an exclusive device which was previously available to the Player.">
+        <details>
+          The eventData parameter is a string specifying the name of the device.
+        </details>
+      </property>
+      <property name="EVENT_DURATION_UPDATED" type="String" value="durationUpdated" readonly="true" static="false" comment="Posted when the duration of a Player is updated.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the duration of the media.
+        </details>
+      </property>
+      <property name="EVENT_END_OF_MEDIA" type="String" value="endOfMedia" readonly="true" static="false" comment="Posted when a Player has reached the end of the media.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the media time when the player reached end of media and stopped.
+        </details>
+      </property>
+      <property name="EVENT_ERROR" type="String" value="error" readonly="true" static="false" comment="Posted when an error had occurred.">
+        <details>
+          When this event is received, the eventData parameter will be a string object specifying the error message.
+          Error code:
+          1 : Media player busy: the media player is currently performing an operation that precludes the requested operation.
+          2 : Invalid parameter: a parameter was specified with an invalid value.
+          3 : Insufficient memory: there is insufficient memory to perform the requested operation.
+          4 : Need more data: playback cannot proceed until the streaming source provides more data.
+          5 : Unspecified: some error occured which does not fit into any other category.
+          6 : Format: an error in the media file was detected.
+          7 : No server response: a server has stopped responding.
+          8 : Connetion lost: the current connection has been dropped.
+          9 : DNS resolve error: an invalid URL has been detected.
+          10 : Unseekable: the media player needs to seek in the file in order to access headers, but can't since the file being played is unseekable.
+          11 : Connection timeout: the (streaming) server is unreachable.
+          12 : No rights:
+          The DRM agent wasn't able to find a valid digital right in the media.
+          RTSP error 401 has occurred.
+          13 : General client error:
+          The streaming server rejected the streaming request.
+          RTSP error 4xx not covered by another error code has occurred.
+          14 : Server error:
+          An error occured on the streaming server while streaming.
+          RTSP error 5xx has occurred.
+          15 : Payment required:
+          Payment is required to stream this item from the server.
+          RTSP error 402 has occurred.
+          16 :
+          Forbidden:
+          The streaming server has rejected the streaming request for security reasons.
+          RTSP error 403 has occurred.
+          17 : Client file not found:
+          The item required to stream doesn't exist or has been removed from the server.
+          RTSP error 404 has occurred.
+          18 : Client proxy authentication required:
+          Device needs to authenticate with a proxy server before streaming.
+          RTSP error 407 has occurred.
+          19 : Client request URI too large:
+          The request URI sent to the server is too large.
+          RTSP error 414 has occurred.
+          20 : Not enough bandwidth:
+          There is not enough bandwidth to support streaming.
+          RTSP error 453 has occurred.
+          21 : Client session not found:
+          Streaming session has been removed by the server (e.g.: when paused for too long).
+          RTSP error 454 has occurred.
+          22 : Unsupported transport:
+          The streaming server/network doesn't support UDP/TCP streaming.
+          RTSP error 461 has occurred.
+          29 : Switch cannot be completed: Try to do a fast content switch but failed. The server returned 4xx/5xx error.
+        </details>
+      </property>
+      <property name="EVENT_RECORD_ERROR" type="String" value="recordError" readonly="true" static="false" comment="Posted when an error occurs during the recording.">
+        <details>
+          When this event is received, the eventData parameter will be a string object specifying the error message.
+        </details>
+      </property>
+      <property name="EVENT_RECORD_STARTED" type="String" value="recordStarted" readonly="true" static="false" comment="Posted when recording is started.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the media time when the recording is started.
+        </details>
+      </property>
+      <property name="EVENT_RECORD_STOPPED" type="String" value="recordStopped" readonly="true" static="false" comment="Posted when recording is stopped.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the media time when the recording stopped.
+        </details>
+      </property>
+      <property name="EVENT_SIZE_CHANGED" type="String" value="sizeChanged" readonly="true" static="false" comment="Posted when the size of the video is changed either because the source video size or the display size is changed.">
+        <details>
+          When this event is received, the eventdata parameter will be null.
+        </details>
+      </property>
+      <property name="EVENT_STARTED" type="String" value="started" readonly="true" static="false" comment="Posted when a Player is started.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the media time when the player is started.
+        </details>
+      </property>
+      <property name="EVENT_STOPPED" type="String" value="stopped" readonly="true" static="false" comment="Posted when a Player stops in response to the stop method call.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the media time when the player stopped.
+        </details>
+      </property>
+      <property name="EVENT_STOPPED_AT_TIME" type="String" value="stoppedAtTime" readonly="true" static="false" comment="Posted when a Player is stopped as responding to the setStopTime call using the StopTimeControl.">
+        <details>
+          When this event is received, the eventData parameter will be a number designating the media time when the player is stopped.
+        </details>
+      </property>
+      <property name="EVENT_VOLUME_CHANGED" type="String" value="volumeChanged" readonly="true" static="false" comment="Posted when the volume of an audio device is changed.">
+        <details>
+          When this event is received, the eventData parameter will be null.
+        </details>
+      </property>
+    </properties>
+    
+    <subclasses>
+      <object name="OnPlayerUpdate" shortName="Player's Update Interface" interface="true" comment="Interface to provide information about update occured to the Player.">
+        <param name="player" type="Player" comment="The player which generated the event."/>
+        <param name="event" type="String" comment="The event generated as defined by the enumerated types."/>
+        <param name="eventData" type="Object" comment="The associated event data."/>
+        <details>
+          This is the interface that must be available on the callback function to receive a player's event data.
+        </details>
+      </object>
+    </subclasses>
+  </object>
+</library>

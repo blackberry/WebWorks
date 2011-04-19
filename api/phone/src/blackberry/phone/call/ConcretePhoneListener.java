@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ public class ConcretePhoneListener extends ScriptableFunction implements PhoneLi
 
     private CallNamespace _owner = null;
     private final ScriptableFunction[] _callbacks = new ScriptableFunction[CB_PHONELISTENERS_SIZE];
-    private final int NO_FAILURE = -1;
+    private static final int NO_FAILURE = -1;
     private int _lastCallIdPassedToCallInitiated;
 
     public static final int CB_CALL_INITIATED = 0;

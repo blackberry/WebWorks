@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.ui.dialog">
+    <entryClass>blackberry.ui.dialog.DialogExtension</entryClass>
+  </extension>
+
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>
+  
+  <features>
+    <feature id="blackberry.ui.dialog" version="1.0.0"/>
+  </features>
+  
+  <object name="blackberry.ui.dialog" shortName="Dialog" introduced="1.0.0" comment="The Dialog object contains functions for manipulating system dialog boxes.">
+    <details>
+      The functionality in this object allows you to integrate standard system dialog boxes into your BlackBerry Widget and control your application flow based on user responses.
+    </details>
+    <features>
+      <feature id="blackberry.ui.dialog" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  function launchDialog() {
+    setTimeout(globalDialog, 5000);
+    return;
+  }
+
+  function globalDialog() {
+    var ss = new Array("Saab", "Volvo", "BMW");
+    var ret = blackberry.ui.dialog.customAsk("Select your favorite car", ss, 2, true);
+    blackberry.ui.dialog.standardAsk(blackberry.ui.dialog.D_OK, "You selected " + ss[ret], 0, true);
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="standardAsk" returns="Number" static="true" comment="Creates a standard dialog to ask the user a question.">
+        <param name="type" type="Number" comment="parameter that specifies the type of standard dialog. Constants starting with D_*."/>
+        <param name="message" type="String" comment="Message to be displayed in the dialog."/>
+        <param name="defaultChoice" type="Number" optional="true" comment="Optional parameter that specifies what choice should be selected by default. For the standard dialogs, these options can be one of the constants starting with C_*."/>
+        <param name="globalStatus" type="Boolean" optional="true" comment="Default value is false. If set to true it adds a screen to the queue of displayed global status screens. Global status screens appear on top of all other screens on the device, even if the current application is not in the foreground. If no other status screens are currently displayed, your provided screen appears immediately. NOTE: If the widget is in the background and globalStatus is set to true, the widget WILL NOT be brought to the foreground."/>
+        <details>
+          Uses the standard question mark bitmap. The function will block execution and when the user selects an option it will return one of the constants starting with C_* in the blackberrry.app.dialog Namespace as the choice selected by the user.
+        </details>
+      </func>
+      <func name="customAsk" returns="Number" static="true" comment="Creates a dialog to ask the user a question.">
+        <param name="message" type="String" comment="Message to be displayed in the dialog."/>
+        <param name="choices" type="String" array="true" comment="Array of string choices that will be presented to the user in the form of buttons."/>
+        <param name="defaultChoice" type="Number" optional="true" comment="Optional parameter that specifies what choice should be selected by default. This is a number value representing the index of the choice provided in the choices parameter."/>
+        <param name="globalStatus" type="Boolean" optional="true" comment="Default value is false. If set to true it adds a screen to the queue of displayed global status screens. Global status screens appear on top of all other screens on the device, even if the current application is not in the foreground. If no other status screens are currently displayed, your provided screen appears immediately. NOTE: If the widget is in the background and globalStatus is set to true, the widget WILL NOT be brought to the foreground."/>
+        <details>
+          Uses the standard question mark bitmap. The function will block execution and when the user selects an option it will return the index of the choice selected by the user.
+        </details>
+      </func>
+    </functions>
+    
+    <constants comment="Application Type">
+      <const name="D_OK" type="Number" value="0" readonly="true" static="true" comment="Standard OK dialog"/>
+      <const name="D_SAVE" type="Number" value="1" readonly="true" static="true" comment="Standard Save dialog"/>
+      <const name="D_DELETE" type="Number" value="2" readonly="true" static="true" comment="Standard Delete confirmation dialog"/>
+      <const name="D_YES_NO" type="Number" value="3" readonly="true" static="true" comment="Standard Yes/No dialog"/>
+      <const name="D_OK_CANCEL" type="Number" value="4" readonly="true" static="true" comment="Standard OK/Cancel dialog"/>
+    </constants>
+    <constants comment="Choice Value">
+      <const name="C_CANCEL" type="Number" value="-1" readonly="true" static="true" comment="Cancel Choice for us in dialogs"/>
+      <const name="C_OK" type="Number" value="0" readonly="true" static="true" comment="OK choice for use in dialogs"/>
+      <const name="C_SAVE" type="Number" value="1" readonly="true" static="true" comment="Save choice for use in dialogs"/>
+      <const name="C_DISCARD" type="Number" value="2" readonly="true" static="true" comment="Discard choice for use in dialogs"/>
+      <const name="C_DELETE" type="Number" value="3" readonly="true" static="true" comment="Delete choice for use in dialogs"/>
+      <const name="C_YES" type="Number" value="4" readonly="true" static="true" comment="Yes choice for use in dialogs"/>
+      <const name="C_NO" type="Number" value="-1" readonly="true" static="true" comment="No choice for use in dialogs"/>
+    </constants>
+    
+  </object>  
+</library>

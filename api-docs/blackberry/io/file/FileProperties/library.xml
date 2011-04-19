@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <object name="blackberry.io.file.FileProperties" shortName="File Properties" introduced="1.0.0" comment="The FileProperties object provides functions and attributes for interacting with a file's properties on the file system.">
+    <details>
+      This class can only be created by using the "blackberry.io.file.getFileProperties()" method.
+    </details>
+    <features>
+      <feature id="blackberry.io.file" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  var filePath = "file:///store/home/user/sample.xml";
+       
+  if (blackberry.io.file.exists(filePath)) {
+    var properties = blackberry.io.file.getFileProperties(filePath);
+    if (properties.readonly) {
+      alert("file is read only");
+    }
+  }
+</script>]]></example>
+    
+    <properties>
+      <property name="isReadonly" type="Boolean" readonly="true" comment="Whether or not the file is read-only"/>
+      <property name="isHidden" type="Boolean" readonly="true" comment="Whether or not the file is hidden"/>
+      <property name="size" type="Number" readonly="true" comment="File size in bytes"/>
+      <property name="dateModified" type="Date" readonly="true" comment="File modified date"/>
+      <property name="fileExtension" type="String" readonly="true" comment="Provides the file's extension"/>
+      <property name="directory" type="String" readonly="true" comment="Provides the directory that the file is in"/>
+      <property name="mimeType" type="String" readonly="true" comment="Specifies the mime type for the file"/>
+    </properties>
+    
+  </object>  
+</library>

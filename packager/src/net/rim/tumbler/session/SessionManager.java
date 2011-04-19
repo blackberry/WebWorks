@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import net.rim.tumbler.exception.SessionException;
 import net.rim.tumbler.exception.ValidationException;
 
 public class SessionManager {
-    private static SessionManager   _instance = null;
+    private static SessionManager _instance = null;
     
     // Environment properties
     public static String    BBWP_JAR_PATH;
@@ -123,15 +123,19 @@ public class SessionManager {
         validateArchive(_widgetArchive);
         
         // Load top level domain info
-        BufferedReader input = new BufferedReader(new FileReader(new File(
-                _bbwpJarFolder + "tld.txt")));
-        String line = null; // Not declared within while loop
-        StringBuffer sb = new StringBuffer("$$");
-        while ((line = input.readLine()) != null) {
-            sb.append(line.toLowerCase().trim());
-            sb.append("$$");
+        BufferedReader input = null;
+        try {
+            input = new BufferedReader(new FileReader(new File(_bbwpJarFolder + "tld.txt")));
+            String line = null; // Not declared within while loop
+            StringBuffer sb = new StringBuffer("$$");
+            while ((line = input.readLine()) != null) {
+                sb.append(line.toLowerCase().trim());
+                sb.append("$$");
+            }
+            _tld = sb.toString();
+        } finally {
+            input.close();
         }
-        _tld = sb.toString();
     }
 
     private void validateArchive(String archive) throws PackageException {

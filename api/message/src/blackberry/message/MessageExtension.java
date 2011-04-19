@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.w3c.dom.Document;
 import blackberry.message.sms.SMSNamespace;
 
 /**
+ * blackberry.message extension.
  * 
  * @author oel
  * 
@@ -33,20 +34,34 @@ public class MessageExtension implements WidgetExtension {
 
     private final static String[] _features = { SMSNamespace.NAME };
 
+    /**
+     * @see net.rim.device.api.web.WidgetExtension#getFeatureList()
+     */
     public String[] getFeatureList() {
         return _features;
     }
 
-    public void loadFeature(String feature, String version, Document doc, ScriptEngine scriptEngine) throws Exception {
-        if (feature.equals(SMSNamespace.NAME)) {
-            scriptEngine.addExtension(feature, new SMSNamespace());
+    /**
+     * @see net.rim.device.api.web.WidgetExtension#loadFeature(String, String, Document, ScriptEngine)
+     */
+    public void loadFeature( String feature, String version, Document doc, ScriptEngine scriptEngine ) throws Exception {
+        if( feature.equals( SMSNamespace.NAME ) ) {
+            scriptEngine.addExtension( feature, new SMSNamespace() );
         }
     }
 
-    public void register(WidgetConfig widgetConfig, BrowserField browserField) {
+    /**
+     * @see net.rim.device.api.web.WidgetExtension#register(WidgetConfig, BrowserField)
+     */
+    public void register( WidgetConfig widgetConfig, BrowserField browserField ) {
+        // do nothing
     }
 
-    public void unloadFeatures(Document doc) {
+    /**
+     * @see net.rim.device.api.web.WidgetExtension#unloadFeatures(Document)
+     */
+    public void unloadFeatures( Document doc ) {
+        // do nothing
     }
 
 }

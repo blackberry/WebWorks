@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import blackberry.phone.find.TestableScriptableObject;
 public class CallLogFindFunction extends ScriptableFunction {
     static final String NAME = "find";
 
-    private final int INDEX_TESTABLE = 0;
-    private final int INDEX_FOLDER_ID = 1;
-    private final int INDEX_ORDER_BY = 2;
-    private final int INDEX_MAX_RETURN = 3;
-    private final int INDEX_IS_ASCENDING = 4;
+    private static final int INDEX_TESTABLE = 0;
+    private static final int INDEX_FOLDER_ID = 1;
+    private static final int INDEX_ORDER_BY = 2;
+    private static final int INDEX_MAX_RETURN = 3;
+    private static final int INDEX_IS_ASCENDING = 4;
 
     /* override */
     public Object invoke(final Object thiz, final Object[] args) throws Exception {

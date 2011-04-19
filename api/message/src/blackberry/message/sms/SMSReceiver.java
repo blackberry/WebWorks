@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -23,51 +23,65 @@ import javax.wireless.messaging.MessageConnection;
 
 import blackberry.message.Receiver;
 
+/**
+ * SMS message receiver implementation.
+ * 
+ * @author dmeng
+ *
+ */
 public class SMSReceiver extends Receiver {
 
+    /**
+     * Constructor.
+     */
     public SMSReceiver() {
         listenerRegistry = new SMSReceiveListenerRegistry();
     }
 
+    /**
+     * Gets the message protocol.
+     * 
+     * @return The message protocol
+     */
     public String getProtocol() {
         return SMSMessage.PROTOCOL;
     }
-    
+
     protected void listenForMessages() throws Exception {
         _connection = openPort();
         DatagramConnection dCon = (DatagramConnection) _connection;
-        while (true) {
-            Datagram dgram = dCon.newDatagram(dCon.getMaximumLength());
-            dCon.receive(dgram);
-            if (isRunning() && listenerRegistry.listenerIsSet()) {
-                new DatagramProcessor(dgram).start();
-            }
-            else {
+        while( true ) {
+            Datagram dgram = dCon.newDatagram( dCon.getMaximumLength() );
+            dCon.receive( dgram );
+            if( isRunning() && listenerRegistry.listenerIsSet() ) {
+                new DatagramProcessor( dgram ).start();
+            } else {
                 yield();
             }
         }
     }
-    
-    private class DatagramProcessor extends Thread{
+
+    private class DatagramProcessor extends Thread {
         Datagram datagram;
-        DatagramProcessor (Datagram dg) {
+
+        DatagramProcessor( Datagram dg ) {
             datagram = dg;
         }
-        
+
         public void run() {
-            String body = new String(datagram.getData());
+            String body = new String( datagram.getData() );
             String address = datagram.getAddress();
-            MessageConnection mc = (MessageConnection)_connection;
-            Message newMessage = new SMSMessage(body, address).toMessage(mc);
-            listenerRegistry.queueIncomingMessage(newMessage);
+            MessageConnection mc = (MessageConnection) _connection;
+            Message newMessage = new SMSMessage( body, address ).toMessage( mc );
+            listenerRegistry.queueIncomingMessage( newMessage );
         }
-        
+
     }
-    
+
     private DatagramConnection openPort() throws Exception {
-        //use DatagramConnection because MessageConnection requires opening port 0,
-        //which in most cases will be blocked by some 3rd part application
-        return (DatagramConnection) Connector.open(getProtocol());
+        // use DatagramConnection because MessageConnection requires opening port 0,
+        // which in most cases will be blocked by some 3rd part application
+        return (DatagramConnection) Connector.open( getProtocol() );
     }
 
 }

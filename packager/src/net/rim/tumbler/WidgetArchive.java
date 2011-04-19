@@ -1,3 +1,18 @@
+/*
+* Copyright 2010-2011 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package net.rim.tumbler;
 
 import java.io.BufferedInputStream;
@@ -41,7 +56,7 @@ public class WidgetArchive {
             ZipInputStream zis = new ZipInputStream(new BufferedInputStream(
                     checksum));
                 
-            // parse each zip file
+            // Parse each zip file
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName().replace('\\', '/');
@@ -65,16 +80,16 @@ public class WidgetArchive {
                     _iconFile = "icon.gif";                        
                 }
                 else if (entry.isDirectory()) {
-                    // check for reservedDirs
+                    // Check for reservedDirs
                     for (String reserved : RESERVED_DIRS) {
-                        // the dir entry name has a trailing / like "dir/"
+                        // The dir entry name has a trailing / like "dir/"
                         if (entryName.equals(reserved + "/")) {
                             throw new ValidationException("EXCEPTION_ARCHIVE_RESERVED_DIR");
                         }
                     }
                 }
                 // Validate the resource name
-                Pattern patternEntryName = Pattern.compile("[a-zA-Z0-9][a-zA-Z_0-9\\.]*");;
+                Pattern patternEntryName = Pattern.compile("[a-zA-Z-_0-9][a-zA-Z-_0-9\\.]*");;
                 String entity;
                 String fullEntryName = entryName;
                 boolean noMoreEntity = false;
@@ -103,7 +118,7 @@ public class WidgetArchive {
             }
         }
         catch (FileNotFoundException fnfe) {
-            // already validated for existence of archive file - never get here
+            // Already validated for existence of archive file - never get here
             Logger.logMessage(LogType.FATAL, "EXCEPTION_WIDGET_ARCHIVE_NOT_FOUND");
         }
         catch (IOException ioe) {

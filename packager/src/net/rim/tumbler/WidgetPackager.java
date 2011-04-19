@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.exception.CommandLineException;
@@ -39,31 +37,31 @@ import net.rim.tumbler.xml.XMLParser;
 
 public class WidgetPackager {
 	
-	
 	public static final String[] STANDARD_OUTPUTS = new String[] { ".cod",
 			".alx", ".cso", ".csl" };
 	public static final String[] OTA_OUTPUTS = new String[] { ".cod", ".jad" };
 
-	// TODO: retrieve from logger
-	public static final String BLACKBERRY_WIDGET_PORTAL_URL = "http://www.blackberry.com/developers/webworkssdk/";
-	public static final String PROPERTIES_FILE = "bbwp.properties";
-	public static final String SIGNATURE_KEY_FILE = "sigtool.csk";
+    // TODO: retrieve from logger
+    public static final String   BLACKBERRY_WIDGET_PORTAL_URL = "http://www.blackberry.com/developers/webworkssdk/";
+    public static final String   PROPERTIES_FILE              = "bbwp.properties";
+    public static final String   SIGNATURE_KEY_FILE           = "sigtool.csk";
 
-	private static final String AUTOGEN_FILE = "blackberry/web/widget/autogen/WidgetConfigAutoGen.java";
-	
-	private static final int NO_ERROR_RETURN_CODE = 0;
-	private static final int PACKAGE_ERROR_RCODE = 1;
-	private static final int VALIDATION_ERROR_RCODE = 2;
-	private static final int RUNTIME_ERROR_RCODE = 3;
-	private static final int UNEXPECTED_ERROR_RCODE = 4;
-	private static final int COMMAND_LINE_EXCEPTION = 5;
+    private static final String  AUTOGEN_FILE                 = "blackberry/web/widget/autogen/WidgetConfigAutoGen.java";
+
+    private static final int     NO_ERROR_RETURN_CODE         = 0;
+    private static final int     PACKAGE_ERROR_RCODE          = 1;
+    private static final int     VALIDATION_ERROR_RCODE       = 2;
+    private static final int     RUNTIME_ERROR_RCODE          = 3;
+    private static final int     UNEXPECTED_ERROR_RCODE       = 4;
+    private static final int     COMMAND_LINE_EXCEPTION       = 5;
 	
 	public static void main(String[] args) {
 	    WidgetPackager wp = new WidgetPackager();
-	    wp.go(args);
+	    int returnCode = wp.go(args);
+	    System.exit(returnCode);
 	}
 	
-	public void go(String[] args) {
+	public int go(String[] args) {
 		Logger.logMessage(LogType.INFO, "PROGRESS_CMDLINE_OPTIONS");
 		int returnCode = NO_ERROR_RETURN_CODE;
 		
@@ -71,7 +69,7 @@ public class WidgetPackager {
 			CmdLineHandler cmd = new CmdLineHandler();
 			if (!cmd.parse(args)) {
 			    // nothing to package
-			    System.exit(NO_ERROR_RETURN_CODE);
+			    return NO_ERROR_RETURN_CODE;
 			}
 			
 			// create SessionManager
@@ -99,7 +97,7 @@ public class WidgetPackager {
 
 			// create/clean outputs/source
 			// Logger.printInfoMessage("BlackBerry WebWorks application packaging starts...");
-			FileManager fileManager = new FileManager(bbwpProperties);
+			FileManager fileManager = new FileManager(bbwpProperties, config.getAccessTable());
 			Logger.logMessage(LogType.INFO, "PROGRESS_FILE_POPULATING_SOURCE");
 			fileManager.prepare();
 
@@ -120,7 +118,7 @@ public class WidgetPackager {
 
 			// run rapc
 			Logger.logMessage(LogType.INFO, "PROGRESS_COMPILING");
-			Rapc rapc = new Rapc(bbwpProperties, config);
+			Rapc rapc = new Rapc(bbwpProperties, config, fileManager.getCompiledJARDependencies());
 			if (!rapc.run(fileManager.getFiles())) {
 				throw new PackageException("EXCEPTION_RAPC");
 			}
@@ -149,9 +147,9 @@ public class WidgetPackager {
 
 			Logger.logMessage(LogType.INFO, "PROGRESS_COMPLETE");
 		} catch (CommandLineException cle) {
-                        Logger.logMessage(LogType.ERROR, cle.getMessage(), cle.getInfo());
-                        Logger.logMessage(LogType.NONE, "BBWP_USAGE", getVersion());
-                        returnCode = COMMAND_LINE_EXCEPTION;		    		
+		    Logger.logMessage(LogType.ERROR, cle.getMessage(), cle.getInfo());
+		    Logger.logMessage(LogType.NONE, "BBWP_USAGE", getVersion());
+		    returnCode = COMMAND_LINE_EXCEPTION;		    		
 		} catch (PackageException pe) {
 			Logger.logMessage(LogType.ERROR, pe.getMessage(), pe.getInfo());
 			returnCode = PACKAGE_ERROR_RCODE;
@@ -162,17 +160,16 @@ public class WidgetPackager {
 			Logger.logMessage(LogType.FATAL, re);
 			returnCode = RUNTIME_ERROR_RCODE;
 		} catch (Exception e) {
-			System.out.println(e);
+			Logger.logMessage(LogType.ERROR, e);
 			returnCode = UNEXPECTED_ERROR_RCODE;
 		} 
 		
-		System.exit(returnCode);
+		return returnCode;
 	}
-	
-        public static Object[] getVersion() {
-            return new Object[] { new WidgetPackager().getClass().getPackage().getImplementationVersion() };
-        }
-	    
+
+	public static Object[] getVersion() {
+	    return new Object[] { new WidgetPackager().getClass().getPackage().getImplementationVersion() };
+	}
 
 	private static void signCod(SessionManager sessionManager) throws Exception {
 		Process signingProcess;
@@ -249,4 +246,5 @@ public class WidgetPackager {
 		writer.write("</loader>" + EOL);
 		writer.close();
 	}
+	
 }

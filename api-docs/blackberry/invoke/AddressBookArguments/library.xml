@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.invoke.AddressBookArguments" shortName="AddressBookArguments" introduced="1.0.0" comment="The AddressBookArguments object is an instance object, and is used as a parameter to the invoke() method when invoking the Address Book application.">
+    <details>
+      The AddressBookArguments object must be created as an instance using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.invoke" version="1.0.0"/>
+      <feature id="blackberry.invoke.AddressBookArguments" version="1.0.0"/>
+      <feature id="blackberry.pim.Contact" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+  var contact = new blackberry.pim.Contact();
+  contact.firstName = 'Nick';
+  contact.lastName = 'Scott';
+  
+  var args = new blackberry.invoke.AddressBookArguments(contact);
+  args.view = 0;
+   
+  blackberry.invoke.invoke(blackberry.invoke.APP_ADDRESSBOOK, args);  
+</script>]]></example>
+    
+    <constants comment="View">
+      <const name="VIEW_NEW" type="Number" value="0" comment="VIEW_NEW will launch the address book with the 'add contact' window; if a contact object is specified, it will open that contact in the 'edit contact' window of the address book. "/>
+      <const name="VIEW_COMPOSE" type="Number" value="1" comment="VIEW_COMPOSE will launch the address book with the 'message composing' window. It's not allowed to specify a contact with VIEW_COMPOSE; if a contact object is specified, it will throw an exception."/>
+      <const name="VIEW_DISPLAY" type="Number" value="2" comment="VIEW_DISPLAY will launch the address book with the 'view contact' window displaying the specified contact; if a contact object is not specified, it will throw an exception."/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new AddressBookArguments object.">
+        <param name="contact" optional="true" type="blackberry.pim.Contact" comment="Contact to view in Contacts application."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="view" type="Number" static="false" comment="Value that specifies what kind of view you want to view the contact."/>
+    </properties>
+    
+  </object>
+</library>

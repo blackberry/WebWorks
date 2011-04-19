@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -235,19 +235,17 @@ The following options generally appear in the .def files:
     In the .def file the option name is on a single line, enclosed in '[' and ']'.
         the option values appear individually on subsequent lines.
  */
-
 package net.rim.tumbler.rapc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -265,24 +263,25 @@ public class Rapc {
     public static String[] EXTENSIONS = new String[] {
         ".cod", ".jar", ".csl", ".cso", ".rapc", ".jar" 
     };
-    
-    private final String FILE_SEP = System.getProperty("file.separator");
-    private final String EOL = System.getProperty("line.separator");
-    
+
+    private static final String FILE_SEP    = System.getProperty("file.separator");
+    private static final String NL          = System.getProperty("line.separator");
+    private static final String SOURCE_FILE = "sourcefile";
+
     // RAPC Collections
-    private List<String> _imports = new ArrayList<String>();
-    private List<String> _inputFiles = new ArrayList<String>();
+    private List<String>        _imports    = new ArrayList<String>();
+    private List<String>        _inputFiles = new ArrayList<String>();
 
     // Rapc single arguments
     // Class name that contains the main entry point
-    private String _className = null;
-    private String _codeName = null;
-    private String _additional = null;
-    private String _javac = null;
+    private String              _className;
+    private String              _codeName;
+    private String              _additional;
+    private String              _javac;
 
     // Paths
-    private String _cwd;
-    private String _bin;
+    private String              _cwd;
+    private String              _bin;
 
     // Data
     private Map<String, String> _env;
@@ -293,10 +292,19 @@ public class Rapc {
     // /
     // / Constructor uses predetermined defaults
     // / </summary>
-    public Rapc(BBWPProperties bbwpProperties, WidgetConfig widgetConfig) {
+    public Rapc(BBWPProperties bbwpProperties, WidgetConfig widgetConfig, List<String> compiledJARDeps) {
         _widgetConfig = widgetConfig;
         _bin = bbwpProperties.getRapc();
         _imports = bbwpProperties.getImports();
+        
+		// If there are additional compiled JARs that the extensions might
+		// depend on, make sure they get added to classpath
+		if (_imports != null && compiledJARDeps != null) {
+			for (String path : compiledJARDeps) {
+				_imports.add(path);
+			}
+		}
+        
         _javac = bbwpProperties.getJavac();
         _cwd = SessionManager.getInstance().getSourceFolder();
         _codeName = SessionManager.getInstance().getArchiveName();
@@ -319,40 +327,60 @@ public class Rapc {
     // / Generate the parameters to pass to rapc
     // / </summary>
     // / <returns>A String of passable parameters</returns>
-    public String GenerateParameters() {
+    public String generateParameters() {
         // forcing the -noshortname switch for rapc
         // http://hhappsweb/hhwiki/Browser/BrowserField2#Display_a_Web_Page_from_a_resource_within_your_COD_file
-        String param = "-noshortname ";
+        
+        StringBuilder param = new StringBuilder("-noshortname ");
 
-        if (_className != null && _className.trim() != "")
-            param += "-class \"" + _className + "\" ";
+        if (_className != null && !_className.trim().isEmpty()) {
+            param.append("-class \"" + _className + "\" ");
+        }
 
-        if (_codeName != null && _codeName.trim() != "")
-            param += "-codename=\"" + _codeName + "\" ";
+        if (_codeName != null && !_codeName.trim().isEmpty()) {
+            param.append("-codename=\"" + _codeName + "\" ");
+        }
 
         if (_imports.size() > 0) {
-            param += "-import=\"";
+            param.append("-import=\"");
             for (int i = 0; i < _imports.size(); ++i) {
-                param += _imports.get(i);
+                param.append(_imports.get(i));
                 if (i < _imports.size() - 1 && _imports.size() != 1)
-                    param += ";";
+                    param.append(";");
             }
-            param += "\" ";
+            param.append("\" ");
         }
 
-        if (_javac != null && _javac.trim() != "") {
-            param += "-javacompiler=";
-            param += _javac;
-            param += " ";
+        if (_javac != null && !_javac.trim().isEmpty()) {
+            param.append("-javacompiler=");
+            param.append(_javac);
+            param.append(" ");
         }
 
-        if (_additional != null && _additional.trim() != "")
-            param += _additional + " ";
-        
-             for (String file : _inputFiles)
-                    param += "\"" + file + "\" ";
+        if (_additional != null && !_additional.trim().isEmpty()) {
+            param.append(_additional + " ");
+        }
+         
+        param.append("@" + SOURCE_FILE);
 
-        return param.trim();
+        return param.toString().trim();
+    }
+    
+    // rapc is not happy if there are too many files listed on command line, the solution
+    // is to generate a file that contains all source files
+    // http://download.oracle.com/javase/1.4.2/docs/tooldocs/windows/javac.html#commandlineargfile
+    private void generateSourceFile() throws IOException {
+		File dest = new File(this._cwd + File.separator + SOURCE_FILE);
+    	BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dest),"UTF8"));
+    	
+    	for (String file : _inputFiles) {
+    		writer.write('\"');
+    		writer.write(file);
+    		writer.write('\"');
+    		writer.write('\n');
+    	}
+    	
+    	writer.close();
     }
 
     // / <summary>
@@ -375,7 +403,7 @@ public class Rapc {
     // / = &lt;path&gt;\[...]]&lt;filename&gt;
     // / </summary>
     public String getCodeName() {
-        return this._codeName;
+        return _codeName;
     }
 
     // / <summary>
@@ -386,7 +414,7 @@ public class Rapc {
     // / = &lt;classname&gt;
     // / </summary>
     public String getMainEntryPointClassFile() {
-        return this._className;
+        return _className;
     }
 
     // / <summary>
@@ -416,7 +444,7 @@ public class Rapc {
     // / = &lt;file&gt;.jar[;...]
     // / </summary>
     public List<String> getImports() {
-        return this._imports;
+        return _imports;
     }
 
     // / <summary>
@@ -424,7 +452,7 @@ public class Rapc {
     // / to the executable
     // / </summary>
     public String getAdditionalParameters() {
-        return this._additional;
+        return _additional;
     }
 
     // / <summary>
@@ -432,7 +460,7 @@ public class Rapc {
     // / to the executable
     // / </summary>
     public String getJavac() {
-        return this._javac;
+        return _javac;
     }
 
     // / <summary>
@@ -440,7 +468,7 @@ public class Rapc {
     // / based on entry in bbwp property file.
     // / </summary>
     private String getJavaBin(String javaHome) {
-    	if(javaHome != null && javaHome.trim() != "") {
+    	if(javaHome != null && !javaHome.trim().isEmpty()) {
             return javaHome + "\\bin";
     	}
     	
@@ -454,7 +482,8 @@ public class Rapc {
     public boolean run(List<String> inputFiles) throws Exception{
         _inputFiles = inputFiles;
         _inputFiles.add(generateRapcFile());
-        return run(GenerateParameters());
+        generateSourceFile();
+        return run(generateParameters());
     }
 
     // / <summary>
@@ -506,10 +535,7 @@ public class Rapc {
             return false;
         }
 
-        if (proc.exitValue() != 0)
-            return false;
-
-        return true;
+        return (proc.exitValue() == 0);
     }
 
     // / <summary>
@@ -540,24 +566,24 @@ public class Rapc {
         String fileName = _cwd + FILE_SEP + SessionManager.getInstance().getArchiveName() + ".rapc";
         //BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
         //This ensures that the generated RAPC file is UTF8 encoded
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName),"UTF8"));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF8"));
         
-        writer.write("MIDlet-Name: " + _widgetConfig.getName() + EOL);
+        writer.write("MIDlet-Name: " + _widgetConfig.getName() + NL);
         if (_widgetConfig.getDescription() != null) {
-            writer.write("MIDlet-Description: " + _widgetConfig.getDescription() + EOL);
+            writer.write("MIDlet-Description: " + _widgetConfig.getDescription() + NL);
         }
-        writer.write("MIDlet-Version: " + _widgetConfig.getVersion() + EOL);
+        writer.write("MIDlet-Version: " + _widgetConfig.getVersion() + NL);
         writer.write("MIDlet-Vendor:");
         if (_widgetConfig.getAuthor() != null && _widgetConfig.getAuthor().length() != 0) {
         	writer.write(" " + _widgetConfig.getAuthor());
         } else {
         	writer.write(" Unknown");
         }
-        writer.write(EOL);
-        writer.write("MIDlet-Jar-URL: " + SessionManager.getInstance().getArchiveName() + ".jar" + EOL);
-        writer.write("MIDlet-Jar-Size: 0" + EOL);
-        writer.write("MicroEdition-Profile: MIDP-2.0" + EOL);
-        writer.write("MicroEdition-Configuration: CLDC-1.1" + EOL);
+        writer.write(NL);
+        writer.write("MIDlet-Jar-URL: " + SessionManager.getInstance().getArchiveName() + ".jar" + NL);
+        writer.write("MIDlet-Jar-Size: 0" + NL);
+        writer.write("MicroEdition-Profile: MIDP-2.0" + NL);
+        writer.write("MicroEdition-Configuration: CLDC-1.1" + NL);
 
         Vector<String> icons = _widgetConfig.getIconSrc();
         String icon = (icons == null || icons.isEmpty()) ? "" : icons.elementAt(0);
@@ -566,10 +592,10 @@ public class Rapc {
         if (SessionManager.getInstance().debugMode()) {
         	writer.write("DEBUG_ENABLED");
         }
-        writer.write(EOL);
+        writer.write(NL);
         
         if(_widgetConfig.getBackgroundSource()!=null&&_widgetConfig.isStartupEnabled()) {
-        	writer.write("MIDlet-2:,,rim:runOnStartup"+EOL);
+        	writer.write("MIDlet-2:,,rim:runOnStartup"+NL);
         }
         	
         // The rest icons
@@ -578,7 +604,7 @@ public class Rapc {
             for (int i = 1; i < icons.size(); i++) {
                 iconCount = iconCount + 1;
                 writer.write("RIM-MIDlet-Icon-1-" + iconCount + ": "
-                            + icons.elementAt(i) + EOL);
+                            + icons.elementAt(i) + NL);
             }
         }
 
@@ -590,31 +616,29 @@ public class Rapc {
             for (int i = 0; i < hoverIcons.size(); i++) {
                 iconCount = iconCount + 1;
                	writer.write("RIM-MIDlet-Icon-1-" + iconCount + ": "
-                            + copyIcon(
-                                    hoverIcons.elementAt(i),
-                                    SessionManager.getInstance().getSourceFolder())
-                            + ",focused" + EOL);
+                            + copyIcon(hoverIcons.elementAt(i),
+                                       SessionManager.getInstance().getSourceFolder())
+                            + ",focused" + NL);
             }
         }
 
         if (iconCount > 0) {
-            writer.write("RIM-MIDlet-Icon-Count-1: " + iconCount + EOL);
+            writer.write("RIM-MIDlet-Icon-Count-1: " + iconCount + NL);
         }
         
         //TODO:CLEAN UP THIS LOGIC ELSEWHERE
         if(_widgetConfig.getForegroundSource().length()==0) {
-        	writer.write("RIM-MIDlet-Flags-1: 2" + EOL);
+        	writer.write("RIM-MIDlet-Flags-1: 2" + NL);
         } else {
-        	writer.write("RIM-MIDlet-Flags-1: 0" + EOL);
+        	writer.write("RIM-MIDlet-Flags-1: 0" + NL);
         }
         
-        //Alternate Entry point
+        // Alternate Entry point
         if(_widgetConfig.getBackgroundSource()!=null&&_widgetConfig.isStartupEnabled()) {
-        	writer.write("RIM-MIDlet-Flags-2: 3" + EOL);
+        	writer.write("RIM-MIDlet-Flags-2: 3" + NL);
         }
 	
         writer.close();
-
         return fileName;
     }
     
@@ -638,12 +662,12 @@ public class Rapc {
 }
 
 class StreamRedirector extends Thread {
-    OutputStream os;
+    // OutputStream os; // Unused field
     InputStream is;
 
     public StreamRedirector(InputStream is, OutputStream os) {
         this.is = is;
-        this.os = os;
+        // this.os = os;
     }
 
     public void run() {

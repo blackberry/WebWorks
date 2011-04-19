@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <extension id="blackberry.pim">
+    <entryClass>blackberry.pim.PIMExtension</entryClass>
+    
+    <dependencies>
+      <extension id="blackberry.find"/>
+      <extension id="blackberry.identity"/>
+    </dependencies>
+  </extension>
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR"/>
+      <target version="5.0" config="JAVA_XHR_BlackBerry"/>
+    </platform>
+  </platforms>
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript"/>
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript"/>
+    </configuration>
+  </configurations>
+  <features>
+    <feature id="blackberry.pim.Address" version="1.0.0" required="true">blackberry.pim.Address</feature>
+    <feature id="blackberry.pim.Appointment" version="1.0.0" required="true">blackberry.pim.Appointment</feature>
+    <feature id="blackberry.pim.Attendee" version="1.0.0" required="true">blackberry.pim.Attendee</feature>
+    <feature id="blackberry.pim.category" version="1.0.0" required="true">blackberry.pim.category</feature>
+    <feature id="blackberry.pim.Contact" version="1.0.0" required="true">blackberry.pim.Contact</feature>
+    <feature id="blackberry.pim.Memo" version="1.0.0" required="true">blackberry.pim.Memo</feature>
+    <feature id="blackberry.pim.Recurrence" version="1.0.0" required="true">blackberry.pim.Recurrence</feature>
+    <feature id="blackberry.pim.Reminder" version="1.0.0" required="true">blackberry.pim.Reminder</feature>
+    <feature id="blackberry.pim.Task" version="1.0.0" required="true">blackberry.pim.Task</feature>
+  </features>
+</library>

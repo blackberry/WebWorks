@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <object name="blackberry.identity.Service" shortName="Service" introduced="1.0.0" comment="The Service object represents a service entry that describes specifics for a service on a BlackBerry smartphone.">
+    <details>
+      A Service object will describe different settings for different kinds of accounts on the BlackBerry device.  A user might have Hotmail account, a Unite account, and a BES account on the device.
+      Each service entry will describe the details of that specific service and will also provide a class to be passed into the constructors of PIM objects that could be saved specifically to their intended service.
+      The Service object is an instance object that cannot be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.identity" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  // Enumerate all of our services on the device.
+  var services = blackberry.identity.getServiceList();
+  for (var i = 0; i < services.length; i++) {
+    if (services[i].type == services[i].TYPE_CONTACT) {
+      alert("Name: " + services[i].name);
+    }
+  }
+</script>]]></example>
+    
+    <constants comment="[Service types]">
+      <const name="TYPE_EMAIL" type="Number" value="0" comment="Constant denoting a type of EMAIL"/>
+      <const name="TYPE_CALENDAR" type="Number" value="1" comment="Constant denoting a type of CALENDAR"/>
+      <const name="TYPE_CONTACT" type="Number" value="2" comment="Constant denoting a type of CONTACT"/>
+    </constants>
+    
+    <properties>
+      <property name="emailAddress" type="String" readonly="true" comment="Email address associated with the service."/>
+      <property name="name" type="String" readonly="true" comment="Name of the service"/>
+      <property name="type" type="Number" readonly="true" comment="Specifies the type of service.  This can be one of Calendar, Email or Contacts."/>
+    </properties>
+    
+  </object>
+</library>

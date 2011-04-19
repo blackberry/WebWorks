@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -84,24 +84,23 @@ public class Tester {
         return false;
     }
 
-    private static boolean testByBoolean(final Boolean value, final Boolean objective, final int operator) {
+    private static boolean testByBoolean( final Boolean value, final Boolean objective,
+            final int operator ) {
+        
+        boolean result;
 
         switch (operator) {
         case FilterExpressionConstructor.OPERATOR_NOT_EQUAL:
-            return objective != value;
+            result = !objective.equals(value);
+            break;
         case FilterExpressionConstructor.OPERATOR_EQUAL:
-            return objective == value;
-        case FilterExpressionConstructor.OPERATOR_LESS_THAN:
-            return false;
-        case FilterExpressionConstructor.OPERATOR_GREATER_THAN:
-            return false;
-        case FilterExpressionConstructor.OPERATOR_LESS_OR_EQUAL:
-            return false;
-        case FilterExpressionConstructor.OPERATOR_GREATER_OR_EQUAL:
-            return false;
+            result = objective.equals(value);
+            break;
+        default:
+            result = false;
         }
 
-        return false;
+        return result;
     }
 
     private static boolean testByDate(final Date value, final Object objective, final int operator, final String optional) {

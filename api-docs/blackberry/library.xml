@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library isWhitelist="false">
+  <object name="blackberry" shortName="BlackBerry" comment="The blackberry object is the root of all BlackBerry specific JavaScript functionality. blackberry.network is available by default in the regular browser.">
+    <details>
+    </details>
+    <example><![CDATA[<script type="text/javascript">
+  alert("You are on the " + blackberry.network + " Network");
+</script>]]></example>
+    
+    <properties>
+      <property name="network" static="true" type="String" readonly="true" comment="Returns the wireless network on which the BlackBerry device is communicating.">
+        <details>
+          The value may be one of: 3GPP, CDMA,iDEN, or Wi-Fi.  Multiple networks may be supported on a single BlackBerry device. If multiple networks are supported, they are returned as a commaseparated list. For example: 3GPP,Wi-Fi.
+        </details>
+      </property>
+    </properties>
+    
+  </object>  
+</library>

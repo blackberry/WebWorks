@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,9 +16,16 @@
 package blackberry.message;
 
 import java.util.Vector;
+
 import net.rim.device.api.script.ScriptableFunction;
 import net.rim.device.api.ui.UiApplication;
 
+/**
+ * Message receive listener registry.
+ * 
+ * @author dmeng
+ * 
+ */
 public abstract class ReceiveListenerRegistry {
     public static final String ADDER = "addReceiveListener";
     public static final String REMOVER = "removeReceiveListener";
@@ -27,30 +34,48 @@ public abstract class ReceiveListenerRegistry {
     protected ScriptableFunction listener;
     protected UiApplication uiApplication;
 
+    /**
+     * Constructor.
+     */
     public ReceiveListenerRegistry() {
         messages = new Vector();
         uiApplication = UiApplication.getUiApplication();
     }
 
+    /**
+     * Returns if the listener has been set.
+     * 
+     * @return <code>true</code> if yes; <code>false</code> otherwise
+     */
     public boolean listenerIsSet() {
         return listener != null;
     }
-    
-    public ScriptableFunction add() throws Exception {
+
+    /**
+     * Adds a message listener.
+     * 
+     * @return The <code>ScripableFunction</code> to be executed.
+     */
+    public ScriptableFunction add() {
         return new ScriptableFunction() {
-            public Object invoke(Object self, Object[] args) throws Exception {
-                if (args != null && args[0] instanceof ScriptableFunction) {
-                    listener = (ScriptableFunction)args[0];
+            public Object invoke( Object self, Object[] args ) {
+                if( args != null && args[ 0 ] instanceof ScriptableFunction ) {
+                    listener = (ScriptableFunction) args[ 0 ];
                 }
                 return UNDEFINED;
             }
         };
     }
 
+    /**
+     * Removes a message listener.
+     * 
+     * @return The <code>ScripableFunction</code> to be executed.
+     */
     public ScriptableFunction remove() {
         return new ScriptableFunction() {
-            public Object invoke(Object self, Object[] args) {
-                if (listener == null) {
+            public Object invoke( Object self, Object[] args ) {
+                if( listener == null ) {
                     return Boolean.FALSE;
                 }
                 listener = null;
@@ -59,23 +84,42 @@ public abstract class ReceiveListenerRegistry {
         };
     }
 
-    public void queueIncomingMessage(Object msg) {
-        if (!isTheRightTypeOfMessage(msg)) {
+    /**
+     * Adds the given message to the queue.
+     * 
+     * @param msg
+     *            The message to be added
+     */
+    public void queueIncomingMessage( Object msg ) {
+        if( !isTheRightTypeOfMessage( msg ) ) {
             return;
         }
-        synchronized (messages) {
-            messages.addElement(msg);
+        synchronized( messages ) {
+            messages.addElement( msg );
         }
         new ListenerLauncher().start();
     }
 
+    /**
+     * Notifies listeners for message arrival.
+     */
     public abstract void fireAll();
 
-    protected abstract boolean isTheRightTypeOfMessage(Object msg);
+    /**
+     * Returns if the given message has the right message type.
+     * 
+     * @param msg
+     *            The message object
+     * @return <code>true</code> if yes; <code>false</code> otherwise
+     */
+    protected abstract boolean isTheRightTypeOfMessage( Object msg );
 
+    /**
+     * A thread to notify the listeners.
+     */
     private class ListenerLauncher extends Thread {
         public void run() {
-            synchronized (messages) {
+            synchronized( messages ) {
                 fireAll();
             }
         }

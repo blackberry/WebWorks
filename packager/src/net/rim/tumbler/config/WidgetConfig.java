@@ -1,3 +1,18 @@
+/*
+* Copyright 2010-2011 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package net.rim.tumbler.config;
 
 import java.util.HashMap;
@@ -61,11 +76,13 @@ public class WidgetConfig {
     private boolean               _allowInvokeParams;
     private String                _backgroundSource;
     private String                _foregroundSource;
-    // debug issue
+    
+    // Debug issue
     private boolean _debugEnabled=false;
     
 	public WidgetConfig() {
-		// set defaults
+		
+		// Set defaults
 		_accessTable = new Hashtable<WidgetAccess, Vector<WidgetFeature>>();
 		_hoverIconSrc = new Vector<String>();
 		_customHeaders = new HashMap<String, String>();
@@ -184,7 +201,7 @@ public class WidgetConfig {
 				Logger.logMessage(LogType.INFO,
 						"PROGRESS_VALIDATING_CONFIG_XML_LOADINGSCREEN_COLOR");
 			}
-			// color variable should look like: #000000
+			// Color variable should look like: #000000
 			String regex = "^#[A-Fa-f0-9]{6}$";
 			Pattern pattern = Pattern.compile(regex);
 			Matcher matcher = pattern.matcher(screenColour);
@@ -430,9 +447,9 @@ public class WidgetConfig {
 	
 	public void setAggressiveCacheAge(int inputValue) {
 		// Enable aggressive cache flag if the value is above 0
-		if(inputValue > 0){
+		if (inputValue > 0){
 			setAggressiveCache(true);
-		} else if (inputValue==-1) {
+		} else if (inputValue == -1) {
 			setAggressiveCache(false);
 		}
 		
@@ -448,10 +465,11 @@ public class WidgetConfig {
 	
 	public void setMaxCacheSize(int inputValue) {
 		// Min value of 0, max value of 2048 KB
-		if(inputValue >= 0 && inputValue <= (2048*1024)){
+	    final int kb_2048 = 2048 * 1024;
+		if (inputValue >= 0 && inputValue <= (kb_2048)){
 			_maxCacheSize = inputValue;
-		} else if(inputValue > 2048*1024) {
-			_maxCacheSize = 2048*1024;
+		} else if (inputValue > kb_2048) {
+			_maxCacheSize = kb_2048;
 		}
 	}
 	
@@ -461,7 +479,7 @@ public class WidgetConfig {
 	
 	public void setMaxCacheItemSize(int inputValue) {
 		// -1 is a valid value
-		if(inputValue >= -1){
+		if (inputValue >= -1){
 			_maxCacheable = inputValue;
 		}
 	}

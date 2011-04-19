@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="false">
+  <object name="blackberry.identity.Transport" shortName="Transport" introduced="1.0.0" comment="Transport objects are used to store information about BlackBerry connections such as BES, BIS-B, Unite and Hotspots.">
+    <details>
+      Transport objects behave like a registry, in that they allow you to keep track of the various configuration settings of your BlackBerry device.  The Transport object is an instance object that cannot be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.identity" version="1.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">    
+  var transports = blackberry.identity.getTransportList();
+  for (var i = 0; i < transports.length;i++) {
+    if (transports[i].type == "BES") {
+      alert("You are registered with a BES");
+      break;
+    }
+  }  
+</script>]]></example>
+    
+    <properties>
+      <property name="name" type="String" readonly="true" comment="Specifies the name of the Transport, for example, 'Desktop', 'Unite', or 'BIS'."/>
+      <property name="type" type="String" readonly="true" comment="Specifies the type of the Transport.  Can be one of the following: TCP Cellular, Wap, Wap 2.0, MDS, Bis B, Unite!, or TCP Wifi."/>
+    </properties>
+    
+  </object>
+</library>

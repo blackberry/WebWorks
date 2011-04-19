@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -211,7 +211,7 @@ public final class CallNamespace extends Scriptable {
     // / (i.e doesn't have PERMISSION_PHONE permission)to use the phone
     // / features.
     // / </summary>
-    public class InActiveCallFunction extends ScriptableFunction {
+    public static class InActiveCallFunction extends ScriptableFunction {
         public static final String NAME = "inActiveCall";
 
         /* override */

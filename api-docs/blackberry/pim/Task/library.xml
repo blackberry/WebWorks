@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.pim.Task" shortName="Task" introduced="1.0.0" comment="The Task object represents a Task entry that would be in your PIM task list.  This Task object can be used for manipulating Task PIM information.">
+    <details>
+      The Task object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    <features>
+      <feature id="blackberry.find" version="1.0.0"/>
+      <feature id="blackberry.pim.Recurrence" version="1.0.0"/>
+      <feature id="blackberry.pim.Reminder" version="1.0.0"/>
+      <feature id="blackberry.pim.Task" version="1.0.0"/>
+    </features>
+    <example><![CDATA[<script type="text/javascript">
+  // Create our Task 
+  var newTask = new blackberry.pim.Task(); 
+  newTask.summary = "Get Groceries"; 
+  newTask.note = "Pick up eggs, and Milk";  
+  newTask.priority = blackberry.pim.Task.PRIORITY_HIGH;   
+  newTask.save(); 
+</script>]]></example>
+    
+    <constants comment="Status">
+      <const name="NOT_STARTED" type="Number" value="0" readonly="true" static="true" comment="Constant representing the NOT_STARTED status"/>
+      <const name="IN_PROGRESS" type="Number" value="1" readonly="true" static="true" comment="Constant representing the IN_PROGRESS status"/>
+      <const name="COMPLETED" type="Number" value="2" readonly="true" static="true" comment="Constant representing the COMPLETED status"/>
+      <const name="WAITING" type="Number" value="3" readonly="true" static="true" comment="Constant representing the WAITING status"/>
+      <const name="DEFERRED" type="Number" value="4" readonly="true" static="true" comment="Constant representing the DEFERRED status"/>
+    </constants>
+    
+    <constants comment="Priority">
+      <const name="PRIORITY_HIGH" type="Number" value="0" readonly="true" static="true" comment="Constant representing the HIGH priority"/>
+      <const name="PRIORITY_NORMAL" type="Number" value="1" readonly="true" static="true" comment="Constant representing the NORMAL priority"/>
+      <const name="PRIORITY_LOW" type="Number" value="2" readonly="true" static="true" comment="Constant representing the LOW priority"/>
+    </constants>
+    
+    <constructors>
+      <ctor comment="Constructor for a new Task object ">
+      </ctor>
+    </constructors>
+    
+    <functions comment="[Static]">
+      <func name="find" returns="Task" static="true" array="true" comment="This method finds the tasks that match the regular expression provided.">
+        <param name="filter" type="blackberry.find.FilterExpression" optional="true" comment="optional expression parameter that defines the search criteria for the find.  If no value is provided the method will return all the Tasks on the device."/>
+        <param name="orderBy" type="String" optional="true" comment="optional 'orderBy' parameter specifying the field which the results will be sorted by. If 'isAscending' is not specified or 'isAscending' is true, the sort results will be in an ascending order. If 'isAscending' is false, the sort results will be in a descending order."/>
+        <param name="maxReturn" type="Number" optional="true" comment="optional integer parameter specifying the maximum number of results to return from the find.  If not specified or set to -1, it will return all results found."/>
+        <param name="isAscending" type="Boolean" optional="true" comment="optional 'isAscending' parameter specifying whether the sort order is ascending or descending. If not specified or set to true, the results sorted by the field specified by 'orderBy' will be in an ascending order. If set to false, the sort results will be in a descending order. If no 'orderBy' value is specified, 'isAscending' is neglected."/>
+        <details>
+          The function returns list of Tasks that match search criteria.
+        </details>
+      </func>
+    </functions>
+    
+    <functions>
+      <func name="save" returns="void" static="false" comment="This method will save the changes made to the Task object.">
+        <details>
+          If save is called after the new creation of a Task object, the uid field will be filled in with its value after save.
+        </details>
+      </func>
+      <func name="remove" returns="void" static="false" comment="This method will remove a Task from the PIM storage.">
+        <details>
+          If the Task has not been previously saved, an exception will be thrown.
+        </details>
+      </func>
+    </functions>
+    
+    <properties>
+      <property name="summary" type="String" static="false" comment="Contains a brief description of the task."/>
+      <property name="note" type="String" static="false" comment="Contains a more complete description than the summary field."/>
+      <property name="status" type="Number" static="false" comment="Current status of this task. Value can be one of the 'Status' constants. Default value is NOT_STARTED."/>
+      <property name="due" type="Date" static="false" comment="The due date for this task."/>
+      <property name="priority" type="Number" static="false" comment="This specifies the priority of the task.  Value can be one of the 'Priority' constants. Default value is PRIORITY_NORMAL."/>
+      <property name="uid" type="String" readonly="true" static="false" comment="Contains the unique ID of the object. It is the primary key and would be automatically generated. This field is read-only."/>
+      <property name="recurrence" type="Recurrence" static="false" comment="This is the rule to store how this task should be repeated if any."/>
+      <property name="reminder" type="Reminder" static="false" comment="This is the rule to store how the user should be reminded about the task."/>
+      <property name="categories" type="String" array="true" static="false" readonly="false" comment="The list of categories associated to the task."/>
+    </properties>
+    
+  </object>
+</library>

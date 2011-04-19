@@ -1,5 +1,5 @@
 /*
-* Copyright 2010 Research In Motion Limited.
+* Copyright 2010-2011 Research In Motion Limited.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 */
 package blackberry.audio.Player;
 
-import net.rim.device.api.script.ScriptableFunction;
-import common.util.ArgumentValidationUtil;
+import blackberry.core.FunctionSignature;
+import blackberry.core.ScriptableFunctionBase;
 
-public class PlayerConstructor extends ScriptableFunction {
+public class PlayerConstructor extends ScriptableFunctionBase {
 
     public static final String NAME = "blackberry.audio.Player";
 
@@ -58,52 +58,69 @@ public class PlayerConstructor extends ScriptableFunction {
         }
 
         return super.getField(name);
-    }
+    }        
+    
+	/* @Override */
+	protected FunctionSignature[] getFunctionSignatures() {
+		FunctionSignature sig1 = new FunctionSignature(3);
+		FunctionSignature sig2 = new FunctionSignature(2);
+		
+		sig1.addParam(String.class, true);
+		sig2.addParam(String.class, true);
+		
+		sig1.addParam(String.class, false);
+		sig2.addParam(Boolean.class, false);
+		
+		sig1.addParam(Boolean.class, false);
+		
+		
+		return new FunctionSignature[] {sig1,sig2};
+	}
 
-    /* @Override */
-    public Object construct(final Object thiz, final Object[] args) throws Exception {
-        final int[] validParamNumber = { 1, 2, 3 };
+	
+	
+	public Object construct(Object thiz, Object[] args) throws Exception {
+		validateArgs( args );
+		return createObject(thiz, args);
+	}
 
-        ArgumentValidationUtil.validateParameterNumber(validParamNumber, args);
+	/* @Override */
+	protected Object createObject(Object thiz, Object[] args) throws Exception {
+		final String fullPathToMedia = (String) args[0];
+        String mediaType = null;
+        boolean asyncMode = false;
 
-        // Create PlayerObject by passing parameters:
-        // The boolean parameter specifies whether the player should
-        // asynchronously advance to PREFETCHED state. If not provided set to
-        // false.
-        // (Prefetching a Player can be a resource and time consuming process).
+        // Creating Player by providing full path only.
+        if (args.length == 1) {
+            return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
+        }
+        else {
 
-        if (args != null && args.length > 0) {
-            final String fullPathToMedia = (String) args[0];
-            String mediaType = null;
-            boolean asyncMode = false;
-
-            // Creating Player by providing full path only.
-            if (args.length == 1) {
-                return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
-            }
-            else {
-
-                if (args.length == 2) {
-                    // Creating Player while using 'local' as a scheme (i.e.
-                    // local:///res/filename.mid).
-                    if (args[1] instanceof String) {
-                        mediaType = (String) args[1];
-                        return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
-                    }
-                    else {
-                        asyncMode = ((Boolean) args[1]).booleanValue();
-                        return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
-                    }
-                }
-                else if (args.length == 3) {
+            if (args.length == 2) {
+                // Creating Player while using 'local' as a scheme (i.e.
+                // local:///res/filename.mid).
+                if (args[1] instanceof String) {
                     mediaType = (String) args[1];
-                    asyncMode = ((Boolean) args[2]).booleanValue();
+                    return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
+                }
+                else {
+                    asyncMode = ((Boolean) args[1]).booleanValue();
                     return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
                 }
             }
+            else if (args.length == 3) {
+                mediaType = (String) args[1];
+                asyncMode = ((Boolean) args[2]).booleanValue();
+                return new PlayerObject(fullPathToMedia, mediaType, asyncMode);
+            }
         }
-
         return UNDEFINED;
-    }
+	}
+	
+	protected Object execute(Object thiz, Object[] args) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
+

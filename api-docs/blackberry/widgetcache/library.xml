@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library isWhitelist="true">
+  <object name="blackberry.widgetcache" shortName="WidgetCache" introduced="1.0.0" comment="The WidgetCache object provides functions and properties to control Widget Caching behavior.">
+    
+    <features>
+      <feature id="blackberry.widgetcache" version="1.0.0">Browser Field 2 Caching Extension.</feature>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">
+  //Clears the cache if its size is over 9000.
+  function cleanUp() {
+    if(blackberry.widgetcache.getCurrentSize()>9000) {
+      blackberry.widgetcache.clearAll();
+    }
+  }
+</script>]]></example>
+    
+    <functions>
+      <func name="getCurrentSize" static="true" returns="Number" comment="Returns the current total size used by the caches."/>
+      <func name="getCacheInformation" static="true" returns="CacheInformation[]" comment="Returns all the cache information of the cached copies."/>
+      <func name="clearAll" static="true" returns="void" comment="Removes all items currently in the cache."/>
+      <func name="hasCache" static="true" returns="Boolean" comment="Checks whether there is a cached copy for the specified URL, whether expired or not.">
+        <param name="url" type="String" comment="The URL for which the cache will be checked."/>
+      </func>
+      <func name="clearCache" static="true" returns="void" comment="Clears the cached copy of the specified URL.">
+        <param name="url" type="String" comment="The URL for which the cache will be cleared."/>
+      </func>
+    </functions>
+    
+  </object>
+</library>

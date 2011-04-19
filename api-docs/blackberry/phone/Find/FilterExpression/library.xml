@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<library isWhitelist="true">
+  <object name="blackberry.phone.Find.FilterExpression" whitelistName="blackberry.phone.Find" shortName="FilterExpression" introduced="1.0.0" comment="The FilterExpression object represents the expression that is used to find an item that matches its defined condition.">
+    <details>
+      The FilterExpression object is an instance object, where if a new instance is desired, it must be created using the new keyword.
+    </details>
+    
+    <features>
+      <feature id="blackberry.phone.Find" version="1.0.0.0"/>
+    </features>
+    
+    <example><![CDATA[<script type="text/javascript">  
+  // Create simple filters and combine them with AND operator
+  var filter1 = new blackberry.phone.Find.FilterExpression("date.Hour", ">", 17);
+  var filter2 = new blackberry.phone.Find.FilterExpression("duration", "<=", 100);
+  var filterAND = new blackberry.phone.Find.FilterExpression(filter1, "AND", filter2);
+</script>]]></example>
+    
+    <constructors>
+      <ctor comment="Constructor for a new FilterExpression object.">
+        <param name="leftField " type="object" comment="an object of String or FilterExpression class."/>
+        <param name="operator " type="object" comment="the operator used for comparing or combining."/>
+        <param name="rightField" type="object" comment="a value to be comared or an object of the FilterExpression class to be combined."/>
+        <param name="negate" optional="true" type="Boolean" comment="optional (default value is false), the flag that indicates whether the condition of the FilterExpression object should be evaluated negatively."/>
+      </ctor>
+    </constructors>
+    
+    <properties>
+      <property name="leftField" type="object" readonly="true" static="false" comment="">
+        <details>
+          <![CDATA[
+1. (Either) contains the interested field for "Find."  
+It also supports the JAM predefined fields for the attribute of Date type (using "."), 
+so the user can "find" towards a date attribute to match the searching criteria. 
+  For example, for a find towards call log date attribute with the Date of "Dec. 4, 2008 16:30:00" 
+date.Year - returns a string of 4 digits of the Year value of the date attribute: "2008" 
+date.Month - returns a string of the Month value: "12" 
+date.Day - returns a string of the Date value: "4" 
+date.Hour - returns a string of the Hour value: "16" 
+date.Minute - returns a string of the Minute value: "30" 
+date.Second - returns a string of the Second value: "00" 
+
+2. (Or) contains another FilterExpression object to be combined with "rightField."         
+          ]]>
+        </details>
+      </property>
+      <property name="operator" type="object" readonly="true" static="false" comment="Contains an operator, used for comparing or combining.">
+        <details>
+          <![CDATA[
+        Support one of the following operators:
+"!="
+"=="
+"<"
+">"
+"<="
+">="
+"AND"
+"OR"
+"CONTAINS"
+]]>
+        </details>
+      </property>
+      <property name="rightField" type="object" readonly="true" static="false" comment="">
+        <details>
+          <![CDATA[
+1. (Either) contains the value that used for comparing with the field that is specified by "leftField (see details for the leftField)." 
+2. (Or) contains another FilterExpression object to be combined with "leftField."         
+          ]]>
+        </details>
+      </property>
+      <property name="negate" type="Boolean" readonly="true" static="false" comment="The boolean flag that indicates whether the condition of the FilterExpression object should be evaluated negatively.  This should only be used when you have nested expressions.  On regular field/value comparisons, negate isn't necessary as the != is sufficient."/>
+    </properties>
+  </object>
+</library>
