@@ -1,5 +1,10 @@
 # About BlackBerry&reg; WebWorks
-The BlackBerry WebWorks&reg; Platform is the next evolution of our BlackBerry&reg; Widget technology that we have contributed to this Open Source community under the Apache 2.0 license. It is a unique platform in the mobile market and is designed to take the Web as a first class citizen to create full featured applications. BlackBerry WebWorks is built on three main strategic principles:
+The BlackBerry&reg; WebWorks&trade; for BlackBerry Smartphone OS Platform allows web and mobile web developers to use the SDK in combination with their development 
+tooling of choice to develop, test and package up their web applications as BlackBerry WebWorks applications for smartphones. 
+BlackBerry WebWorks applications can be distributed through the BlackBerry App World&trade; storefront and they run on the BlackBerry&reg; Smartphones 
+with access to the hardware.
+
+The project is Open Sourced under the Apache 2.0 license [http://github.com/blackberry](http://github.com/blackberry).
 
 * Advanced Standards
 * Powerful Integration
@@ -8,11 +13,7 @@ The BlackBerry WebWorks&reg; Platform is the next evolution of our BlackBerry&re
 [Read more](https://github.com/blackberry/WebWorks/wiki) about the BlackBerry WebWorks open source project
 
 ## Downloads
-Below you will find the downloads and install files for the BlackBerry WebWorks project.  The install includes the BlackBerry MDS simulator as well as a BlackBerry v5.0 and BlackBerry 6 device simulator.
-
-Operating System | Java Support | Release | File | File Format | File size 
-:------------|:------------:|:------------:|:------------|:------------|:------------:|
-Windows&reg; XP (32-bit), Windows 7 (32-bit or 64-bit) | 32-bit | 1.5.0 | [Setup.exe](https://www.blackberry.com/Downloads/contactFormPreload.do?code=DC727151E5D55DDE1E950767CF861CA5&dl=8185E1D15E547FA5D76168608FF54721) | InstallShield&reg; Installer | 301.5 MB
+Full installers for Windows can be found on the [product download page](http://us.blackberry.com/developers/browserdev/widgetsdk.jsp)
 
 ## Reference Material &amp; Community
 You can also find associated reference material for the BlackBerry WebWorks platform as well as community forums for building and contributing to the BlackBerry WebWorks project
@@ -23,4 +24,7 @@ You can also find associated reference material for the BlackBerry WebWorks plat
 * [Project Contributor Forums](http://supportforums.blackberry.com/t5/BlackBerry-WebWorks/bd-p/ww_con)
 
 ## Building the Source Code
+*Coming Soon*
+
+## Testing the Source Code
 *Coming Soon*
