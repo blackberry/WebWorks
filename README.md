@@ -1,5 +1,5 @@
 # About BlackBerry&reg; WebWorks
-The BlackBerry&reg; WebWorks&trade; for BlackBerry Smartphone OS Platform allows web and mobile web developers to use the SDK in combination with their development 
+The BlackBerry&reg; WebWorks&trade; for the BlackBerry Smartphone OS allows web and mobile web developers to use the SDK in combination with their development 
 tooling of choice to develop, test and package up their web applications as BlackBerry WebWorks applications for smartphones. 
 BlackBerry WebWorks applications can be distributed through the BlackBerry App World&trade; storefront and they run on the BlackBerry&reg; Smartphones 
 with access to the hardware.
