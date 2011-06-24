@@ -27,6 +27,7 @@ import net.rim.tumbler.exception.ValidationException;
 import net.rim.tumbler.file.FileManager;
 import net.rim.tumbler.log.LogType;
 import net.rim.tumbler.log.Logger;
+import net.rim.tumbler.os.OperatingSystems;
 import net.rim.tumbler.rapc.Rapc;
 import net.rim.tumbler.serialize.WidgetConfigSerializer;
 import net.rim.tumbler.serialize.WidgetConfig_v1Serializer;
@@ -187,6 +188,10 @@ public class WidgetPackager {
 					+ "\"" + sessionManager.getSourceFolder()
 					+ System.getProperty("file.separator")
 					+ sessionManager.getArchiveName() + ".cod" + "\"";
+			if( !OperatingSystems.isWindows() ) {
+			    cmdline = cmdline.replace( "\"", "" );
+			}
+			
 			signingProcess = Runtime.getRuntime().exec(cmdline, null, cwd);
 		} catch (IOException ex) {
 			throw ex;

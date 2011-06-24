@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.rim.tumbler.exception.PackageException;
+import net.rim.tumbler.exception.ValidationException;
+import net.rim.tumbler.os.OperatingSystems;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,12 +33,10 @@ import org.xml.sax.InputSource;
 
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 
-import net.rim.tumbler.exception.PackageException;
-import net.rim.tumbler.exception.ValidationException;
-
 public class BBWPProperties {
     private static final String NODE_WCP = "wcp";
     private static final String NODE_JAVA = "java";
+    private static final String NODE_PREVERIFY_DIRECTORY = "preverify_directory";
     private static final String NODE_RAPC = "rapc";
     private static final String NODE_JAR = "jar";
     private static final String NODE_TEMPLATE = "wcp_template";
@@ -42,6 +44,7 @@ public class BBWPProperties {
     private static final String NODE_REPOSITORY = "extension_repository";
     
     private String          _rapc;
+    private String          _preverifyDirectory;
     private String          _javac;
     private String          _templateDir;
     private List<String>    _imports;
@@ -63,6 +66,10 @@ public class BBWPProperties {
     
     public String getRapc() {
         return _rapc;
+    }
+    
+    public String getPreverifyDirectory() {
+        return _preverifyDirectory;
     }
 
     public String getJavac() {
@@ -187,8 +194,34 @@ public class BBWPProperties {
                             if (!_rapc.equals("rapc.exe") && !_rapc.equals("rapc")) {
                                 if (new File(_rapc).isAbsolute()) {
                                     _rapc = getAbsolutePath(_rapc);
-                                } else {                                
-                                    _rapc = _sessionHome + "\\" + _rapc;
+                                } else {
+                                    
+                                    if( OperatingSystems.isWindows() ) {
+                                        _rapc = _sessionHome + "\\" + _rapc;
+                                    }
+                                    else{
+                                        _rapc = _sessionHome + "/" + _rapc;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (nodename.equals(NODE_PREVERIFY_DIRECTORY)) {
+                    NodeList childlist = node.getChildNodes();
+                    for (int j = 0; j < childlist.getLength(); j++) {
+                        if (childlist.item(j).getNodeType() == Node.TEXT_NODE) {
+                            _preverifyDirectory = childlist.item(j).getNodeValue();
+                            if (!_preverifyDirectory.equals("preverify.exe") && !_preverifyDirectory.equals("preverify")) {
+                                if (new File(_preverifyDirectory).isAbsolute()) {
+                                    _preverifyDirectory = getAbsolutePath(_preverifyDirectory);
+                                } else {
+                                    
+                                    if( OperatingSystems.isWindows() ) {
+                                        _preverifyDirectory = _sessionHome + "\\" + _preverifyDirectory;
+                                    }
+                                    else{
+                                        _preverifyDirectory = _sessionHome + "/" + _preverifyDirectory;
+                                    }
                                 }
                             }
                         }
@@ -200,8 +233,14 @@ public class BBWPProperties {
                             _javaHome = childlist.item(j).getNodeValue();
 
                             if (!_javaHome.isEmpty()) {
-                                _javac = "\"" + _javaHome + "\\bin\\javac.exe"
-                                        + "\"";
+                                
+                                if( OperatingSystems.isWindows() ) {
+                                    _javac = "\"" + _javaHome + "\\bin\\javac.exe"
+                                            + "\"";
+                                }
+                                else {
+                                    _javac = _javaHome + "/bin/javac";
+                                }
                             } else {
                                 _javac = getAbsolutePath("javac.exe");
                             }
@@ -216,7 +255,12 @@ public class BBWPProperties {
                             if (new File(_templateDir).isAbsolute()) {
                                 _templateDir = getAbsolutePath(_templateDir);
                             } else {
-                                _templateDir = _sessionHome + "\\" + _templateDir;
+                                if( OperatingSystems.isWindows() ) {
+                                    _templateDir = _sessionHome + "\\" + _templateDir;
+                                }
+                                else{
+                                    _templateDir = _sessionHome + "/" + _templateDir;
+                                }
                             }
                         }
                     }
@@ -243,7 +287,12 @@ public class BBWPProperties {
                             if (new File(_repositoryDir).isAbsolute()) {
                             	_repositoryDir = getAbsolutePath(_repositoryDir);
                             } else {
-                            	_repositoryDir = _sessionHome + "\\" + _repositoryDir;
+                                if( OperatingSystems.isWindows() ) {
+                                    _repositoryDir = _sessionHome + "\\" + _repositoryDir;
+                                }
+                                else{
+                                    _repositoryDir = _sessionHome + "/" + _repositoryDir;
+                                }
                             }
                         }
                     }                	
@@ -269,7 +318,12 @@ public class BBWPProperties {
             if (new File(lib).isAbsolute()) {
                 lib = getAbsolutePath(lib);
             } else {
-                lib = _sessionHome + "\\" + lib;
+                if( OperatingSystems.isWindows() ) {
+                    lib = _sessionHome + "\\" + lib;
+                }
+                else{
+                    lib = _sessionHome + "/" + lib;
+                }
             }
             
             if (new File(lib).exists()) {

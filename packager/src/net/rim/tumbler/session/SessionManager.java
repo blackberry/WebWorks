@@ -26,6 +26,7 @@ import net.rim.tumbler.WidgetPackager;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.exception.SessionException;
 import net.rim.tumbler.exception.ValidationException;
+import net.rim.tumbler.os.OperatingSystems;
 
 public class SessionManager {
     private static SessionManager _instance = null;
@@ -169,8 +170,14 @@ public class SessionManager {
         if (home.equals("")) {
             return System.getProperty("user.dir");
         } else {
+            
+            if( OperatingSystems.isWindows() ) {
+                return home
+                        .substring(0, home.lastIndexOf("\\bin"));
+            }
+            
             return home
-                    .substring(0, home.lastIndexOf("\\bin"));
+                .substring(0, home.lastIndexOf("/bin"));
         }
     }
     
