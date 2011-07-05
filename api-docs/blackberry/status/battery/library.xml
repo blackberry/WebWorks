@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <object name="blackberry.status.Battery" shortName="Battery" comment="Battery Namespace provides API to access the battery properties and to register callbacks to be notified about battery related events">
+    <features>
+      <feature id="blackberry.status.Battery" version="1.0.0.0" required="true">Battery Namespace</feature>
+    </features>
+    <example>
+      <![CDATA[
+<script type="text/javascript">
+function addBatteryListener() {
+    alert("Registering for battery events.. ");
+    var res = blackberry.status.Battery.addBatteryListener(null, OnBatteryLow, OnBatteryStatusChange);
+    alert("Registered for battery events: " + res);
+}
+
+function removeBatteryListener() {
+    var res = blackberry.status.Battery.addBatteryListener(null);
+    alert("Unregistered from battery events: " + res);
+}
+
+// Invoked when the internal battery voltage falls below a critical level.
+function OnBatteryLow() {
+    alert("Battery voltage below critical level.");
+}
+
+// Invoked when the internal battery state has changed.
+function OnBatteryStatusChange(status) {
+    var res = status;
+
+    if (status == blackberry.status.Battery.BSTAT_LOW ) {
+        alert("Battery status changed to LOW");
+    }
+    else {
+        alert("Battery status changed to: " + res);
+    }
+}
+</script>
+      ]]>
+    </example>
+    <functions>
+      <func name="addBatteryListener" static="true" returns="Boolean" comment="Register a system listener to be notified on battery events. Returns TRUE on success, else FALSE or UNDEFINED.">
+        <param name="callback" type="OnBatteryGood" comment="This ScriptableFunction invoked when the internal battery voltage has returned to normal."/>
+        <param name="callback" type="OnBatteryLow" comment="This ScriptableFunction invoked when the internal battery voltage falls below a critical level."/>
+        <param name="callback" type="OnBatteryStatusChange" comment="This ScriptableFunction invoked when the internal battery state has changed."/>
+        <details>
+          Register listeners when interested in receiving system events regarding the battery.
+          When subscribe more than one callback function, every new callback set will overwrite each previous.
+          To unsubscribe from all callbacks, pass 'null' as a parameter.
+        </details>
+       </func>
+    </functions>
+    <properties>
+      <property name="level" type="Number" readonly="true" static="true" comment="Current battery level (percentage of maximum battery level remaining)."/>
+      <property name="status" type="Number" readonly="true" static="true" comment="Battery status (one of BSTAT_xxx)"/>
+      <property name="voltage" type="Number" readonly="true" static="true" comment="Battery's current voltage (Current voltage (milliVolts) provided by battery)."/>
+      <property name="temperature" type="Number" readonly="true" static="true" comment="Battery's current temperature (Approximate temperature (celsius) of battery)."/>
+      <property name="isRemovable" type="Boolean" readonly="true" static="true" comment="Determines if this device has a removable battery (True if this device has removable battery)."/>
+
+      <property name="BSTAT_DEAD" type="Number" readonly="true" static="true" comment="Battery at or below zero percent."/>
+      <property name="BSTAT_TOO_COLD" type="Number" readonly="true" static="true" comment="Battery is too cold."/>
+      <property name="BSTAT_TOO_HOT" type="Number" readonly="true" static="true" comment="Battery is too hot."/>
+      <property name="BSTAT_LOW" type="Number" readonly="true" static="true" comment="Battery is low."/>
+      <property name="BSTAT_NONE" type="Number" readonly="true" static="true" comment="No battery."/>
+      <property name="BSTAT_REVERSED" type="Number" readonly="true" static="true" comment="Battery is inserted backwards."/>
+      <property name="BSTAT_UNKNOWN_BATTERY" type="Number" readonly="true" static="true" comment="Battery is not recognized by the firmware."/>
+      <property name="BSTAT_NO_TURN_ON" type="Number" readonly="true" static="true" comment="Battery is too low for device to turn on."/>
+      <property name="BSTAT_NO_RADIO" type="Number" readonly="true" static="true" comment="Battery is too low for radio usage."/>
+      <property name="BSTAT_NO_CAMERA_FLASH" type="Number" readonly="true" static="true" comment="Battery is too low for camera flash usage."/>
+      <property name="BSTAT_CHARGING" type="Number" readonly="true" static="true" comment="Battery is charging."/>
+      <property name="BSTAT_LOW_RATE_CHARGING" type="Number" readonly="true" static="true" comment="Battery is charging, but at a reduced rate."/>
+      <property name="BSTAT_IS_USING_EXTERNAL_POWER" type="Number" readonly="true" static="true" comment="Device is connected to an external power source."/>
+      <property name="BSTAT_LEVEL_CHANGED" type="Number" readonly="true" static="true" comment="The level of the battery has changed, call getBatteryLevel() for detailed info on the Battery Level."/>
+      <property name="BSTAT_NO_WLAN" type="Number" readonly="true" static="true" comment="Battery is too low for WLAN radio usage."/>
+      <property name="BSTAT_AC_CONTACTS" type="Number" readonly="true" static="true" comment="Battery is charging via the AC contacts."/>
+    </properties>
+    
+    <subclasses>
+      <object name="OnBatteryGood" shortName="Battery status Interface" interface="true" comment="Invoked when the internal battery voltage has returned to normal.">
+        <details>This is the interface that must be available on the callback function to recieve a system's battery update.</details>
+      </object>
+    </subclasses>
+    
+    <subclasses>
+      <object name="OnBatteryLow" shortName="Battery status Interface" interface="true" comment="Invoked when the internal battery voltage falls below a critical level.">
+        <details>This is the interface that must be available on the callback function to recieve a system's battery update.</details>
+      </object>
+    </subclasses>
+
+    <subclasses>
+      <object name="OnBatteryStatusChange" shortName="Battery status Interface" interface="true" comment="Invoked when the internal battery state has changed.">
+        <param name="status" type="Number" comment="A combination of the BSTAT_xxx masks."/>
+        <details>This is the interface that must be available on the callback function to recieve a system's battery update.</details>
+      </object>
+    </subclasses>
+   </object>
+</library>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

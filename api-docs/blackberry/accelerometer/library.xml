@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <extension>
+    <entryClass>blackberry.accelerometer.AccelerometerExtension</entryClass>
+  </extension>
+  
+  <object name="blackberry.accelerometer" shortName="Accelerometer" comment="Provides functions and properties to access the device accelerometer where supported.">
+    <features>
+      <feature id="blackberry.accelerometer" version="1.0.0.0" required="true">Accelerometer Extension</feature>
+    </features>
+    
+    <details>
+      The accelerometer namespace is static; all of its functions/properties are used directly from the object.
+    </details>
+    
+    <details title="Accelerometer Data Types">
+      * Orientation, which represents handheld orientation with respect to the ground, for example, ORIENTATION_TOP_UP or ORIENTATION_LEFT_UP.
+    </details>
+    <details>
+      * Raw acceleration samples, which are tuples of three coordinates: X, Y, and Z. Each raw value represents acceleration along X, Y and Z axes at a give point in time.
+    </details>
+    
+    <details title="Accelerometer Axes">
+      Acceleration sensors return G-force values along the X, Y, and Z axes, relative to the ground, as follows:
+    </details>
+    <details>
+      * X axis runs from east (negative values) to west (positive values)
+    </details>
+    <details>
+      * Y axis runs from north (negative values) to south (positive values)
+    </details>
+    <details>
+      * Z axis runs from the front of the BlackBerry device (negative values) to the back of the device (positive values).
+    </details>
+    <details>
+      For example, if the handheld is lying flat on a table, the X and Y values are equal to 0, while Z is equal to 1000 (which represents G-Force, or 9.80665m/sec2).
+      In freefall, all three values are equal to 0. The G-Force value is specified by blackberry.accelerometer.Orientation.G_FORCE_VALUE constant.
+    </details>
+    
+    <details title="Hardware Limitations">
+      * Maximum acceleration measured - typically 2 * G, but is hardware dependant.
+    </details>
+    <details>
+      * Sensitivity - since acceleration is never a constant the sensor may provide duplicate values
+    </details>
+    
+    <details title="Battery Considerations">
+      Subscribing to accelerometer sensor readings is costly for the device battery, and should therefore only be used only when necessary. We recommend setting the xyzBufferSize to
+      a larger number and batch processing the samples once they are retrieved. Keeping xyzBufferSize equal to 1 will attempt to provide realtime readings but it is a very expensive
+      operation in terms of processing and battery power.
+    </details>
+    
+    <functions>
+      <func name="startListening" static="true" returns="undefined" array="false" comment="Starts listening for accelerometer events if supported. If not supported, it does nothing.">
+        <param name="listenInBackground" type="Boolean" comment="True if application should receive accelerometer events while in background mode. By default events are received only while application is in the foreground."/>
+      </func>
+      <func name="stopListening" static="true" returns="undefined" array="false" comment="Stops listening for accelerometer events."/>
+    </functions>
+    
+    <properties>
+      <property name="isSupported" type="Boolean" readonly="true" static="true" comment="Returns true if the device supports an accelerometer."/>
+      <property name="orientation" type="Number" readonly="true" static="true" comment="Returns one of the blackberry.accelerometer.Orientation constants, representing current orientation."/>
+      <property name="sensitivity" type="Number" readonly="false" static="true" comment="Hysteresis on any of the x, y, z axes as a percentage of 360 degrees before the onXYZChange event is triggered."/>
+      <property name="xyzBufferSize" type="Number" readonly="false" static="true" comment="The number of xyz position samples that are buffered before the onXYZChange event is triggered."/>
+      <property name="onOrientationChange" type="callback : OnOrientationChange" readonly="false" static="true" comment="Event handler is called when the orientation of the device changes."/>
+      <property name="onXYZChange" type="callback : OnXYZChange(XYZSample[] samples)" readonly="false" static="true"
+       comment="Event handler is called with an array of orientation samples of xyzBufferSize length. Samples are recorded when the device is moved more than the sensitivity value on any axis."/>
+    </properties>
+    
+    <subclasses>
+      <object name="OnOrientationChange" shortName="OnOrientationChange Interface" interface="true" comment="Interface for orientation change callbacks.">
+        <details>
+          This is the interface that the orientation change event callback function provided must satisfy.
+        </details>
+      </object>
+      
+      <object name="OnXYZChange" shortName="OnXYZChange Interface" interface="true" comment="Interface for new XYZ sample callbacks.">
+        <details>
+          This is the interface that the orientation change event callback function provided must satisfy. The signature of the callback is: function onXYZChange(XYZSample[] samples)
+        </details>
+      </object>
+    </subclasses>
+  </object>
+</library>
+

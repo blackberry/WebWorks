@@ -382,17 +382,13 @@ public class CacheManager implements HttpProtocolConstants {
         }
     }
 
-    private boolean isExpired( HttpConnection response ) {
-        try {
-            long expires = response.getExpiration(); // getExpiration() returns 0 if not known
-            if( expires > 0 && expires <= ( new Date() ).getTime() ) {
-                return true;
-            }
-
-            return false;
-        } catch( IOException ioe ) {
+    private boolean isExpired( HttpConnection response ) { 
+        long expires = getResponseExpires( response ); // getExpiration() returns 0 if not known
+        if( expires > 0 && expires <= ( new Date() ).getTime() ) {
             return true;
         }
+
+        return false;
     }
 
     private boolean containsCacheControlNoCache( HttpConnection response ) {
@@ -432,12 +428,6 @@ public class CacheManager implements HttpProtocolConstants {
 
     private long getResponseExpires( HttpConnection response ) {
         try {
-            // Calculate expires from "expires"
-            long expires = response.getExpiration();
-            if( expires > 0 ) {
-                return expires;
-            }
-
             // Calculate expires from "max-age" and "date"
             if( response.getHeaderField( "cache-control" ) != null ) {
                 String cacheControl = removeSpace( response.getHeaderField( "cache-control" ).toLowerCase() );
@@ -447,6 +437,12 @@ public class CacheManager implements HttpProtocolConstants {
                 if( maxAge > 0 && date > 0 ) {
                     return ( date + maxAge );
                 }
+            }
+            
+            // Calculate expires from "expires"
+            long expires = response.getExpiration();
+            if( expires > 0 ) {
+                return expires;
             }
         } catch( IOException ioe ) {
         }

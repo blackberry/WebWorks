@@ -27,25 +27,42 @@
   </features>
   
   <object name="blackberry.push" shortName="Push" introduced="1.0.0" comment="The Push object allows you to leverage the BlackBerry push architecture to receive push data in your application.">
+    <features>
+      <feature id="blackberry.push" version="1.0.0"/>
+    </features>
     <example><![CDATA[<script  type="text/javascript">
   var port = 1234; 
+  var appId = ""46-55re2RM55eh2M5"";
+  var url = "http://pushapi.eval.blackberry.com";
 
-  function doMySubscription() {
+  function openPushListener() {
     //See if they have a BIS transport.. if so use it
     var transports = blackberry.system.getTransportList();
     found = false;
     for (var i = 0; i < transports.length; i++) {
       if (transports[i].name == "BIS") {
         found = true;
-        blackberry.push.openPushListener(handleMyReturnData, port, transport[i]);
+        blackberry.push.openBISPushListener(port, appId, url, handlePushData, handleRegistration, handSimChange);
         break;
       }
     }
     if (!found)
-      blackberry.push.openPushListener(handleMyReturnData, port);
+      blackberry.push.openBESPushListener(port, handPushData, handleSimChange);
   }
 
-  function handleMyReturnData(data) {
+  function handleRegistration(result) {
+    if ( result != 0 ) {
+      alert('Registration failed, reason:' + result);
+    }
+  }
+  
+  function handleSimChange() {
+    if ( confirm.register("SIM card is changed, re-register?") ) {
+        openPushListener();
+    }  
+  }
+  
+  function handlePushData(data) {
     if (data != null) {
       var myRecievedData= blackberry.utils.blobToString(data.payload)
       alert(myRecievedData);
@@ -60,11 +77,13 @@
 </script>]]></example>
     
     <subclasses>
-      <object name="OnData" shortName="OnData Interface" interface="true" comment="Interface to implement on the callback function when data is received.">
+      <object name="onMessage" shortName="onMessage Interface" interface="true" comment="Interface for taking action on a newly received push.">
         <param name="data" type="blackberry.push.Data" comment="Object that contains the data that was just received"/>
-        <details>
-          This is the interface that must be available on the callback function to receive push data
-        </details>
+      </object>
+      <object name="onRegister" shortName="onRegister Interface" interface="true" comment="Interface for taking action on registration.">
+        <param name="result" type="Number" comment="The error or success code will be passed in corresponding to the following codes 0: success, 1: network error, 2: rejected by server, 3: invalid parameter, -1: general error."/>
+      </object>
+      <object name="onSimChange" shortName="onSimChange Interface" interface="true" comment="Interface for taking action on a SIM card change. Suggested implementation: Close the push listener, prompt the user whether they want to re-register and, if so, open the push listener again.">
       </object>
     </subclasses>
     
@@ -79,17 +98,27 @@
           
           Since the state for JavaScript for a web page is only as long as the web page is being viewed, there is a need for the widget to maintain the open port for push information.  This allows this listening for push data to remain open between page transitions.
           
-          If no current active callback is assigned to the push listener, the widget will queue the push data (limiting the number of messages using maxQueueCap if available) for the application until a subsequent openPushListener call is made for that port.  At that point it will then pass the data to the subscribed callback function.
-          
           To subscribe to the same previously opened push port on a new web page, a secondary call to openPushListener is called.  In this scenario it will re-assign the callback provided to the already open port.  If calling openPushListener on a page where the port is already open, the callback will be updated to use the latest one passed in.  NOTE: In such cases where consecutive calls to openPushListener occurs on the page, the transport argument will only be used on the first call, and ignored for all others.
           Any calls to openPushListener should have matching calls to closePushListener to ensure ports are not left open accidentally.
         </details>
       </func>
-      <func name="closePushListener" static="true" returns="void" comment="Closes the listening connection for an already open push channel.">
-        <param name="port" type="Number" comment="Unique listener integer port used in the original openPushListener method."/>
-        <details>
-          When this close is called, it will stop listening for incoming data on the push port.
-        </details>
+      <func name="openBESPushListener" returns="void" static="true" comment="Opens the push listener to allow an application to listen for BES pushes.">
+        <param name="port" type="Number" comment="The port on the device to listen for pushes on."/>
+        <param name="pushCallback" type="onMessage" comment="The ScriptableFunction that is invoked when a new push has been received."/>
+        <param name="simChangeCallback" type="onSimChange" comment="The ScriptableFunction that is invoked on a SIM card change (since it has implications on the receiving of pushes)."/>
+        <param name="maxQueueCap" type="Number" optional="true" comment="The maximum number of pushes to queue before the oldest pushes are discarded. If the number is not provided, no limit is imposed."/>
+      </func>
+      <func name="openBISPushListener" returns="void" static="true" comment="Opens the push listener to allow an application to listen for BIS pushes.">
+        <param name="port" type="Number" comment="The port on the device to listen for pushes on."/>
+        <param name="appId" type="String" comment="The id provided to you for your push application after signing up to use the BlackBerry Push Service."/>
+        <param name="url" type="String" comment="The URL of the push server.  Examples of this URL include: http://pushapi.eval.blackberry.com if using the eval environment of the BlackBerry Push Service or http://pushapi.na.blackberry.com if using the production environment of the BlackBerry Push Service."/>
+        <param name="pushCallback" type="onMessage" comment="The ScriptableFunction that is invoked when a new push has been received."/>
+        <param name="registerCallback" type="onRegister" comment="The ScriptableFunction that is invoked when the result of the registration performed during the opening of the push listener is received."/>
+        <param name="simChangeCallback" type="onSimChange" comment="The ScriptableFunction that is invoked on a SIM card change (since it has implications on the receiving of pushes)."/>
+        <param name="maxQueueCap" type="Number" optional="true" comment="The maximum number of pushes to queue before the oldest pushes are discarded. If the number is not provided, no limit is imposed."/>
+      </func>
+      <func name="closePushListener" static="true" returns="void" comment="Closes the push listener so that an application can no longer listen for pushes.">
+        <param name="port" type="Number" optional="true" comment="The port on the device to be closed. If port is not provided, the function will close all ports and unregister the application from the push server."/>
       </func>
     </functions>
     

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <object name="blackberry.accelerometer.Orientation" shortName="Orientation" comment="Contains constants for the six possible device orientations sensed by the accelerometer sensor.">
+    <features>
+      <feature id="blackberry.accelerometer" version="1.0.0.0" required="true"/>
+    </features>
+    
+    <details>
+      The Orientation object contains constants for all the possible orientations supported by the accelerometer. One of these values will populate the blackberry.accelerometer.orientation field.
+    </details>
+    
+    <constants>
+      <const name="UNKNOWN" type="Number" value="0" comment="Orientation constant indicating an unknown BlackBerry device orientation."/>
+      <const name="G_FORCE_VALUE" type="Number" value="10" comment="Constant for raw acceleration value that is equal to G-Force."/>
+      <const name="BACK_UP" type="Number" value="20" comment="Orientation constant indicating the BlackBerry device display is directly facing the ground."/>
+      <const name="BOTTOM_UP" type="Number" value="30" comment="Orientation constant indicating the bottom side of the Blackberry device is moving upwards."/>
+      <const name="FRONT_UP" type="Number" value="40" comment="Orientation constant indicating the BlackBerry device display is facing 180 degrees from the ground."/>
+      <const name="LEFT_UP" type="Number" value="50" comment="Orientation constant indicating the left side of the BlackBerry device is moving upwards."/>
+      <const name="RIGHT_UP" type="Number" value="60" comment="Orientation constant indicating the right side of the BlackBerry device is moving upwards."/>
+      <const name="TOP_UP" type="Number" value="70" comment="Orientation constant indicating the top side of the Blackberry device is moving upwards."/>
+    </constants>
+    
+  </object>
+</library>

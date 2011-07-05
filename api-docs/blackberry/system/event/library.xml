@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <library isWhitelist="true">
   <object name="blackberry.system.event" shortName="System Event" introduced="1.0.0" comment="The System Event object allows you to get access to events triggered by system events on the BlackBerry device.">
+    <features>
+      <feature id="blackberry.system.event" version="1.0.0"/>
+    </features>
     <details>
       The System Object is static; all of its functions and properties are used directly from the object.
     </details>

@@ -1,18 +1,18 @@
 /*
-* Copyright 2010-2011 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010-2011 Research In Motion Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package blackberry.web.widget.bf;
 
 import java.util.Enumeration;
@@ -54,7 +54,6 @@ public final class BrowserFieldScreen extends WidgetScreen {
     private Manager _manager;
     private boolean _attached;
 
-    private boolean _loaded;
     private int _bgColor;
 
     private static BrowserField _browserFieldReference;
@@ -172,17 +171,14 @@ public final class BrowserFieldScreen extends WidgetScreen {
         if( getAppNavigationMode() ) {
             _manager = new WidgetFieldManager( Manager.VERTICAL_SCROLL | Manager.VERTICAL_SCROLLBAR | Manager.HORIZONTAL_SCROLL
                     | Manager.HORIZONTAL_SCROLLBAR );
-            
-            // navController depends on navExtension.  Initialize navExtension first
+
+            // navController depends on navExtension. Initialize navExtension first
             _navigationExtension = new NavigationNamespace( this );
             _navigationController = new NavigationController( this );
         } else {
             _manager = new VerticalFieldManager( Manager.VERTICAL_SCROLL | Manager.VERTICAL_SCROLLBAR | Manager.HORIZONTAL_SCROLL
                     | Manager.HORIZONTAL_SCROLLBAR );
         }
-
-        // Initialize the value of the 'loaded' flag.
-        _loaded = true;
 
         // Add BrowserField/Manager to the Screen.
         _manager.add( _browserField );
@@ -218,7 +214,6 @@ public final class BrowserFieldScreen extends WidgetScreen {
             }
             _widgetCacheExtension = new WidgetCacheNamespace( this );
         }
-
     }
 
     /**
@@ -237,15 +232,7 @@ public final class BrowserFieldScreen extends WidgetScreen {
 
     /* Paints a bgcolor if the page is not loaded yet. */
     protected void paint( Graphics graphics ) {
-        if( _loaded ) {
-            super.paint( graphics );
-        }
-    }
-
-    // Sets the loaded flag and repaint the screen.
-    protected void setPageLoaded( boolean isLoaded ) {
-        _loaded = isLoaded;
-        this.invalidate();
+        super.paint( graphics );
     }
 
     /*
@@ -346,7 +333,7 @@ public final class BrowserFieldScreen extends WidgetScreen {
     public WidgetCacheNamespace getWidgetCacheExtension() {
         return _widgetCacheExtension;
     }
-    
+
     protected boolean onBackButton() {
         boolean result = false;
 
