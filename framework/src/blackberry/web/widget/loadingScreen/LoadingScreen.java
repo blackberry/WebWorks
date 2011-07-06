@@ -15,11 +15,15 @@
  */
 package blackberry.web.widget.loadingScreen;
 
+import net.rim.device.api.math.Fixed32;
+import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.system.Display;
 import net.rim.device.api.system.EncodedImage;
 import net.rim.device.api.system.GIFEncodedImage;
+import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.Manager;
 import net.rim.device.api.ui.component.BitmapField;
 import net.rim.device.api.ui.container.HorizontalFieldManager;
@@ -43,19 +47,36 @@ public class LoadingScreen extends MainScreen {
         _widgetConfigImpl = widgetConfigImpl;
         _pageManager = pageManager;
 
+        int bgColor = processColorString( _widgetConfigImpl.getLoadingScreenColor() );
+        
         if( _widgetConfigImpl.getBackgroundImage().length() != 0 ) {
             // Set background image
             EncodedImage backgroundImage = EncodedImage.getEncodedImageResource( _widgetConfigImpl.getBackgroundImage() );
             if( backgroundImage != null ) {
-                Background bg = BackgroundFactory.createBitmapBackground( backgroundImage.getBitmap(),
+            	
+            	// Resize the image to the display size.
+            	int scaleX = Fixed32.div( Fixed32.toFP( backgroundImage.getWidth() ), Fixed32.toFP( Display.getWidth() ) );
+            	int scaleY = Fixed32.div( Fixed32.toFP( backgroundImage.getHeight() ), Fixed32.toFP( Display.getHeight() ) );
+            	EncodedImage scaledBgImage = backgroundImage.scaleImage32(scaleX, scaleY);
+
+            	// Using the scaled bg image draw onto the blank white bitmap.
+            	Bitmap bgImg = new Bitmap( scaledBgImage.getScaledWidth(), scaledBgImage.getScaledHeight() );
+                Graphics g = new Graphics( bgImg );
+                if( bgColor != -1 ) {
+                	g.setColor( bgColor );
+                } else {
+                	g.setColor( Color.WHITE );
+                }
+                g.fillRect( 0, 0, scaledBgImage.getScaledWidth(), scaledBgImage.getScaledHeight() );
+                g.drawImage( 0, 0, scaledBgImage.getScaledWidth(), scaledBgImage.getScaledHeight(),
+                		scaledBgImage, 0, 0, 0 );
+
+                Background bg = BackgroundFactory.createBitmapBackground( bgImg,
                         Background.POSITION_X_CENTER, Background.POSITION_Y_CENTER, Background.REPEAT_SCALE_TO_FIT );
                 this.setBackground( bg );
                 this.getMainManager().setBackground( bg );
             }
         } else {
-            // Set background color
-            int bgColor = processColorString( _widgetConfigImpl.getLoadingScreenColor() );
-
             // -1 denotes an invalid color
             if( bgColor != -1 ) {
                 Background color = BackgroundFactory.createSolidBackground( bgColor );

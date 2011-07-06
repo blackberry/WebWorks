@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <extension>
+    <entryClass>blackberry.radio.RadioExtension</entryClass>
+  </extension>
+  <features>
+    <feature id="blackberry.radio" version="1.0.0.0" required="true">radio namespace</feature>
+    <feature id="blackberry.radio.RadioInfo" version="1.0.0.0" required="true">RadioInfo namespace</feature>
+  </features>
+  <object name="blackberry.radio" shortName="Radio" comment="">
+    <functions>
+      <func name="activateWAFs" static="true" returns="boolean" array="false"
+       comment="This method requests that the radios that belong to the provided Wireless Access Families (WAFs) be powered on. 
+       A request will not be successful if the BlackBerry device is in the process of an Upgrade over
+       the wireless network, or if the CryptoBlock or USBPasswordRedirectManager does not allow the radio
+       to be turned on.
+       If the request is successful, and all the specified WAF(s) are supported, the activateWAFs method
+       activates the specified WAF(s).
+       To determine if a WAF is supported, call RadioInfo.areWAFsSupported(int).">
+        <details>
+          returns true if the request was successful and false if not. If the request was successful,
+          it does not guarantee that the specified WAFs were activated.
+        </details>
+        <param name="WAFs" type="int" comment="A bitfield of RadioInfo.WAF_* flags indicating the Wireless Access Families whose radios should be turned on."/>
+      </func>
+      <func name="deactivateWAFs" static="true" returns="boolean" array="false"
+       comment="Requests that the radios belonging to the provided Wireless Access Families be powered off.">
+        <details>
+          returns true if the request was successful.
+        </details>
+        <param name="WAFs" type="int" comment="A bitfield of RadioInfo.WAF_* flags indicating the Wireless
+         Access Families whose radios should be turned off. "/>
+      </func>
+    </functions>
+  </object>
+  <object name="blackberry.radio.RadioInfo" shortName="RadioInfo" comment="Provides access to information about the status of the radio.">
+    <functions>
+      <func name="areWAFsSupported" static="true" returns="Boolean" array="false"
+       comment="Determines if any of the provided Wireless Access Families are supported by the device.">
+        <param name="WAFs" type="int" comment="A bitfield of WAF_* flags indicating the Wireless Access Families to check for support."/>
+      </func>
+      <func name="calculatedNetworkId" static="true" returns="int" array="false"
+       comment="Calculate the Cellular network ID value given the MCC and MNC in decimal value representation.">
+        <details>
+          <![CDATA[
+                 If the provided values are out of range, such as negative numbers or greater than
+                 0xFFF, then the returned value is undefined.
+                 For example, after the code below executes the variable hexNetworkId will have value 0x02600310.
+                 int mcc = 310
+                 int mnc = 260
+                 int hexNetworkId = RadioInfo.calculateNetworkId(mcc, mnc);
+            ]]>
+        </details>
+        <param name="mcc" type="int" comment="Decimal value of MCC"/>
+        <param name="mnc" type="int" comment="Decimal value of MNC"/>
+      </func>
+      <func name="convertNetworkId" static="true" returns="int" array="false"
+       comment='Converts the MNC portion of a network ID from a 3 digit format of "##f" to the numeric 3 digit (i.e. "##0") or 2 digit numeric format (i.e. "##") used by our SE13 table.'>
+        <details>
+          This function returns the network Id in the numeric format.
+        </details>
+        <param name="networkId" type="int" comment="The network Id as presented to the applications from the firmware."/>
+      </func>
+      <func name="getAccessPointName" static="true" returns="String" array="false"
+       comment="Gets the access point name from the given identifier.">
+        <details>
+          It throws RadioException if a radio error occurs or if the provided value for
+          apnId is invalid.
+        </details>
+        <param name="apnId" type="int" comment=" The access point name identifier."/>
+      </func>
+      <func name="getAccessPointNumber" static="true" returns="int" array="false"
+       comment="Retrieves the access point number for the specified name.">
+        <details>
+          It throws RadioException if a radio error occurs or if the provided value for
+          apnId is invalid.
+        </details>
+        <param name="name" type="String" comment="The access point name."/>
+      </func>
+      <func name="getActiveWAFs" static="true" returns="int" array="false"
+       comment="Retrieves the currently active Wireless Access Families.">
+        <details>
+          It returns a bitfield of WAF_* flags indicating the currently
+          active Wireless Access Families.
+        </details>
+      </func>
+      <func name="getCurrentNetworkIndex" static="true" returns="int" array="false"
+       comment="Retrieves the index of the current Cellular network.">
+        <details>
+          The current network index, from 0 to {@link #getNumberOfNetworks} - 1.
+        </details>
+      </func>
+      <func name="getCurrentNetworkName" static="true" returns="String" array="false"
+       comment="Retrieve the name of the carrier network on which the device is currently registered.">
+        <details>
+          It returns the name of the carrier network, or null if the device is not registered on any network.
+        </details>
+      </func>
+      <func name="getEnabledWAFs" static="true" returns="int" array="false"
+       comment="Retrieves the currently enabled Wireless Access Families">
+        <details>
+          Enabled WAFs are those permitted to be active on multiple WAF devices
+          where not all WAFs are active at the same time.
+          E.g. Global mode enables CDMA and GSM but only one of these WAFs
+          may be active depending on availability of network.
+          It returns a bitfield of WAF_* flags indicating the currently enabled Wireless Access Families.
+        </details>
+      </func>
+      <func name="getIPAddress" static="true" returns="int" array="false"
+       comment="Retrieves the IP address for the specified access point name identifier.">
+        <details>
+          It returns the IP address in network byte order (the highest order byte of
+          the address is in address[0]).
+        </details>
+        <param name="apnId" type="int" comment=" The access point name identifier."/>
+      </func>
+      <func name="getMCC" static="true" returns="int" array="false"
+       comment="Retrieves Mobile Country Code for the given Cellular network.">
+        
+        <param name="index" type="int" comment="The network index, from 0 to getNumberOfNetworks() - 1."/>
+      </func>
+      <func name="getMNC" static="true" returns="int" array="false"
+       comment="Retrieves Mobile Network Code for the specified Cellular network.">
+        <param name="index" type="int" comment="The network index, from 0 to getNumberOfNetworks() - 1."/>
+      </func>
+      <func name="getNetworkCountryCode" static="true" returns="String" array="false"
+       comment="Retrieves the country code (i.e. country initials) of the specified Cellular network.">
+        <details>
+          It returns the three-letter network country code listed in the GSM SE.13 table, or null if unknown.
+          It throws IllegalArgumentException if the index parameter is out of bounds.
+        </details>
+        <param name="index" type="int" comment="The network index, from 0 to getNumberOfNetworks() - 1."/>
+      </func>
+      <func name="getNetworkId" static="true" returns="int" array="false"
+       comment="Retrieves the Id of the specified Cellular network.">
+        <details>
+          It throws IllegalArgumentException if the index parameter is out of bounds.
+        </details>
+        <param name="index" type="int" comment="The network index, from 0 to getNumberOfNetworks() - 1."/>
+      </func>
+      <func name="getNetworkName" static="true" returns="String" array="false"
+       comment="Retrieves the name of the specified Cellular network.">
+        <param name="index" type="int" comment="The network index, from 0 to getNumberOfNetworks() - 1."/>
+      </func>
+      <func name="getNetworkService" static="true" returns="int" array="false"
+       comment="Retrieves currently available network services.">
+        <details>
+          It returns the combination of the NETWORK_SERVICE_* flags.
+        </details>
+        <param name="wafs" type="int" comment="The active RadioInfo.WAF_*(s) that you would like to query."/>
+      </func>
+      <func name="getNetworkTime" static="true" returns="long" array="false"
+       comment="Determine the current network time, as calculated using an offset from the current 
+       device time. The quality of this information is network dependent. " >
+      <details>
+        It returns a time in milliseconds corresponding to
+        the network reported time normalized to the local time zone.
+      </details>
+      <param name="deviceTime" type="long" comment="Current time in milliseconds"/>
+    </func>
+    <func name="getNetworkType" static="true" returns="int" array="false"
+     comment="Retrieves the network type.">
+      <details>
+        Network type; one of NETWORK_GPRS, NETWORK_UMTS, NETWORK_CDMA, NETWORK_IDEN, NETWORK_802_11.
+      </details>
+    </func>
+    <func name="getNumberOfNetworks" static="true" returns="int" array="false"
+     comment="Retrieves the number of available Cellular networks.">
+    </func>
+    <func name="getNumberOfPacketsReceived" static="true" returns="long" array="false"
+     comment="Retrieves the number of IP bytes received by the radio or -1 if this feature is
+     not supported. " >   
+  </func>
+    <func name="getNumberOfPacketsSent" static="true" returns="long" array="false"
+     comment="Retrieves the number of IP bytes sent by the radio or -1 if this feature is
+     not supported. " >   
+  </func>
+    <func name="getSignalLevel" static="true" returns="int" array="false"
+     comment="Retrieves current signal strength of the Cellular network or for the specified Wireless Access Family.">
+      <details>
+        Signal level in dBm (typically between -121 dBm and -40 dBm)
+        or LEVEL_NO_COVERAGE if the radio is out of coverage.
+      </details>
+      <param name="waf" type="int" comment="The Wireless Access Family whose signal level is to be retrieved.  Must be one
+       of the WAF_* constants, otherwise WAF_3GPP is assumed. "/> 
+    </func>
+    <func name="getState" static="true" returns="int" array="false"
+     comment="Checks the radio state. This checks the cellular WAFs EXCEPT when WLAN is the primary WAF.">
+      <details>
+        It returns one of the STATE_ON, STATE_OFF, STATE_LOWBATT
+      </details>
+    </func>
+    <func name="getSupportedBands" static="true" returns="int" array="false"
+     comment="Retrieves the Cellular network bands which are supported by the device.">
+    </func>
+    <func name="getSupportedWAFs" static="true" returns="int" array="false"
+     comment="Retrieves the Wireless Access Families that are supported by the device.">
+    </func>
+    <func name="isDataServiceOperational" static="true" returns="boolean" array="false"
+     comment="Indicates whether the radio can perform data services over Cellular network at this time.">
+    </func>
+    <func name="isDataServiceSuspended" static="true" returns="boolean" array="false"
+     comment="Indicates whether data services are temporarily suspended at the present time.
+     Data services are suspended on class B networks when the phone is active. " >  
+  </func>
+    <func name="isPDPContextActive" static="true" returns="boolean" array="false"
+     comment="Indicates if the PDP context for the specified APN is active.">
+      <param name="apnId" type="int" comment="The access point name identifier."/>
+    </func>
+  </functions>
+  <properties>
+    <property name="BAND_CDMA_1900" type="int" readonly="true" static="true" comment="Represents the 1900 MHz CDMA band."/>
+    <property name="BAND_CDMA_800" type="int" readonly="true" static="true" comment="Represents the 800 MHz CDMA band."/>
+    <property name="BAND_GSM_1800" type="int" readonly="true" static="true" comment="Represents the 1800 MHz GSM band."/>
+    <property name="BAND_GSM_1900" type="int" readonly="true" static="true" comment="Represents the 1900 MHz GSM band."/>
+    
+  </properties>
+</object>
+
+</library>

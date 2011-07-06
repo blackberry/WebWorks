@@ -5,6 +5,9 @@
   </features>
   
   <object name="blackberry.app.event" shortName="Application Event" introduced="1.0.0" comment="The Application Event object allows you to access events triggered by the application.">
+    <features>
+      <feature id="blackberry.app.event" version="1.0.0">The Application Event object allows you to access events triggered by the application.</feature>
+    </features>
     <details>
       The Application Event Object is static; all of its functions and properties are used directly from the object.
     </details>

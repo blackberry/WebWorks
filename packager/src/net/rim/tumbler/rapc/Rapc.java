@@ -14,20 +14,6 @@
 * limitations under the License.
 */
 /*
- rapc.exe options:
-
-    -dumpcodfile <input>.cod [<output>.cod]
-    -dumpsigner [-inherit] <input>.cod
-    -dumpdebug <input>.debug
-    -dumpclassfile <input>.class
-    -dumpdepend <input>{.class|.jar}
-    -eviscerateclass {<input>.class|<directory>}
-    -verifydebug <input>.cod
-
-    Note that the contents of a RAPC environment variable are added by rapc.exe
-    to the command line used to invoke rapc.jar
-        i.e. set RAPC_OPTIONS=-timing
-
 rapc.jar options:
 
     <input>.java
@@ -594,8 +580,10 @@ public class Rapc {
         }
         writer.write(NL);
         
+        // If app to run on startup, set title and icon to appear
         if(_widgetConfig.getBackgroundSource()!=null&&_widgetConfig.isStartupEnabled()) {
-        	writer.write("MIDlet-2:,,rim:runOnStartup"+NL);
+        	writer.write("MIDlet-2: " + _widgetConfig.getName() + "," + icon + ",runOnStartup;WIDGET;" + 
+        			NL);
         }
         	
         // The rest icons
@@ -626,6 +614,38 @@ public class Rapc {
             writer.write("RIM-MIDlet-Icon-Count-1: " + iconCount + NL);
         }
         
+        /* Repeat the same for the run on startup instance of the icon*/
+        
+        // Generate icon for RIM-MIDlet-2 (startup entry point)
+       iconCount = 0;
+        if (icons != null) {
+            for (int i = 1; i < icons.size(); i++) {
+                iconCount = iconCount + 1;
+                writer.write("RIM-MIDlet-Icon-2-" + iconCount + ": "
+                            + icons.elementAt(i) + NL);
+            }
+        }
+        
+        // Generate hover-icons for RIM-MIDlet-2 (startup entry point)
+        // Hover icons are not displayed correctly for application if 
+        // used as icons. Since above code already made copies, return
+        // the same icon copy generated above
+        hoverIcons = _widgetConfig.getHoverIconSrc();
+        if (hoverIcons != null) {
+            for (int i = 0; i < hoverIcons.size(); i++) {
+                iconCount = iconCount + 1;
+               	writer.write("RIM-MIDlet-Icon-2-" + iconCount + ": "
+               			+ copyIcon(hoverIcons.elementAt(i),
+                                SessionManager.getInstance().getSourceFolder())
+                            + ",focused" + NL);
+            }
+        }
+
+        // Generate count for RIM-MIDLlet-2 (startup entry point) icon 
+        if (iconCount > 0) {
+            writer.write("RIM-MIDlet-Icon-Count-2: " + iconCount + NL);
+        }
+        
         //TODO:CLEAN UP THIS LOGIC ELSEWHERE
         if(_widgetConfig.getForegroundSource().length()==0) {
         	writer.write("RIM-MIDlet-Flags-1: 2" + NL);
@@ -642,6 +662,12 @@ public class Rapc {
         return fileName;
     }
     
+    /* 
+     * Make a copy of an icon in a specified directory. If that icon exists in
+     * the specified directory a copy is generated and returned. If a copy of
+     * the icon already exists, the copy is returned. If the icon doesn not
+     * exist in the directory then the icon is returned. 
+     */
     private String copyIcon(String icon, String directory) {
         String tempPrefix = "____HOVER_ICON_";
         
@@ -649,6 +675,7 @@ public class Rapc {
         File from = new File(directory + FILE_SEP + icon);              
         File to = new File(from.getParent() + FILE_SEP + tempPrefix + from.getName());          
         if ((!to.exists()) && from.exists()) {
+        	// Icon exists in directory but icon copy does not
             try {
                 FileManager.copyFile(from, to);
                 // Return copied icon file name
@@ -656,7 +683,11 @@ public class Rapc {
             } catch (Exception e) {
                 return icon;
             }
+        } else if(to.exists()) {
+        	// Return initial copy
+        	return tempPrefix + icon;
         }
+        //Icon not present in the specified directory
         return icon;
     }
 }

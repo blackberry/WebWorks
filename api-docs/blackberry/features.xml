@@ -20,6 +20,7 @@
   <feature id="blackberry.invoke.TaskArguments" version="1.0.0">The TaskArguments feature is used as a parameter to the invoke() method when invoking the Tasks application.</feature>
   <feature id="blackberry.io.dir" version="1.0.0">The directory feature provides functions for interacting with directories on the file system.</feature>
   <feature id="blackberry.io.file" version="1.0.0">The file feature provides functions for interacting with the file system.</feature>
+  <feature id="blackberry.media.camera" version="1.0.0">The camera feature allows you to invoke the native camera application to record video or take a picture. </feature>
   <feature id="blackberry.message" version="1.0.0">The message feature represents a messaging capability on the BlackBerry device. </feature>
   <feature id="blackberry.pim.Address" version="1.0.0">The Address feature represents an address used for a contact or for use with launching the BlackBerry Maps application.</feature>
   <feature id="blackberry.pim.Appointment" version="1.0.0">The Appointment feature represents an appointment in your calendar.</feature>

@@ -342,7 +342,7 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
         }
         return _keyListeners;
     }
-
+    
     public WidgetAccess[] getAccessList() {
         if( _accessArray != null ) {
             return _accessArray;

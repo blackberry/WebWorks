@@ -7,49 +7,7 @@
     <features>
       <feature id="blackberry.push" version="1.0.0"/>
     </features>
-    <example><![CDATA[<script type="text/javascript">
-  var port = 1234; 
 
-  function doMySubscription() {
-    //See if they have a BIS transport.. if so use it
-    var transports = blackberry.system.getTransportList();
-    found = false;
-    for (var i = 0; i < transports.length; i++) {
-      if (transports[i].name == "BIS") {
-        found = true;
-        blackberry.push.openPushListener(handleMyReturnData, port, transport[i]);
-        break;
-      }        
-    }
-    if (!found)
-      blackberry.push.openPushListener(handleMyReturnData, port);
-  }
-
-  function handleMyReturnData(data) {
-    if (data != null) {
-      var myRecievedData= blackberry.utils.blobToString(data.payload);   
-      alert(data1.getHeaderField(0));
-      alert("RequestURI=" + data.getRequestURI());
-      alert("Source=" + data.getSource());
-    }       
-    else
-      alert("No data available");
-  }
-
-  function cancelSubscription() {
-    blackberry.push.closePushListener(port);
-  }
-</script>]]></example>
-
-    <constants comment="[Decline Reasons]">
-      <const name="ACCEPT" type="Number" value="0" comment="Push message accepted"/>
-      <const name="DECLINE_USERDCR" type="Number" value="1" comment="Push message discarded due to resource shortage"/>
-      <const name="DECLINE_USERDCU" type="Number" value="2" comment="Content type of Push message cannot be processed"/>
-      <const name="DECLINE_USERPND" type="Number" value="3" comment="Push message cannot be delivered to intended destination"/>
-      <const name="DECLINE_USERREQ" type="Number" value="4" comment="User refused Push message"/>
-      <const name="DECLINE_USERRFS" type="Number" value="5" comment="User refused Push message"/>
-    </constants>
-    
     <functions>
       <func name="getHeaderField" returns="String" comment="Returns the value of a header field.">
         <param name="field" type="String" comment="This parameter is the name of the header field."/>

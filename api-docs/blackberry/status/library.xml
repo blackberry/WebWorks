@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <extension>
+    <entryClass>blackberry.status.StatusExtension</entryClass>
+  </extension>
+  
+  <object name="blackberry.status" shortName="Status" comment="Status Namespace provides shared place for all status elements.">
+    <features>
+      <feature id="blackberry.status.Battery" version="1.0.0.0"/>
+    </features>
+  </object>
+</library>
+

@@ -169,6 +169,9 @@ public class WidgetConfig {
 		if (name == null || name.length() == 0) {
 			throw new ValidationException(
 					"EXCEPTION_CONFIGXML_MISSING_WIDGET_NAME");
+		} else if ( name.indexOf(",") != -1 ) {
+			throw new ValidationException(
+					"EXCEPTION_CONFIGXML_INVALID_WIDGET_NAME" );
 		}
 		_name = name;
 	}

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <extension>
+    <entryClass>blackberry.notification.NotificationExtension</entryClass>
+  </extension>
+  <features>
+    <feature id="blackberry.notification" version="1.0.0.0" required="true">notification namespace</feature>
+    <feature id="blackberry.notification.Indicator" version="1.0.0.0" required="true">application indicator</feature>
+  </features>
+  <object name="blackberry.notification" shortName="Notification" comment="">
+    <functions>
+      <func name="blink" static="true" returns="Object" array="false" comment="blink the LED">
+        <details>
+          .
+        </details>
+      </func>
+      <func name="setOff" static="true" returns="Object" array="false" comment="set the LED off">
+        <details>
+          .
+        </details>
+      </func>
+    </functions>
+    <properties>
+      <property name="isSupported" type="Boolean" readonly="true" static="true" comment="determine if the LED is supported."/>
+    </properties>
+  </object>
+  <object name="blackberry.notification.Indicator" shortName="Indicator" introduced="1.0.0"
+   comment="The indicator object allows an application to register an application indicator.">
+    <details>
+      Represents an application indicator that consists of an icon and optional numeric value. The icon is placed in indicators area along with others such as new mail counter, calendar reminders, missed calls counter, security status and others. Application can register only one indicator and has to register it every time the phone starts. All indicators are cleared upon phone restart.
+      Registered application indicators are not guaranteed to be displayed. Different factors play role in visibility decision making such as available indicators space, number of registered indicators and current application preferences. Application indicators have the lowest drawing priority compared to system indicators such as unread email counter or missed calls indicator.
+      Indicator dimensions depend on current theme and phone screen size. The icon size varies from 10x10 up to 24x24. The provided icon can be resized up or down to take up the whole available space. Alternatively, application icon can be set to remain unchanged, however, in this case it may be cut if it doesn't fit the indicator area.
+      Application indicator users are encouraged to use small icons. If indicator is initialized with a big icon then an exception is thrown.
+      Indicator can have optional numeric value that usually serves as a counter. The value can be negative, 0 or positive. If indicator is used as a counter then the best practice is to hide it when its value is equal to 0. Some applications may choose to show 0 as a counter value if such information is important to user, for example number of financial transactions in the current business day. Due to limited real estate, indicator value can be truncated if it is very big. In such case the indicator will display '99+' or '999+' which means 'over a hundred' or 'over a thousand'.
+    </details>
+    <example><![CDATA[<script type="text/javascript">  
+  //register application indicator  
+  //update icon
+  //update value
+  //unregister
+</script>]]></example>
+    <constructors>
+      <ctor comment="Constructing a new indicator object.">
+        <param name="icon " optioanl="true" type="String" comment="name of the icon to be set for the application."/>
+        <param name="value" optional="true" type="int" comment="optional count value displayed beside the icon"/>
+        <param name="visible" optional="true" type="boolean" comment="determine if indicator should be drawn on the screen."/>
+        <param name="iconOnly" optional="true" type="boolean" comment="defines layout where indicator consists of an icon only, without the value"/>
+      </ctor>
+    </constructors>
+    <functions>
+      <func name="register" static="false" returns="Object" array="false" comment="register the indicator">
+        <param name="icon " optional="true" type="String" comment="name of the icon to be set for the application indicator."/>
+        <param name="visible" optional="true" type="boolean" comment="determine if indicator should be drawn on the screen."/>
+        <param name="iconOnly" optional="true" type="boolean" comment="defines layout where indicator consists of an icon only."/>
+        <details>
+          .
+        </details>
+      </func>
+      <func name="unregister" static="false" returns="Object" array="false" comment=".">
+      </func>
+      <func name="updateValue" static="false" returns="void" comment="Sets new value and updates indicator if visible. If very big value is provided then indicator will display '99+'.">
+        <param name="value" type="int" comment="Indicator's count value"/>
+      </func>
+      <func name="updateIcon" static="false" returns="void" comment="Sets a new Icon to the indicator and repaints itself if visible.">
+        <param name="icon " type="String" comment="name of the icon to be set for the application indicator."/>
+      </func>
+      <func name="setVisible" static="false" returns="void" comment="hide/show the indicator.">
+        <param name="show" type="Boolean" comment="true/false"/>
+      </func>
+    </functions>
+    <properties>
+      <property name="icon" type="String" readonly="true" static="false" comment="name of the icon to be set for the application indicator."/>
+      <property name="value" type="int" readonly="false" static="false" comment="current count value"/>
+      <property name="visible" type="Boolean" readonly="false" static="false" comment="determine if indicator should be drawn on the screen."/>
+      <property name="iconOnly" type="Boolean" readonly="false" static="false" comment="defines layout where indicator consists of an icon only."/>
+    </properties>
+    
+  </object>
+</library>

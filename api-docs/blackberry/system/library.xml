@@ -26,6 +26,9 @@
   </features>
   
   <object name="blackberry.system" shortName="System" introduced="1.0.0" comment="The System object allows you to get access to system level functions and attributes of the BlackBerry device.">
+    <features>
+      <feature id="blackberry.system" version="1.0.0"/>
+    </features>
     <details>
       The System object is static; all of its functions and properties are used directly from the object.
     </details>

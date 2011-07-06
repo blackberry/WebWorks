@@ -21,17 +21,18 @@ import net.rim.device.api.script.ScriptableFunction;
 
 public class NavigationNamespace extends Scriptable {
 
-    public static final String NAME                = "blackberry.focus";
+    public static final String NAME                		= "blackberry.focus";
 
-    public static final String LABEL_RIGHT         = "RIGHT";
-    public static final String LABEL_LEFT          = "LEFT";
-    public static final String LABEL_UP            = "UP";
-    public static final String LABEL_DOWN          = "DOWN";
+    public static final String LABEL_RIGHT         		= "RIGHT";
+    public static final String LABEL_LEFT          		= "LEFT";
+    public static final String LABEL_UP            		= "UP";
+    public static final String LABEL_DOWN          		= "DOWN";
 
-    public static final String LABEL_SET_FOCUS     = "setFocus";
-    public static final String LABEL_GET_FOCUS     = "getFocus";
-    public static final String LABEL_GET_OLDFOCUS  = "getOldFocus";
-    public static final String LABEL_GET_DIRECTION = "getDirection";
+    public static final String LABEL_SET_FOCUS     		= "setFocus";
+    public static final String LABEL_GET_FOCUS     		= "getFocus";
+    public static final String LABEL_GET_OLDFOCUS  		= "getOldFocus";
+    public static final String LABEL_GET_DIRECTION 		= "getDirection";
+    public static final String LABEL_UPDATE_FOCUS_MAP   = "updateFocusMap";
 
     private BrowserFieldScreen _widgetScreen;
 
@@ -43,6 +44,7 @@ public class NavigationNamespace extends Scriptable {
     private GetRimFocus        _funcGetRimFocus;
     private GetOldFocus        _funcGetOldFocus;
     private GetDirection       _funcGetDirection;
+    private UpdateFocusMap     _funcUpdateFocusMap;
 
     public NavigationNamespace( BrowserFieldScreen widgetScreen ) {
         _widgetScreen = widgetScreen;
@@ -55,6 +57,7 @@ public class NavigationNamespace extends Scriptable {
         _funcGetRimFocus = new GetRimFocus();
         _funcGetOldFocus = new GetOldFocus();
         _funcGetDirection = new GetDirection();
+        _funcUpdateFocusMap = new UpdateFocusMap();
     }
 
     public void setOldFocusedId( String id ) {
@@ -115,6 +118,9 @@ public class NavigationNamespace extends Scriptable {
         if( name.equals( LABEL_GET_DIRECTION ) ) {
             return _funcGetDirection;
         }
+        if( name.equals( LABEL_UPDATE_FOCUS_MAP ) ) {
+            return _funcUpdateFocusMap;
+        }
 
         return UNDEFINED;
     }
@@ -164,6 +170,21 @@ public class NavigationNamespace extends Scriptable {
         public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args == null || args.length == 0 ) {
                 return ( new Integer( _direction ) );
+            }
+
+            throw new IllegalArgumentException();
+        }
+    }
+
+    /**
+     * Rescans and repopulates the navigation map
+     */
+    private class UpdateFocusMap extends ScriptableFunction {
+        /* @Override */
+        public Object invoke( Object thiz, Object[] args ) throws Exception {
+            if( args == null || args.length == 0 ) {
+                _widgetScreen.getNavigationController().update();
+                return UNDEFINED;
             }
 
             throw new IllegalArgumentException();

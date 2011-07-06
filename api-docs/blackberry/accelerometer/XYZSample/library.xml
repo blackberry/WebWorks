@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library>
+  <object name="blackberry.accelerometer.XYZSample" shortName="XYZSample" comment="Data object that represents the current rotation of the device.">
+    <features>
+      <feature id="blackberry.accelerometer" version="1.0.0.0" required="true"/>
+    </features>
+    
+    <details>
+      The XYZSample object is not static; however, only the underlying implementation can construct and return it. All its fields are read-only properties.
+    </details>
+    
+    <properties>
+      <property name="X" type="Number" readonly="true" static="false" comment="The X-axis acceleration value."/>
+      <property name="Y" type="Number" readonly="true" static="false" comment="The Y-axis acceleration value."/>
+      <property name="Z" type="Number" readonly="true" static="false" comment="The Z-axis acceleration value."/>
+      <property name="timeStamp" type="Date" readonly="true" static="false" comment="The timestamp of the last accelerometer value."/>
+    </properties>
+  </object>
+</library>

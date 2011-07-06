@@ -213,17 +213,13 @@ final class DispatcherImpl implements Runnable {
 
             // Process "_current" event
             try {
-                synchronized( this ) {
-                    _current.dispatch();
-                }
-            } catch ( Interruption in ) {
-                synchronized( this ) {
-                    // Clear the interrupted flag
-                    _thread.reset();
-                }
-            } catch ( Error e ) {
+                _current.dispatch();
+            } catch( Interruption in ) {
+                // Clear the interrupted flag
+                _thread.reset();
+            } catch( Error e ) {
                 e.printStackTrace();
-            } catch ( Throwable t ) {
+            } catch( Throwable t ) {
                 t.printStackTrace();
             }
 

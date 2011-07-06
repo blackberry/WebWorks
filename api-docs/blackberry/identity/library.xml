@@ -28,7 +28,6 @@
   <object name="blackberry.identity" shortName="Identity" comment="The Identity object contains information regarding the user's identity and accounts on a BlackBerry smartphone.">
     <features>
       <feature id="blackberry.identity" version="1.0.0"/>
-      <feature id="blackberry.identity.phone" version="1.0.0"/>
     </features>
     
     <example><![CDATA[<script type="text/javascript">

@@ -29,7 +29,6 @@
   <object name="blackberry.audio" shortName="Audio" comment="The audio object provides information about supported audio functionality on the device.">
     <features>
       <feature id="blackberry.audio" version="1.0.0.0"/>
-      <feature id="blackberry.audio.Player" version="1.0.0.0"/>
     </features>
     
     <example><![CDATA[<script type="text/javascript">

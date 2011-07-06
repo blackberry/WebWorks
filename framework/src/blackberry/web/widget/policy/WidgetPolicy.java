@@ -58,13 +58,14 @@ public class WidgetPolicy {
                 // Check for an authority string that has an existing key
                 // Special case: Allow file protocol to proceed without an authority
                 // Special case: Allow local protocol which is always without an authority
+                // Special case: Allow data protocol which is always without an authority (let isMatch handle it)
                 authString = authorityCheck( schemeString, authString );
-                if( authString.equals( "" ) && !( schemeString.equals( "file" ) || schemeString.equals( "local" ) ) ) {
+                if( authString.equals( "" ) && !( schemeString.equals( "file" ) || schemeString.equals( "local" ) || schemeString.equals( "data" ) ) ) {
                     return null;
                 }
 
                 WidgetWebFolderAccess folderAccess;
-                WidgetAccess fetchedAccess;
+                WidgetAccess fetchedAccess = null;
 
                 // Retrieve WidgetAccess set for the specified authority
                 folderAccess = (WidgetWebFolderAccess) _authorityCollection.get( schemeString + "://" + authString );
@@ -77,10 +78,12 @@ public class WidgetPolicy {
                 
                 // If no access element is found with local URI, use local access for this request
                 if ( schemeString.equals( "local" ) && folderAccess == null ) {
-                	return _localAccess;
+                    return _localAccess;
                 }
 
-                fetchedAccess = folderAccess.getWidgetAccess( requestURI.getPath() + parseNull( requestURI.getQuery() ) );
+                if(folderAccess != null) {
+                    fetchedAccess = folderAccess.getWidgetAccess( requestURI.getPath() + parseNull( requestURI.getQuery() ) );
+                }
 
                 boolean failedToFindAccess = false;
                 // Make sure we've got the right one
@@ -265,6 +268,9 @@ public class WidgetPolicy {
      * @return Authority which exists in the authority collection
      */
     private String authorityCheck( String scheme, String authString ) {
+        if(authString == null) {
+            authString = "";
+        }
 
         boolean firstPass = true;
         while( !_authorityCollection.containsKey( scheme + "://" + authString ) ) {

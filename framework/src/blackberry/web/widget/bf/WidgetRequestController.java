@@ -1,22 +1,24 @@
 /*
-* Copyright 2010-2011 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010-2011 Research In Motion Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package blackberry.web.widget.bf;
 
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.InputConnection;
+
+import java.io.IOException;
 
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.blackberry.api.browser.BrowserSession;
@@ -33,6 +35,7 @@ import blackberry.web.widget.impl.WidgetException;
 import blackberry.web.widget.policy.WidgetPolicy;
 import blackberry.web.widget.policy.WidgetPolicyFactory;
 import blackberry.web.widget.device.DeviceInfo;
+import blackberry.web.widget.auth.Authenticator;
 
 /**
  * 
@@ -67,6 +70,9 @@ public class WidgetRequestController extends ProtocolController {
     public void handleNavigationRequest( BrowserFieldRequest request ) throws Exception {
         WidgetAccess access = _widgetPolicy.getElement( request.getURL(), _widgetConfig.getAccessList() );
         if( access == null && !_hasMultiAccess ) {
+            if( !DeviceInfo.isBlackBerry6() ) {
+                _browserField.getHistory().go( -1 );
+            }
             throw new WidgetException( WidgetException.ERROR_WHITELIST_FAIL, request.getURL() );
         }
 
@@ -79,35 +85,29 @@ public class WidgetRequestController extends ProtocolController {
         // Determine protocol
         String protocol = request.getProtocol();
 
+        BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
+
         // Launch the browser if BF2 cannot handle the mime type
         if( openWithBrowser( normalizedContentType, protocol, request.getURL() ) ) {
 
             invokeBrowser( request.getURL() );
-			
-			if(DeviceInfo.isBlackBerry6()) { 
-				// Throw a special type of exception that will prevent the history from being updated
+
+            // Reset the loading screen flags to ensure that the back button is enabled after the invoke
+            bfScreen.getPageManager().clearFlags();
+
+            if( DeviceInfo.isBlackBerry6() ) {
+                // Throw a special type of exception that will prevent the history from being updated
                 throw new MediaHandledException();
             } else {
-				// On 5.0 devices we can simply go back once to counter the history updating before this.
-				_browserField.getHistory().go(-1);
+                // On 5.0 devices we can simply go back once to counter the history updating before this.
+                _browserField.getHistory().go( -1 );
             }
         } else {
-            BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
 
             bfScreen.getPageManager().setGoingBackSafe( false );
-
-            // Push the loading screeen before sending the new request, so BrowserField screen still contains original page for
-            // transition
-            if( !bfScreen.getPageManager().isFirstLaunch() && !bfScreen.getPageManager().isSuppressingLoadingScreen()
-                    && bfScreen.getPageManager().isLoadingScreenRequired( request.getURL() ) ) {
-                bfScreen.getPageManager().showLoadingScreen();
-                Thread.yield();
-                Thread.sleep( 100 );
-            }
-
+            InputConnection ic = null;
             try {
                 if( bfScreen.getCacheManager() != null && bfScreen.getCacheManager().isRequestCacheable( request ) ) {
-                    InputConnection ic = null;
                     if( bfScreen.getCacheManager().hasCache( request.getURL() )
                             && !bfScreen.getCacheManager().hasCacheExpired( request.getURL() ) ) {
                         ic = bfScreen.getCacheManager().getCache( request.getURL() );
@@ -120,9 +120,22 @@ public class WidgetRequestController extends ProtocolController {
                             }
                         }
                     }
+
+                    ic = processAuthentication( ic, request );
+
                     _browserField.displayContent( ic, request.getURL() );
                 } else {
-                    super.handleNavigationRequest( request );
+
+                    // Check whether authentication is required
+                    if( isHttpProtocol( request ) ) {
+                        // Only HTTP/HTTPS can use the API to receive the response
+                        ic = _browserField.getConnectionManager().makeRequest( request );
+                        ic = processAuthentication( ic, request );
+
+                        _browserField.displayContent( ic, request.getURL() );
+                    } else {
+                        super.handleNavigationRequest( request );
+                    }
                 }
 
                 if( !bfScreen.getPageManager().isRedirectableNavigation( protocol ) ) {
@@ -137,7 +150,7 @@ public class WidgetRequestController extends ProtocolController {
                 }
 
             } catch( Exception e ) {
-				bfScreen.getPageManager().hideLoadingScreen();
+                bfScreen.getPageManager().hideLoadingScreen();
                 bfScreen.getPageManager().clearFlags();
 
                 // Rethrow the Exception
@@ -156,8 +169,8 @@ public class WidgetRequestController extends ProtocolController {
         }
 
         BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
+        InputConnection ic = null;
         if( bfScreen.getCacheManager() != null && bfScreen.getCacheManager().isRequestCacheable( request ) ) {
-            InputConnection ic = null;
             if( bfScreen.getCacheManager().hasCache( request.getURL() )
                     && !bfScreen.getCacheManager().hasCacheExpired( request.getURL() ) ) {
                 ic = bfScreen.getCacheManager().getCache( request.getURL() );
@@ -170,12 +183,91 @@ public class WidgetRequestController extends ProtocolController {
                     }
                 }
             }
-            return ic;
         } else {
-            return super.handleResourceRequest( request );
+            ic = super.handleResourceRequest( request );
+        }
+
+        ic = processAuthentication( ic, request );
+
+        return ic;
+    }
+
+    /**
+     * Performs authentication checks and requests credentials when needed
+     */
+    private InputConnection processAuthentication( InputConnection ic, BrowserFieldRequest request ) throws Exception {
+
+        // Check if Basic authentication is required to access the resource
+        boolean authenticationIsNeeded = false;
+        while( isAuthenticationNeeded( ic, request ) ) {
+            authenticationIsNeeded = true;
+            BrowserFieldRequest authenticationReq = Authenticator.getAuthenticationRequest( (HttpConnection) ic, request );
+            if( authenticationReq == request ) {
+                break;
+            }
+            ic = super.handleResourceRequest( authenticationReq );
+        }
+
+        // If credentials are needed and they are correct, set them verified
+        if( authenticationIsNeeded && !isHTTPError( ic ) ) {
+            Authenticator.verifyCredential( (HttpConnection) ic );
+        }
+
+        return ic;
+    }
+
+    /**
+     * Check if authentication is needed by checking the response code.
+     * 
+     * @param icResponse
+     * @param request
+     * @return
+     */
+    private static boolean isAuthenticationNeeded( InputConnection icResponse, BrowserFieldRequest request ) {
+        if( icResponse instanceof HttpConnection && isHttpProtocol( request ) ) {
+            HttpConnection hcResponse = (HttpConnection) icResponse;
+            try {
+                int responseCode = hcResponse.getResponseCode();
+                return HttpConnection.HTTP_UNAUTHORIZED == responseCode;
+            } catch( IOException e ) {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 
+    /**
+     * Check if the request uses the HTTP protocol
+     * 
+     * @param request
+     * @return
+     */
+    private static boolean isHttpProtocol( BrowserFieldRequest request ) {
+        String protocol = request.getProtocol();
+        return ( protocol.equalsIgnoreCase( "http" ) || protocol.equalsIgnoreCase( "https" ) );
+    }
+
+    /**
+     * Check the connection for an error response code
+     * 
+     * @param ic
+     * @return
+     */
+    private static boolean isHTTPError( InputConnection ic ) {
+        if( ic instanceof HttpConnection ) {
+            try {
+                HttpConnection hcResponse = (HttpConnection) ic;
+                int responseCode = hcResponse.getResponseCode();
+                return ( responseCode >= 400 && responseCode < 600 );
+            } catch( IOException e ) {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+    
     // Method to check if the browser needs to be launched to handle the file.
     private boolean openWithBrowser( String mimeType, String protocol, String url ) {
         if( mimeType != null ) {

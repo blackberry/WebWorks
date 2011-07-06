@@ -22,6 +22,9 @@
     <feature id="blackberry.ui.menu" version="1.0.0"/>
   </features>
   <object name="blackberry.ui.menu" shortName="Menu" introduced="1.0.0" comment="The Menu object contains functionality for manipulating menu items for the application.">
+    <features>
+      <feature id="blackberry.ui.menu" version="1.0.0"/>
+    </features>
     <details>
       The functionality in this object allows you to manipulate the dynamically created menu items for the application.  This will not allow you to remove the default menu items for the application.
       To create a separator simply pass the appropriate parameters into the MenuItem constructor.
