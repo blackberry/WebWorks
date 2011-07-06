@@ -494,10 +494,7 @@ public class Rapc {
     // / </summary>
     private String getJavaBin(String javaHome) {
     	if(javaHome != null && !javaHome.trim().isEmpty()) {
-    	    if( OperatingSystems.isWindows() ) {
-    	        return javaHome + "\\bin";
-    	    }
-    	    return javaHome + "/bin";
+    	    return javaHome + File.separator + "bin";
     	}
     	
     	return "";

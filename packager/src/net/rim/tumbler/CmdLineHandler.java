@@ -190,9 +190,9 @@ public class CmdLineHandler {
         // Populate correct source directory
         if (!_requireSource) {
             String tmpDir = System.getProperty("java.io.tmpdir");
-            if( !tmpDir.endsWith( "/" ) && !OperatingSystems.isWindows() ) {
+            if( !tmpDir.endsWith( File.separator ) && !OperatingSystems.isWindows() ) {
                 // we probably won't have permissions to create a new top-level directory, so ensure the generated _sourceDir is under the existing tmpDir.
-                tmpDir += "/";
+                tmpDir += File.separator;
             }
             
             _sourceDir = tmpDir + "widgetGen."
