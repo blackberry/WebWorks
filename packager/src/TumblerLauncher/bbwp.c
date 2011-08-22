@@ -32,6 +32,27 @@ extern "C" {
 #define FALSE 0
 #define TRUE 1
 
+#ifdef MAC
+#include <mach-o/dyld.h>
+#define BIN_BBWP_JAR	"/bin/bbwp.jar"
+#define JAVA_EXE		"java"
+#define JRE_BIN_JAVA	"/bin/java"
+#define BBWP_PROPERTIES	"/bin/bbwp.properties"
+#define FAILED_TO_FIND	"Failed to find java"
+#define PATH_DIVIDER	':'
+#define FOLDER_SLASH_DQ	"/"
+#define FOLDER_SLASH_SQ '/'
+#else
+#define BIN_BBWP_JAR	"\\bin\\bbwp.jar"
+#define JAVA_EXE		"java.exe"
+#define JRE_BIN_JAVA	"\\jre\\bin\\java.exe"
+#define BBWP_PROPERTIES	"\\bin\\bbwp.properties"
+#define FAILED_TO_FIND	"Failed to find java.exe"
+#define PATH_DIVIDER	';'
+#define FOLDER_SLASH_DQ	"\\"
+#define FOLDER_SLASH_SQ '\\'
+#endif
+
 char g_base_dir[PATH_MAX + 3] = ""; //the absolute path of the running application
 
 /*
@@ -39,7 +60,7 @@ char g_base_dir[PATH_MAX + 3] = ""; //the absolute path of the running applicati
 *Param: char *s--the string to be printed
 *Return: None.
 */
-void printErr(const char *s) {
+void printErr(char *s) {
 	if (s == NULL) {
 		return;
 	}
@@ -49,7 +70,7 @@ void printErr(const char *s) {
 
 /*
 *Desc: secure version of strlen().
-          a substitution of strnlen() in case gcc for windows/Mac doesn't have this function.
+          a substitution of s_strnlen() in case gcc for windows doesn't have this function.
 *Param: char *s--the string to be trimmed
 *           int max--The size of the string buffer.
 *Return: string length.
@@ -71,9 +92,10 @@ char *trim(char *s, int strsize) {
 	if (s == NULL) {
 		return NULL; // handle NULL string     
 	}
-	if (!*s) {         
+	if (!*s) {
 		return s;    // handle empty string     
-    }
+	}
+
 	for (ptr = s + s_strnlen(s, strsize) - 1; (ptr >= s) && ((*ptr)==0x20); --ptr);
 	ptr[1] = '\0';
 	return s; 
@@ -100,7 +122,7 @@ int surround_quotes(char * desStr, char* path_spaces, int path_spaces_size) {
 	else {
 		trim(path_spaces, path_spaces_size);
 		strncpy(desStr, "\"", 1);
-		strncat(desStr, path_spaces, path_spaces_size);
+		strncat(desStr, path_spaces, s_strnlen(path_spaces, path_spaces_size));
 		strncat(desStr, "\"", 1);
 		strncat(desStr, "\0", 1);
 	}
@@ -120,19 +142,25 @@ int getBaseDir(char *desStr) {
     if( desStr == NULL ) {
         return FALSE;
     }
-		 
-	ptrDir = strrchr(_pgmptr, '\\');
+#ifdef MAC
+	char * _pgmptr = malloc(PATH_MAX);
+	char * tmp = malloc(PATH_MAX);
+	int size=PATH_MAX;
+	_NSGetExecutablePath(tmp,&size);
+	realpath(tmp,_pgmptr);
+#endif
+	ptrDir = strrchr(_pgmptr, FOLDER_SLASH_SQ);
 	if(ptrDir == NULL) {
-		ptrDir = strrchr(_pgmptr, '/');
-		if(ptrDir == NULL){
-			printErr("Could not get application path.");
-			return FALSE;
-		}
+		printErr("Could not get application path.");
+		return FALSE;
 	}
 	newLength = ( (int)ptrDir ) - ( (int)_pgmptr );
 	strncpy(desStr, _pgmptr, newLength);
     desStr[newLength] = '\0';
-
+#ifdef MAC
+	free(_pgmptr);
+	free(tmp);
+#endif
 	return TRUE;
 }
 
@@ -140,7 +168,7 @@ int getBaseDir(char *desStr) {
 *Desc: Resolves a relative tumbler path to an absolute path.
 *Param: char *desStr -- output parameter containing the absolute path.
         char *relative_path -- input augument containing the relative tumbler path
-        int relative_path_size -- The size of relative_path.
+        int relative_path_size -- The size of relative_path. 
 *Return: process result. TRUE for success, FALSE for failure.
 */
 int to_tumbler_base(char *desStr, const char *relative_path, int relative_path_size) {
@@ -148,9 +176,9 @@ int to_tumbler_base(char *desStr, const char *relative_path, int relative_path_s
         return FALSE;
     }
 
-    strncpy( desStr, g_base_dir, sizeof(g_base_dir) );
-    strncat( desStr, relative_path, relative_path_size );
-    strncat( desStr, "\0", 1 );
+	strncpy( desStr, g_base_dir, s_strnlen(g_base_dir, sizeof(g_base_dir)) );
+	strncat( desStr, relative_path, s_strnlen(relative_path, relative_path_size) );
+	strncat(desStr, "\0", 1);
 	
 	return TRUE;
 }
@@ -158,59 +186,64 @@ int to_tumbler_base(char *desStr, const char *relative_path, int relative_path_s
 /*
 *Desc: Finds the absolute path to java.exe when it is a system variable
 *Param: char *desStr -- output parameter containing the absolute path to java.
-*          int desStr_size -- size of string buffer
 *Return: process result. TRUE for success, FALSE for failure.
 */
-int get_java_from_sys(char *desStr, int desStr_size) {
-	const char cstJavaExe[] = "java.exe";
-	char *java_home_t = getenv("PATH");
+int get_java_from_sys(char *desStr) {
+	const char cstJavaExe[] = JAVA_EXE;
     char *java_home = NULL;
+	char *java_home_t = NULL;
 	size_t java_home_len;
     char *substr1 = NULL;
     char *substr2 = NULL;
+    char tmpstr[PATH_MAX];
     FILE *fp;
     int bFlag = FALSE; //return value
 
-	if (java_home_t == NULL)	{
-        printErr("Failed to find jdk path in environment");
-        return FALSE;
+	java_home_t = getenv("PATH");
+	if (java_home_t == NULL)
+	{
+	  printErr("Failed to allocate memory");
+	  return FALSE;
 	}
 	java_home_len = s_strnlen(java_home_t, PATH_MAX);
-	java_home = (char*)malloc(java_home_len);
+	java_home = (char*)malloc(java_home_len+1);
 
-	strncpy(java_home, java_home_t, java_home_len);
+	strncpy(java_home,java_home_t,java_home_len);
+	// Get the value of the PATH environment variable.
+    if( java_home == NULL) {
+        return FALSE;
+    }
 
-    //Search in the environment variable PATH inversely to find the java path
+    //Search in the environment variable PATH inversly to find the java path
     substr1 = &(java_home[java_home_len]);
     substr2 = java_home;
     while(substr2 != NULL) {
-        substr2 = strrchr(java_home, ';');
-        memset(desStr, 0, desStr_size);
+        substr2 = strrchr(java_home, PATH_DIVIDER);
+        memset(tmpstr, 0, sizeof(tmpstr));
         if( substr2 != NULL ) {
-            strncpy(desStr, substr2+1, substr1 - substr2);
+            strncpy(tmpstr, substr2+1, substr1 - substr2);
 			java_home_len = substr2 - java_home;
             java_home[java_home_len] = '\0';
             substr1 = substr2;
         }
         else {
-            strncpy(desStr, java_home, java_home_len);
+            strncpy(tmpstr, java_home, java_home_len);
         }
 
-        if(desStr[s_strnlen(desStr, desStr_size) - 1] != '\\'
-            && desStr[s_strnlen(desStr, desStr_size) - 1] != '/') {
-            strncat(desStr, "\\", 1);
+        if(tmpstr[s_strnlen(tmpstr, sizeof(tmpstr)) - 1] != FOLDER_SLASH_SQ) {
+            strncat(tmpstr, FOLDER_SLASH_DQ, 1);
         }
-        strncat(desStr, cstJavaExe, strlen(cstJavaExe));
-        if( (fp=fopen(desStr, "rb")) != NULL ) {
+        strncat(tmpstr, cstJavaExe, strlen(cstJavaExe));
+        if( (fp=fopen(tmpstr, "rb")) != NULL ) {
             fclose(fp);
             fp = NULL;
+            strncpy(desStr, tmpstr, s_strnlen(tmpstr, sizeof(tmpstr)));
+            desStr[s_strnlen(tmpstr, sizeof(tmpstr))] = '\0';
             bFlag = TRUE;
             break;
         }
    }
-   if(java_home != NULL)
-	free(java_home);
-
+   if (java_home != NULL) free(java_home);
    return bFlag;
 }
 
@@ -221,14 +254,13 @@ int get_java_from_sys(char *desStr, int desStr_size) {
 *Return: process result. TRUE for success, FALSE for failure.
 */
 int get_java_home(char *desStr, int desStr_size) {
-	const char cstJavaPath[] = "\\jre\\bin\\java.exe";
-	const char cstPropPath[] = "\\bin\\bbwp.properties";
+	const char cstJavaPath[] = JRE_BIN_JAVA;
+	const char cstPropPath[] = BBWP_PROPERTIES;
 
 	char path_to_bbwp_properties[PATH_MAX + 3];
 	char *input = NULL;
     int bFlag = FALSE; //bool flag as return value
 	FILE *fp = NULL;
-    unsigned int inputLen = 0;
 
     if ( desStr == NULL ) {
         return FALSE;
@@ -264,13 +296,15 @@ int get_java_home(char *desStr, int desStr_size) {
 	    fseek(fp, 0L, SEEK_SET);
 
 	    // Read the entire file into the string.
-        inputLen = (unsigned int)fread(input, sizeof(char), buffersize, fp);
-        if ( inputLen == 0 ) {
-	        printErr("Error reading file bbwp.properties");
-            input = "";
-            break;
-        } else {
-	        input[++inputLen] = '\0';
+        {
+	        unsigned int newLen = (unsigned int)fread(input, sizeof(char), buffersize, fp);
+	        if ( newLen == 0 ) {
+		        printErr("Error reading file bbwp.properties");
+                input = "";
+                break;
+	        } else {
+		        input[++newLen] = '\0';
+	        }
         }
 
         // Read file successfully
@@ -306,7 +340,7 @@ int get_java_home(char *desStr, int desStr_size) {
             else { //<java> is not found
                 end = strstr(temp, "<java") ;
                 if( end != NULL
-                    && strstr(end + strlen("<java"), "/>") != NULL) { //treat "<java/>" as empty path string
+					&& strstr(end + strlen("<java"), "/>") != NULL) { //treat "<java/>" as empty path string
                     desStr[0] = '\0';
                 }
                 else { //neither <java> nor <java/> is found.
@@ -332,7 +366,7 @@ int get_java_home(char *desStr, int desStr_size) {
             strncat(desStr, "\0", 1);
             // varify if java.exe is available
             if( (fp=fopen(desStr, "rb")) == NULL ) {
-                printErr("Failed to find java.exe");
+                printErr(FAILED_TO_FIND);
                 bFlag = FALSE;
             }
             else {
@@ -341,8 +375,8 @@ int get_java_home(char *desStr, int desStr_size) {
             }
 	    }
         else { // java path in envirionment variable
-            if (get_java_from_sys(desStr, desStr_size) == FALSE) {
-                printErr("Failed to find java.exe");
+            if (get_java_from_sys(desStr) == FALSE) {
+                printErr(FAILED_TO_FIND);
                 bFlag = FALSE;
             }
         }
@@ -361,7 +395,6 @@ int get_java_home(char *desStr, int desStr_size) {
 */
 int generate_system_call(char *desStr, int length, char **strArray) {
     const char cststrJar[] = " -jar ";
-    const char cststrBbwpJar[] = "\\bin\\bbwp.jar";
 
 	char java_path[PATH_MAX + 3];
 	char full_java_path[PATH_MAX + 3];
@@ -386,7 +419,7 @@ int generate_system_call(char *desStr, int length, char **strArray) {
         return FALSE;
     }
     // Get home path of bbwp.jar
-    to_tumbler_base( path_to_bbwp_jar_tmp, cststrBbwpJar, strlen(cststrBbwpJar) );
+    to_tumbler_base( path_to_bbwp_jar_tmp, BIN_BBWP_JAR, strlen(BIN_BBWP_JAR) );
     // Validate if bbwp.jar is available
     fp = fopen(path_to_bbwp_jar_tmp, "rb");
     if ( fp == NULL ) {
@@ -402,16 +435,13 @@ int generate_system_call(char *desStr, int length, char **strArray) {
         }
     }
 
-    totalSize = s_strnlen(full_java_path, sizeof(full_java_path))
-                 + strlen(cststrJar)
-                 + s_strnlen(path_to_bbwp_jar, sizeof(path_to_bbwp_jar))
-                 + 1 ; //Size of the string plus a null character
+    totalSize = s_strnlen(full_java_path, sizeof(full_java_path)) + strlen(cststrJar) + s_strnlen(path_to_bbwp_jar, sizeof(path_to_bbwp_jar)) +1 ; //Size of the string plus a null character
 	temp = malloc( sizeof(char) * totalSize );
     memset(temp, 0, sizeof(char) * totalSize);
 
-    strncpy( temp, full_java_path, s_strnlen(full_java_path, sizeof(full_java_path)) ); //"java.exe"
-	strncat( temp, cststrJar, strlen(cststrJar) );                //" -jar "
-	strncat( temp, path_to_bbwp_jar, sizeof(path_to_bbwp_jar) ); //"bbwp.jar"
+    strncpy(temp, full_java_path, s_strnlen(full_java_path, sizeof(full_java_path))); //"java.exe"
+	strncat(temp, cststrJar, strlen(cststrJar));                //" -jar "
+	strncat(temp, path_to_bbwp_jar, s_strnlen(path_to_bbwp_jar, sizeof(path_to_bbwp_jar))); //"bbwp.jar"
 
     //add arguments to the command string
 	for ( i=1; i<length; i++ ) {
@@ -426,15 +456,18 @@ int generate_system_call(char *desStr, int length, char **strArray) {
 			printErr("Could not reallocate memory.");
 			return FALSE;
 		}
-		strncat( temp," ", 1 );
-		strncat( temp, args, sizeof(args) );
+		strncat(temp," ", 1);
+		strncat(temp, args, s_strnlen(args, sizeof(args)));
 	}
 	temp[totalSize - 1] = '\0';
+#ifdef MAC
+	strncpy(desStr,temp, totalSize);
+#else
     if ( surround_quotes(desStr, temp, sizeof(char)*totalSize) == FALSE ) {
 		printErr("Failde to surround command with quotes.");
 		return FALSE;
     }
-
+#endif
     if( temp != NULL )
         free(temp);
 
@@ -444,10 +477,11 @@ int generate_system_call(char *desStr, int length, char **strArray) {
 int main(int argc, char **argv)
 {
 	char system_call[LEN_MAX] = ""; 
+
 	memset(system_call, 0, sizeof(system_call));
 	
 	//set value of the global variable -- home path of current running application.
-    if ( getBaseDir( g_base_dir ) == FALSE ) {
+    if ( getBaseDir(g_base_dir) == FALSE ) {
         return -1;
     }
 

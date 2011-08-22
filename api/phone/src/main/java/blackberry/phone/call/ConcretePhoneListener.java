@@ -1,19 +1,21 @@
 /*
-* Copyright 2010-2011 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010-2011 Research In Motion Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package blackberry.phone.call;
+
+import java.lang.ref.WeakReference;
 
 import net.rim.blackberry.api.phone.PhoneListener;
 import net.rim.device.api.script.ScriptableFunction;
@@ -22,10 +24,10 @@ import net.rim.device.api.ui.UiApplication;
 public class ConcretePhoneListener extends ScriptableFunction implements PhoneListener {
     public static final String NAME = "addPhoneListener";
 
-    private final UiApplication _uiAppliation = UiApplication.getUiApplication();
+    private final WeakReference _uiApplicationWeakReference = new WeakReference( UiApplication.getUiApplication() );
 
     private CallNamespace _owner = null;
-    private final ScriptableFunction[] _callbacks = new ScriptableFunction[CB_PHONELISTENERS_SIZE];
+    private final ScriptableFunction[] _callbacks = new ScriptableFunction[ CB_PHONELISTENERS_SIZE ];
     private static final int NO_FAILURE = -1;
     private int _lastCallIdPassedToCallInitiated;
 
@@ -79,15 +81,15 @@ public class ConcretePhoneListener extends ScriptableFunction implements PhoneLi
 
     private static ConcretePhoneListener _instance = null;
 
-    public static synchronized ConcretePhoneListener getInstance(final CallNamespace owner) {
-        if (_instance == null) {
-            _instance = new ConcretePhoneListener(owner);
+    public static synchronized ConcretePhoneListener getInstance( final CallNamespace owner ) {
+        if( _instance == null ) {
+            _instance = new ConcretePhoneListener( owner );
         }
 
         return _instance;
     }
 
-    private ConcretePhoneListener(final CallNamespace owner) {
+    private ConcretePhoneListener( final CallNamespace owner ) {
         this._owner = owner;
 
         resetLastInitiatedCallID();
@@ -97,7 +99,7 @@ public class ConcretePhoneListener extends ScriptableFunction implements PhoneLi
         return _lastCallIdPassedToCallInitiated;
     }
 
-    private void setLastInitiatedCallID(final int callid) {
+    private void setLastInitiatedCallID( final int callid ) {
         _lastCallIdPassedToCallInitiated = callid;
     }
 
@@ -106,65 +108,63 @@ public class ConcretePhoneListener extends ScriptableFunction implements PhoneLi
     }
 
     /* override */
-    public Object invoke(final Object thiz, final Object[] args) throws Exception {
+    public Object invoke( final Object thiz, final Object[] args ) throws Exception {
         final int PARAMS_MAX = 2;
 
         // null is passed to remove all listeners.
-        if (args == null || args.length == 1 && args[0] == null) {
+        if( args == null || args.length == 1 && args[ 0 ] == null ) {
             removeAllListeners();
 
-            return new Boolean(true);
-        }
-        else if (args.length != PARAMS_MAX) {
+            return new Boolean( true );
+        } else if( args.length != PARAMS_MAX ) {
             return UNDEFINED;
-        }
-        else {
-            final ScriptableFunction sf = (ScriptableFunction) args[0];
-            final int index = ((Integer) args[1]).intValue();
+        } else {
+            final ScriptableFunction sf = (ScriptableFunction) args[ 0 ];
+            final int index = ( (Integer) args[ 1 ] ).intValue();
 
-            if (isCBIndexValid(index)) {
-                setListenerByIndex(sf, index);
+            if( isCBIndexValid( index ) ) {
+                setListenerByIndex( sf, index );
 
-                return new Boolean(true);
+                return new Boolean( true );
             }
         }
 
         return UNDEFINED;
     }
 
-    private boolean isCBIndexValid(final int index) {
-        if (index >= 0 && index < CB_PHONELISTENERS_SIZE) {
+    private boolean isCBIndexValid( final int index ) {
+        if( index >= 0 && index < CB_PHONELISTENERS_SIZE ) {
             return true;
         }
 
         return false;
     }
 
-    public ScriptableFunction getListenerByIndex(final int index) {
-        if (isCBIndexValid(index)) {
-            return _callbacks[index];
+    public ScriptableFunction getListenerByIndex( final int index ) {
+        if( isCBIndexValid( index ) ) {
+            return _callbacks[ index ];
         }
 
         return null;
     }
 
-    public void setListenerByIndex(final ScriptableFunction sfCB, final int index) {
-        if (isCBIndexValid(index)) {
-            _callbacks[index] = sfCB;
+    public void setListenerByIndex( final ScriptableFunction sfCB, final int index ) {
+        if( isCBIndexValid( index ) ) {
+            _callbacks[ index ] = sfCB;
         }
     }
 
     public void removeAllListeners() {
-        for (int i = 0; i < CB_PHONELISTENERS_SIZE; i++) {
-            setListenerByIndex(null, i);
+        for( int i = 0; i < CB_PHONELISTENERS_SIZE; i++ ) {
+            setListenerByIndex( null, i );
         }
     }
 
     public int getNumberOfRegisteredCallbacks() {
         int cbNumber = 0;
 
-        for (int i = 0; i < CB_PHONELISTENERS_SIZE; i++) {
-            if (_callbacks[i] != null) {
+        for( int i = 0; i < CB_PHONELISTENERS_SIZE; i++ ) {
+            if( _callbacks[ i ] != null ) {
                 cbNumber++;
             }
         }
@@ -175,126 +175,126 @@ public class ConcretePhoneListener extends ScriptableFunction implements PhoneLi
     /* overriding area */
     // //////////////////////////////////////////////////////////////////////////////
     // Invoked when a call gets added to a conference call
-    public void callAdded(final int callid) {
-        InvokeScriptableCallback(CB_CALL_ADDED, callid);
+    public void callAdded( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_ADDED, callid );
     }
 
     // Invoked when the user answers a call (user driven).
-    public void callAnswered(final int callid) {
-        _owner.addActiveCall(callid);
+    public void callAnswered( final int callid ) {
+        _owner.addActiveCall( callid );
 
-        InvokeScriptableCallback(CB_CALL_ANSWERED, callid);
+        InvokeScriptableCallback( CB_CALL_ANSWERED, callid );
     }
 
     // Invoked when a conference call has been established.
-    public void callConferenceCallEstablished(final int callid) {
-        InvokeScriptableCallback(CB_CALL_CONFERENCECALL_ESTABLISHED, callid);
+    public void callConferenceCallEstablished( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_CONFERENCECALL_ESTABLISHED, callid );
     }
 
     // Invoked when the network indicates a connected event (network driven).
-    public void callConnected(final int callid) {
-        InvokeScriptableCallback(CB_CALL_CONNECTED, callid);
+    public void callConnected( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_CONNECTED, callid );
     }
 
     // Invoked when a direct-connect call is connected.
-    public void callDirectConnectConnected(final int callid) {
-        InvokeScriptableCallback(CB_CALL_DIRECTCONNECT_CONNECTED, callid);
+    public void callDirectConnectConnected( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_DIRECTCONNECT_CONNECTED, callid );
     }
 
     // Invoked when a direct-connect call is disconnected.
-    public void callDirectConnectDisconnected(final int callid) {
-        InvokeScriptableCallback(CB_CALL_DIRECTCONNECT_DISCONNECTED, callid);
+    public void callDirectConnectDisconnected( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_DIRECTCONNECT_DISCONNECTED, callid );
     }
 
     // Invoked when a call is disconnected.
-    public void callDisconnected(final int callid) {
-        _owner.removeActiveCall(callid);
+    public void callDisconnected( final int callid ) {
+        _owner.removeActiveCall( callid );
 
-        InvokeScriptableCallback(CB_CALL_DISCONNECTED, callid);
+        InvokeScriptableCallback( CB_CALL_DISCONNECTED, callid );
     }
 
     // Invoked when the user ends the call.
-    public void callEndedByUser(final int callid) {
-        InvokeScriptableCallback(CB_CALL_ENDED_BYUSER, callid);
+    public void callEndedByUser( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_ENDED_BYUSER, callid );
     }
 
     // Invoked when a call fails.
-    public void callFailed(final int callid, final int reason) {
-        InvokeScriptableCallback(CB_CALL_FAILED, callid, reason);
+    public void callFailed( final int callid, final int reason ) {
+        InvokeScriptableCallback( CB_CALL_FAILED, callid, reason );
     }
 
     // Invoked when a call goes into the 'held' state.
-    public void callHeld(final int callid) {
-        InvokeScriptableCallback(CB_CALL_HELD, callid);
+    public void callHeld( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_HELD, callid );
     }
 
     // Invoked when a new call is arriving.
-    public void callIncoming(final int callid) {
-        InvokeScriptableCallback(CB_CALL_INCOMING, callid);
+    public void callIncoming( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_INCOMING, callid );
     }
 
     // Invoked when a call has been initiated by the device (outbound).
     // Known Issue: This method called twice, timestamp is applied to skip the second call.
-    public void callInitiated(final int callid) {
-        if (getLastInitiatedCallID() == callid) {
+    public void callInitiated( final int callid ) {
+        if( getLastInitiatedCallID() == callid ) {
             resetLastInitiatedCallID();
             return;
         }
 
-        setLastInitiatedCallID(callid);
+        setLastInitiatedCallID( callid );
 
-        _owner.addActiveCall(callid);
+        _owner.addActiveCall( callid );
 
-        InvokeScriptableCallback(CB_CALL_INITIATED, callid);
+        InvokeScriptableCallback( CB_CALL_INITIATED, callid );
     }
 
     // Invoked when a call gets removed from a conference call.
-    public void callRemoved(final int callid) {
-        InvokeScriptableCallback(CB_CALL_REMOVED, callid);
+    public void callRemoved( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_REMOVED, callid );
     }
 
     // Invoked when a call goes from 'held' to 'resumed' state.
-    public void callResumed(final int callid) {
-        InvokeScriptableCallback(CB_CALL_RESUMED, callid);
+    public void callResumed( final int callid ) {
+        InvokeScriptableCallback( CB_CALL_RESUMED, callid );
     }
 
     // Invoked when a call is waiting.
-    public void callWaiting(final int callid) {
-        _owner.addActiveCall(callid);
+    public void callWaiting( final int callid ) {
+        _owner.addActiveCall( callid );
 
-        InvokeScriptableCallback(CB_CALL_WAITING, callid);
+        InvokeScriptableCallback( CB_CALL_WAITING, callid );
     }
 
     // Invoked when a conference call is terminated (all members disconnected).
-    public void conferenceCallDisconnected(final int callid) {
-        InvokeScriptableCallback(CB_CONFERENCECALL_DISCONNECTED, callid);
+    public void conferenceCallDisconnected( final int callid ) {
+        InvokeScriptableCallback( CB_CONFERENCECALL_DISCONNECTED, callid );
     }
 
-    private void InvokeScriptableCallback(final int callbackIndex, final int callid) {
-        InvokeScriptableCallback(callbackIndex, callid, NO_FAILURE);
+    private void InvokeScriptableCallback( final int callbackIndex, final int callid ) {
+        InvokeScriptableCallback( callbackIndex, callid, NO_FAILURE );
     }
 
-    private void InvokeScriptableCallback(final int callbackIndex, final int callid, final int reason) {
-        final ScriptableFunction callback = getListenerByIndex(callbackIndex);
+    private void InvokeScriptableCallback( final int callbackIndex, final int callid, final int reason ) {
+        final ScriptableFunction callback = getListenerByIndex( callbackIndex );
 
-        if (callback != null) {
-            _uiAppliation.invokeLater(new Runnable() {
+        if( callback != null ) {
+            ( (UiApplication) _uiApplicationWeakReference.get() ).invokeLater( new Runnable() {
                 public void run() {
                     try {
-                        new Thread(new Runnable() {
+                        new Thread( new Runnable() {
                             public void run() {
                                 try {
-                                    final Integer callidObj = new Integer(callid);
-                                    callback.invoke(null, (reason == NO_FAILURE ? new Object[] { callidObj } : new Object[] { callidObj,
-                                            new Integer(reason) }));
-                                } catch (final Exception e) {
+                                    final Integer callidObj = new Integer( callid );
+                                    callback.invoke( null, ( reason == NO_FAILURE ? new Object[] { callidObj } : new Object[] {
+                                            callidObj, new Integer( reason ) } ) );
+                                } catch( final Exception e ) {
                                 }
                             }
-                        }).start();
-                    } catch (final Exception e) {
+                        } ).start();
+                    } catch( final Exception e ) {
                     }
                 }
-            });
+            } );
         }
     }
 }

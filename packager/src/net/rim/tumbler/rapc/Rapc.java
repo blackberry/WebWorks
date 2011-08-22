@@ -582,7 +582,7 @@ public class Rapc {
         
         // If app to run on startup, set title and icon to appear
         if(_widgetConfig.getBackgroundSource()!=null&&_widgetConfig.isStartupEnabled()) {
-        	writer.write("MIDlet-2: " + _widgetConfig.getName() + "," + icon + ",runOnStartup;WIDGET;" + 
+        	writer.write("MIDlet-2: " + _widgetConfig.getName() + "," + icon + ",rim:runOnStartup;WIDGET;" + 
         			NL);
         }
         	

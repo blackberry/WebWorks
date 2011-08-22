@@ -61,6 +61,7 @@ final public class NavigationController {
     public static final int     NAVIGATION_EVENT_DIRECTION = 0;
     public static final int     NAVIGATION_EVENT_CLICK     = 1;
     public static final int     NAVIGATION_EVENT_UNCLICK   = 2;
+    public static final int     NAVIGATION_EVENT_INITFOCUS = 3;
 
     // Cached references to BrowserFieldScreen components /*package*/
     BrowserField               _browserField;
@@ -166,6 +167,10 @@ final public class NavigationController {
         dispatchUiEvent( NAVIGATION_EVENT_UNCLICK, FOCUS_NAVIGATION_UNDEFINED );
     }
     
+    public void handleInitFocus() {
+        dispatchUiEvent(NAVIGATION_EVENT_INITFOCUS, FOCUS_NAVIGATION_UNDEFINED);
+    }
+
     public void setIFrameHashtable( Hashtable newHash ){
     	_iframeHashtable = newHash;
     }

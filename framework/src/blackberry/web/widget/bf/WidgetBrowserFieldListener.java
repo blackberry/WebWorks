@@ -34,6 +34,9 @@ import blackberry.web.widget.device.DeviceInfo;
 import blackberry.web.widget.policy.WidgetPolicy;
 import blackberry.web.widget.policy.WidgetPolicyFactory;
 
+import java.lang.ref.WeakReference;
+import net.rim.device.api.ui.Screen;
+
 /**
  *
  */
@@ -85,6 +88,12 @@ public class WidgetBrowserFieldListener extends BrowserFieldListener {
                     scriptEngine.addExtension( NavigationNamespace.NAME, bfScreen.getNavigationExtension() );
                 }
                 bfScreen.getNavigationController().reset();
+            }
+
+            // Inject HTML5 to gears shim for 5.0 devices
+            if( scriptEngine != null && DeviceInfo.isBlackBerry5() ) {
+                WidgetExtension HTML5Extension = bfScreen.getHTML5Extension();
+                HTML5Extension.loadFeature( null, null, null, scriptEngine );
             }
         }
     }
@@ -182,16 +191,26 @@ public class WidgetBrowserFieldListener extends BrowserFieldListener {
     }
 
     private static class UpdateBinsEventListener implements EventListener {
-        private BrowserField _browserField;
+        private WeakReference _browserFieldWeakReference;
 
         UpdateBinsEventListener( BrowserField browserField ) {
             super();
-            _browserField = browserField;
+            _browserFieldWeakReference = new WeakReference( browserField );
+        }
+
+        private BrowserField getBrowserField() {
+            Object o = _browserFieldWeakReference.get();
+            if( o instanceof BrowserField ) {
+                return (BrowserField) o;
+            } else {
+                return null;
+            }
         }
 
         public void handleEvent( Event evt ) {
-            if( _browserField.getScreen() instanceof BrowserFieldScreen ) {
-                BrowserFieldScreen bfScreen = (BrowserFieldScreen) _browserField.getScreen();
+            Screen screen = getBrowserField().getScreen();
+            if( screen instanceof BrowserFieldScreen ) {
+                BrowserFieldScreen bfScreen = (BrowserFieldScreen) screen;
 
                 if( bfScreen.getAppNavigationMode() ) {
                     bfScreen.getNavigationController().update();

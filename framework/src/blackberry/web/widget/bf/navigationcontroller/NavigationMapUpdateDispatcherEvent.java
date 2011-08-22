@@ -67,7 +67,9 @@ class NavigationMapUpdateDispatcherEvent extends DispatchableEvent {
             _navigationController._defaultHoverEffect = isDefaultHoverEffectEnabled( _navigationController._dom );
             // Set first focus
             Node firstFocusNode = findInitialFocusNode();
-            if( firstFocusNode != null ) {
+            if( firstFocusNode == null ) {
+                _navigationController.handleInitFocus();
+            } else {
                 _navigationController.setFocus( firstFocusNode );
             }
         } else {

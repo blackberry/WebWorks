@@ -16,20 +16,14 @@
 package blackberry.push;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import net.rim.device.api.io.http.PushInputStream;
 import net.rim.device.api.script.ScriptableFunction;
-import net.rim.device.api.system.CodeSigningKey;
-import net.rim.device.api.system.ControlledAccess;
-import net.rim.device.api.system.PersistentObject;
-import net.rim.device.api.system.PersistentStore;
 import blackberry.common.push.PushDaemon.SimChangeData;
 import blackberry.common.push.PushDaemon.StatusChangeData;
 import blackberry.common.push.PushData;
-import blackberry.common.settings.SettingsManager;
-import blackberry.common.util.ID;
+import blackberry.common.push.PushPersistentStore;
 import blackberry.push.data.PushDataObject;
 
 /**
@@ -38,7 +32,6 @@ import blackberry.push.data.PushDataObject;
  * 
  */
 public class PushListener2 {
-    private static final long LASTKNOWN_ID;
     
     private boolean _stop;
     private ScriptableFunction _pushCallback;
@@ -47,10 +40,6 @@ public class PushListener2 {
     private Object _callBackLock;
     private Vector _messageQueue;
 
-    static {
-        LASTKNOWN_ID = ID.getUniqueID( "LASTKNOWN_ID" );
-    } 
-   
     /**
      * Constructor
      * 
@@ -67,7 +56,7 @@ public class PushListener2 {
         _pushCallback = pushCallback;
         _callBackLock = new Object();
         _stop = false;
-        setLastKnownPort(port); // Keep track of some info between device restarts
+        PushPersistentStore.setLastKnownPort(port); // Keep track of some info between device restarts
     }
 
     /**
@@ -87,7 +76,7 @@ public class PushListener2 {
         this( port, queue, pushCallback );
         _simChangeCallback = simChangeCallback;
         _callBackLock = new Object();
-        setLastKnownType(PushService.BES_PUSH); // Keep track of some info between device restarts
+        PushPersistentStore.setLastKnownType(PushService.BES_PUSH); // Keep track of some info between device restarts
     }
 
     /**
@@ -108,7 +97,7 @@ public class PushListener2 {
             ScriptableFunction simChangeCallback ) {
         this( port, queue, pushCallback, simChangeCallback );
         _registerCallback = registerCallback;
-        setLastKnownType(PushService.BIS_PUSH); // Keep track of some info between device restarts
+        PushPersistentStore.setLastKnownType(PushService.BIS_PUSH); // Keep track of some info between device restarts
     }
 
     /**
@@ -154,75 +143,7 @@ public class PushListener2 {
         MessageProcessor messageProcessor = new MessageProcessor();
         messageProcessor.start();
     }
-
     
-    /**
-     * Get the last known push service type
-     * 
-     * @return push service type 
-     */
-    public static int getLastKnownType() {
-        PersistentObject persistentObject = PersistentStore.getPersistentObject(LASTKNOWN_ID);
-        Hashtable info = (Hashtable)persistentObject.getContents();
-        if(info != null && info.containsKey("type")) {
-            return ((Integer)info.get("type")).intValue();
-        }
-        
-        return -1;
-    }
-
-
-    /**
-     * Set the last known push service type
-     * 
-     * @param type
-     *            push service type
-     */
-    public static void setLastKnownType(int type) {
-        PersistentObject persistentObject = PersistentStore.getPersistentObject(LASTKNOWN_ID);
-        Hashtable info = (Hashtable)persistentObject.getContents();
-        if(info == null) {
-            info = SettingsManager.createStorableObject();
-            CodeSigningKey codeSigningKey = CodeSigningKey.get( info );
-            persistentObject.setContents( new ControlledAccess( info, codeSigningKey ) );
-        }
-        info.put("type", new Integer(type));
-        persistentObject.commit();
-    }
-    
-    /**
-     * Get the last known push service port
-     * 
-     * @return push service port 
-     */
-    public static int getLastKnownPort() {
-        PersistentObject persistentObject = PersistentStore.getPersistentObject(LASTKNOWN_ID);
-        Hashtable info = (Hashtable)persistentObject.getContents();
-        if(info != null && info.containsKey("port")) {
-            return ((Integer)info.get("port")).intValue();
-        }
-        
-        return -1;
-    }
-    
-    /**
-     * Set the last known push service port
-     * 
-     * @param port
-     *            push service port
-     */
-    public static void setLastKnownPort(int port) {
-        PersistentObject persistentObject = PersistentStore.getPersistentObject(LASTKNOWN_ID);
-        Hashtable info = (Hashtable)persistentObject.getContents();
-        if(info == null) {
-            info = SettingsManager.createStorableObject();
-            CodeSigningKey codeSigningKey = CodeSigningKey.get( info );
-            persistentObject.setContents( new ControlledAccess( info, codeSigningKey ) );
-        }
-        info.put("port", new Integer(port));
-        persistentObject.commit();
-    }
-
     /**
      * Private class that creates a thread to process push messages already received by listener thread.
      */

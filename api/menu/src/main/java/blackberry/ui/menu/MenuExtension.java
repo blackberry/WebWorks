@@ -17,6 +17,8 @@ package blackberry.ui.menu;
 
 import org.w3c.dom.Document;
 
+import java.lang.ref.WeakReference;
+
 import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.script.ScriptEngine;
 import net.rim.device.api.web.WidgetConfig;
@@ -28,7 +30,7 @@ import net.rim.device.api.web.WidgetExtension;
 public final class MenuExtension implements WidgetExtension {
 
     public static final String NAME = "blackberry.ui.menu";
-    private static BrowserField _browserField = null;
+    private static WeakReference _browserField;
         
     /**
      * @see net.rim.device.api.web.WidgetExtension#getFeatureList()
@@ -55,7 +57,7 @@ public final class MenuExtension implements WidgetExtension {
      * @see net.rim.device.api.web.WidgetExtension#register(WidgetConfig, BrowserField)
      */
     public void register( final WidgetConfig widgetConfig, final  BrowserField browserField ) {
-        MenuExtension._browserField = browserField;
+        _browserField = new WeakReference( browserField );
     }
     
     /**
@@ -71,7 +73,7 @@ public final class MenuExtension implements WidgetExtension {
      * @return the current BrowserFiled
      */
     public static BrowserField getBrowserField() {
-        return _browserField;
+        return ( BrowserField ) _browserField.get();
     }
 
 }

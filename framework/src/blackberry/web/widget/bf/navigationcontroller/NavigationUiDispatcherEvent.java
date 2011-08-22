@@ -65,6 +65,12 @@ class NavigationUiDispatcherEvent extends DispatchableEvent {
                     _navigationController.fireMouseEvent( "click", _navigationController._currentFocusNode );
                 }
                 break;
+            case NavigationController.NAVIGATION_EVENT_INITFOCUS:
+                Node nd = findHighestFocusableNodeInScreen();
+                if (nd != null) {
+                    _navigationController.setFocus(nd);
+                }
+                break;
             default:
                 throw new Error("Invalid event type: " + _eventType);
         }

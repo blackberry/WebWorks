@@ -105,10 +105,23 @@ public class FileManager {
             throw new PackageException( "EXCEPTION_IO_TEMPLATES" );
         }
 
+        // generate the shim file
+        String sourceFolder = SessionManager.getInstance().getSourceFolder();
+        String packagerShimPath = SessionManager.getInstance().getSessionHome() + FILE_SEP + "lib" + FILE_SEP + "js" + FILE_SEP
+                + "html5_init.js";
+        String sourceShimPath = sourceFolder + FILE_SEP + "html5_init.js";
+        copyFile( new File( packagerShimPath ), new File( sourceShimPath ) );
+        _outputFiles.add( sourceShimPath );
+
+        String workerPath = SessionManager.getInstance().getSessionHome() + FILE_SEP + "lib" + FILE_SEP + "js" + FILE_SEP
+                + "html5_worker.js";
+        String workerSourcePath = sourceFolder + FILE_SEP + "html5_worker.js";
+        copyFile( new File( workerPath ), new File( workerSourcePath ) );
+        _outputFiles.add( workerSourcePath );
+
         // Extract archive
         ZipFile zip = new ZipFile( new File( SessionManager.getInstance().getWidgetArchive() ).getAbsolutePath() );
-        Enumeration< ? > en = zip.entries();
-		String sourceFolder = SessionManager.getInstance().getSourceFolder();
+        Enumeration< ? > en = zip.entries();		
         HashSet< ZipEntry > extJars = new HashSet< ZipEntry >();
 
         while( en.hasMoreElements() ) {

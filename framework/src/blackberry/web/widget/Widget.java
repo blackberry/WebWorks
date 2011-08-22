@@ -20,19 +20,18 @@ import java.util.Hashtable;
 
 import net.rim.device.api.notification.NotificationsConstants;
 import net.rim.device.api.notification.NotificationsManager;
-import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.ApplicationManager;
-import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.system.EventLogger;
 import net.rim.device.api.system.GlobalEventListener;
 import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.web.WidgetConfig;
-import blackberry.core.ApplicationEventHandler;
-import blackberry.core.EventService;
-import blackberry.core.WidgetProperties;
 import blackberry.common.push.PushDaemon;
 import blackberry.common.settings.SettingsManager;
 import blackberry.common.util.ID;
+import blackberry.core.ApplicationEventHandler;
+import blackberry.core.ApplicationRegistry;
+import blackberry.core.EventService;
+import blackberry.core.WidgetProperties;
 import blackberry.web.widget.bf.BrowserFieldScreen;
 import blackberry.web.widget.impl.WidgetConfigImpl;
 import blackberry.web.widget.listener.HardwareKeyListener;
@@ -47,7 +46,7 @@ public class Widget extends UiApplication implements GlobalEventListener {
     public static final long WIDGET_GUID = Long.parseLong( Widget.class.getName().hashCode() + "", 16 );
     private static final String WIDGET_STARTUP_ENTRY = "rim:runOnStartup";
     private static final String WIDGET_FOREGROUND_ENTRY = "rim:foreground";
-    private static boolean _launchFromRibbon;
+    private static final String DEBUG_ARGUMENT = "WIDGET;";
 
     public Widget( WidgetConfig wConfig, String locationURI ) {
         _wConfig = wConfig;
@@ -75,10 +74,9 @@ public class Widget extends UiApplication implements GlobalEventListener {
     public void activate() {
         EventService.getInstance().fireEvent( ApplicationEventHandler.EVT_APP_FOREGROUND, null, false );
 
-        // If launched from ribbon, change the location to the widget content source.
-        if( _launchFromRibbon ) {
-            String page = ( (WidgetConfigImpl) _wConfig ).getForegroundSource();
-            changeLocation( page );
+        // If we're switching application from the background we should change location to the widget content source.\r
+        if( _locationURI.equals( ( (WidgetConfigImpl) _wConfig ).getBackgroundSource() ) ) {
+            changeLocation( ( (WidgetConfigImpl) _wConfig ).getForegroundSource() );
         }
     }
 
@@ -91,20 +89,16 @@ public class Widget extends UiApplication implements GlobalEventListener {
 
     public static void main( String[] args ) {
         WidgetConfigImpl wConfig = new blackberry.web.widget.autogen.WidgetConfigAutoGen();
+        ID.init(wConfig);
+        ApplicationRegistry.getInstance().notifyStarted();
+        
         WidgetProperties.getInstance().setGuid( WIDGET_GUID );
         EventLogger.register( WIDGET_GUID, wConfig.getName(), EventLogger.VIEWER_STRING );
 
-        ID.init(wConfig);
         SettingsManager.setFactory(new SettingsStoreFactoryImpl());
 
-        if( args[ 0 ].indexOf( WIDGET_FOREGROUND_ENTRY ) != -1 ) {
-            _launchFromRibbon = true;
-        } else {
-            _launchFromRibbon = false;
-        }
-        
         // push entry
-        if( args != null && args.length > 0 && args[ 0 ].equals( "PushDaemon" ) ) {
+        if( ApplicationRegistry.isDaemon( args ) ) {
             String page = args[ 1 ];
             int maxQueueCap = Integer.parseInt( args[ 2 ] );
             PushDaemon daemon = new PushDaemon( page, maxQueueCap );
@@ -112,11 +106,20 @@ public class Widget extends UiApplication implements GlobalEventListener {
             return;
         }
 
-        if( isAppRunning( wConfig ) ) {
-            String qsParams = argsToQuery( args, wConfig );
+        if( ApplicationRegistry.isAppRunning() ) {
+            /* rim:foreground is a special case. If the widget is running, just bring it to front, otherwise load the default page.
+             * So we need to differentiate ribbon presses from invokes and handle bringing apps to the foreground vs forceful refresh.
+             */
+            
+            String qsParams;
+            // If we're launching via rim:foreground, pass that directly.
+            if( args.length > 0 && args[ 0 ].indexOf( WIDGET_FOREGROUND_ENTRY ) != -1 ) {
+                qsParams = args[0];
+            } else {
+                qsParams = argsToQuery( args, wConfig );
+            }
             ApplicationManager mgr = ApplicationManager.getApplicationManager();
             mgr.postGlobalEvent( WIDGET_GUID, 0, 0, qsParams, null );
-            makeDebugArgs( args, wConfig );
         } else {
             /*
              * If the WebWorks Application is launched during system startup, wait until system startup is complete. This will
@@ -126,7 +129,6 @@ public class Widget extends UiApplication implements GlobalEventListener {
                 waitForStartupComplete();
             }
             Widget widget = makeWidget( args, wConfig );
-            makeDebugArgs( args, wConfig );
             widget.enterEventDispatcher();
         }
     }
@@ -144,13 +146,6 @@ public class Widget extends UiApplication implements GlobalEventListener {
         try {
             Thread.sleep( 1500 );
         } catch( InterruptedException e ) {
-        }
-    }
-
-    private static void makeDebugArgs( String[] args, WidgetConfigImpl wConfig ) {
-        // Makes modifications to the args to support debugging logic
-        if( !wConfig.isDebugEnabled() ) {
-            args[ 0 ] = "WIDGET;";
         }
     }
 
@@ -177,7 +172,7 @@ public class Widget extends UiApplication implements GlobalEventListener {
         // If parameters are not specified return a query string that handles default cases
         // If the WebWorks Application is launched from the icon "WIDGET;" will be present.
         // If allow invoke params is false then fall back on the default cases.
-        boolean rimEntryPoint = ( args.length > 0 ) ? args[ 0 ].indexOf( "rim:" ) != -1 : false;
+        boolean rimEntryPoint =  args.length > 0 && args[ 0 ].indexOf( "rim:" ) != -1;
         String foregroundSource = wConfig.getForegroundSource();
         String backgroundSource = wConfig.getBackgroundSource();
 
@@ -186,7 +181,7 @@ public class Widget extends UiApplication implements GlobalEventListener {
             args = new String[ 0 ];
         }
 
-        if( args.length == 0 || args[ 0 ].indexOf( "WIDGET;" ) != -1 || rimEntryPoint ) {
+        if( args.length == 0 || args[ 0 ].indexOf( DEBUG_ARGUMENT ) != -1 || rimEntryPoint ) {
             if( foregroundSource.length() == 0 ) {
                 return backgroundSource;
             } else if( rimEntryPoint ) {
@@ -210,24 +205,13 @@ public class Widget extends UiApplication implements GlobalEventListener {
         return queryString;
     }
 
-    private static boolean isAppRunning( WidgetConfigImpl wConfig ) {
-        ApplicationManager mgr = ApplicationManager.getApplicationManager();
-        ApplicationDescriptor current = ApplicationDescriptor.currentApplicationDescriptor();
-        int moduleHandle = current.getModuleHandle();
-        ApplicationDescriptor[] descriptors = CodeModuleManager.getApplicationDescriptors( moduleHandle );
-        for (int i = 0; i < descriptors.length; i++) {
-            if ( !descriptors[i].equals( current ) ) {
-                if ( mgr.getProcessId( descriptors[ i ] ) != -1 ) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     public void eventOccurred( long guid, int data0, int data1, Object object0, Object object1 ) {
         if( guid == WIDGET_GUID ) {
-            changeLocation( (String) object0 );
+            String location = (String) object0;
+            // if widget is already open then rim:foreground does not change/load the page
+            if( location.indexOf( WIDGET_FOREGROUND_ENTRY ) == -1 ) {
+                changeLocation( location );
+            }
             this.requestForeground();
         }
     }

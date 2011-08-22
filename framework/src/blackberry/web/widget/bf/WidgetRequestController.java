@@ -76,33 +76,18 @@ public class WidgetRequestController extends ProtocolController {
             throw new WidgetException( WidgetException.ERROR_WHITELIST_FAIL, request.getURL() );
         }
 
-        // Determine the MIME type of the url
-        String contentType = MIMETypeAssociations.getMIMEType( request.getURL() );
-
-        // Normalize and strip off parameters.
-        String normalizedContentType = MIMETypeAssociations.getNormalizedType( contentType );
-
-        // Determine protocol
-        String protocol = request.getProtocol();
-
         BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
 
         // Launch the browser if BF2 cannot handle the mime type
-        if( openWithBrowser( normalizedContentType, protocol, request.getURL() ) ) {
+        if( !openWithBrowser( request ) ) {
+            // Determine the MIME type of the url
+			String contentType = MIMETypeAssociations.getMIMEType( request.getURL() );
 
-            invokeBrowser( request.getURL() );
+            // Normalize and strip off parameters.
+            String normalizedContentType = MIMETypeAssociations.getNormalizedType( contentType );
 
-            // Reset the loading screen flags to ensure that the back button is enabled after the invoke
-            bfScreen.getPageManager().clearFlags();
-
-            if( DeviceInfo.isBlackBerry6() ) {
-                // Throw a special type of exception that will prevent the history from being updated
-                throw new MediaHandledException();
-            } else {
-                // On 5.0 devices we can simply go back once to counter the history updating before this.
-                _browserField.getHistory().go( -1 );
-            }
-        } else {
+            // Determine protocol
+            String protocol = request.getProtocol();
 
             bfScreen.getPageManager().setGoingBackSafe( false );
             InputConnection ic = null;
@@ -166,6 +151,12 @@ public class WidgetRequestController extends ProtocolController {
         WidgetAccess access = _widgetPolicy.getElement( request.getURL(), _widgetConfig.getAccessList() );
         if( access == null && !_hasMultiAccess ) {
             throw new WidgetException( WidgetException.ERROR_WHITELIST_FAIL, request.getURL() );
+        }
+
+        // In this event, only rtsp link needs to open browser
+        if( request.getProtocol().equalsIgnoreCase("rtsp") ) {
+            openWithBrowser(request);
+            return null;
         }
 
         BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
@@ -267,9 +258,48 @@ public class WidgetRequestController extends ProtocolController {
             return true;
         }
     }
-    
+
+    // Method to check if the browser needs to be launched to handle the file.
+    private boolean openWithBrowser( BrowserFieldRequest request ) throws Exception {
+        BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
+
+        // Determine the MIME type of the url
+        String contentType = MIMETypeAssociations.getMIMEType( request.getURL() );
+
+        // Normalize and strip off parameters.
+        String normalizedContentType = MIMETypeAssociations.getNormalizedType( contentType );
+
+        // Determine protocol
+        String protocol = request.getProtocol();
+
+        // Launch the browser if BF2 cannot handle the mime type
+        if( openWithBrowser( normalizedContentType, protocol, request.getURL() ) ) {
+
+            invokeBrowser( request.getURL() );
+
+            // Reset the loading screen flags to ensure that the back button is enabled after the invoke
+            bfScreen.getPageManager().clearFlags();
+
+            if( DeviceInfo.isBlackBerry6() ) {
+                // Throw a special type of exception that will prevent the history from being updated
+                throw new MediaHandledException();
+            } else {
+                // On 5.0 devices we can simply go back once to counter the history updating before this.
+                _browserField.getHistory().go( -1 );
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // Method to check if the browser needs to be launched to handle the file.
     private boolean openWithBrowser( String mimeType, String protocol, String url ) {
+        //rtsp links should open in the browser.  BF2 does not support the protocol
+        if(protocol.equalsIgnoreCase("rtsp")){
+            return true;
+        }
+
         if( mimeType != null ) {
 
             // Determine media type.

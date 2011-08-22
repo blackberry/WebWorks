@@ -17,6 +17,7 @@ package blackberry.app;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import javax.microedition.io.InputConnection;
 
@@ -39,7 +40,7 @@ import net.rim.device.api.util.ByteVector;
 public final class SetHomeScreenIconFunction extends ScriptableFunctionBase {
 
     public static final String NAME = "setHomeScreenIcon";
-    private BrowserFieldController _controller;
+    private WeakReference _weakReferenceBrwoserFieldController;
 
     /**
      * Constructor
@@ -48,7 +49,7 @@ public final class SetHomeScreenIconFunction extends ScriptableFunctionBase {
      *            The {@link BrowserField}
      */
     public SetHomeScreenIconFunction( BrowserField browserField ) {
-        _controller = (BrowserFieldController) browserField.getConfig().getProperty( BrowserFieldConfig.CONTROLLER );
+        _weakReferenceBrwoserFieldController = new WeakReference((BrowserFieldController) browserField.getConfig().getProperty( BrowserFieldConfig.CONTROLLER ));
     }
 
     /**
@@ -60,7 +61,7 @@ public final class SetHomeScreenIconFunction extends ScriptableFunctionBase {
 
         try {
             BrowserFieldRequest bfr = new BrowserFieldRequest( args[ 0 ].toString() );
-            ic = _controller.handleResourceRequest( bfr );
+            ic = ((BrowserFieldController)_weakReferenceBrwoserFieldController.get()).handleResourceRequest( bfr );
 
             dis = ic.openDataInputStream();
             ByteVector vc = new ByteVector();

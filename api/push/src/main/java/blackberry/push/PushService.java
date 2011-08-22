@@ -26,6 +26,7 @@ import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.EventLogger;
 import net.rim.device.api.util.IntHashtable;
 import blackberry.common.push.PushDaemon;
+import blackberry.common.push.PushPersistentStore;
 import blackberry.core.ApplicationEventHandler;
 import blackberry.core.EventService;
 import blackberry.core.WidgetProperties;
@@ -63,7 +64,8 @@ public class PushService {
     private PushService() {
         // store the application descriptor and push in RuntimeStore so that it can be accessed from daemon.
         _daemonStore = PushDaemon.DaemonStore.loadFromStore();
-        _daemonStore.setUIAppDesc( ApplicationDescriptor.currentApplicationDescriptor() );
+        // persistent the application descriptor
+        PushPersistentStore.setAppDescArgs( ApplicationDescriptor.currentApplicationDescriptor().getArgs() );
 
         _pushListeners = new IntHashtable();
         _onExitHandler = new OnExitHandler();
@@ -134,8 +136,8 @@ public class PushService {
         }
 
         // check to see if a push is open on this port using new push API
-        int currentType = PushListener2.getLastKnownType();
-        int currentPort = PushListener2.getLastKnownPort();
+        int currentType = PushPersistentStore.getLastKnownType();
+        int currentPort = PushPersistentStore.getLastKnownPort();
             
         // cannot run BES and BIS at the same time
         if( currentType != -1 && currentType == BES_PUSH ) {
@@ -193,8 +195,8 @@ public class PushService {
         }
 
         // check to see if a push is open on this port using new push API
-        int currentType = PushListener2.getLastKnownType();
-        int currentPort = PushListener2.getLastKnownPort();
+        int currentType = PushPersistentStore.getLastKnownType();
+        int currentPort = PushPersistentStore.getLastKnownPort();
             
         // cannot run BES and BIS at the same time
         if( currentType != -1 && currentType == BIS_PUSH ) {
@@ -236,7 +238,7 @@ public class PushService {
             listener.stop();
             _pushListeners.remove( port );
         } else {
-            if( PushListener2.getLastKnownPort() == port ) {
+            if( PushPersistentStore.getLastKnownPort() == port ) {
                 stopDaemon();
                 
                 if( _pushListener2 != null ) {
@@ -246,8 +248,8 @@ public class PushService {
 
                 EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), "Unregister push application".getBytes() );
                 PushApplicationRegistry.unregisterApplication();
-                PushListener2.setLastKnownType( -1 );
-                PushListener2.setLastKnownPort( -1 );
+                PushPersistentStore.setLastKnownType( -1 );
+                PushPersistentStore.setLastKnownPort( -1 );
             }
         }
         if( ( _pushListeners.size() == 0 ) && ( _pushListener2 == null ) ) {
@@ -274,14 +276,14 @@ public class PushService {
             EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), "Unregister push application".getBytes() );
             PushApplicationRegistry.unregisterApplication();
             setOnExitListener( false );
-        } else if( PushListener2.getLastKnownPort() != -1 ) {
+        } else if( PushPersistentStore.getLastKnownPort() != -1 ) {
             stopDaemon();
             EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), "Unregister push application".getBytes() );
             PushApplicationRegistry.unregisterApplication();
         }
 
-        PushListener2.setLastKnownType( -1 );
-        PushListener2.setLastKnownPort( -1 );
+        PushPersistentStore.setLastKnownType( -1 );
+        PushPersistentStore.setLastKnownPort( -1 );
 
     }
 

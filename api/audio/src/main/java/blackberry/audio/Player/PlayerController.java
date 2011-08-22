@@ -58,6 +58,7 @@ public class PlayerController implements ApplicationEventHandler {
     public PlayerController( final InputStream is, final String type, final boolean async ) throws Exception {
         _player = Manager.createPlayer( is, type );
         movePlayerToPrefetchedState( async );
+        EventService.getInstance().addHandler( ApplicationEventHandler.EVT_APP_EXIT, this );
     }
 
     private void movePlayerToPrefetchedState( final boolean async ) {
@@ -99,7 +100,7 @@ public class PlayerController implements ApplicationEventHandler {
     }
 
     private Boolean closePlayer() {
-        if( _player.getState() != PlayerController.PLAYER_CLOSED ) {
+        if( _player != null && _player.getState() != PlayerController.PLAYER_CLOSED ) {
             _player.close();
             return Boolean.TRUE;
         }

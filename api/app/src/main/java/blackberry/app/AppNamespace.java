@@ -15,6 +15,7 @@
 */
 package blackberry.app;
 
+import java.lang.ref.WeakReference;
 import java.util.Hashtable;
 
 import net.rim.device.api.browser.field2.BrowserField;
@@ -40,7 +41,7 @@ public final class AppNamespace extends Scriptable {
     public static final String FIELD_VERSION = "version";
 
     private Hashtable _fields;
-    private BrowserField _browserField;
+    private WeakReference _weakReferenceBrowserField;
 
     /**
      * Constructs AppNamespace object.
@@ -51,10 +52,10 @@ public final class AppNamespace extends Scriptable {
      *            The {@link WidgetConfig}
      */
     public AppNamespace( BrowserField browserField, WidgetConfig config ) {
-        _browserField = browserField;
+        _weakReferenceBrowserField = new WeakReference(browserField);;
         _fields = new Hashtable();
         _fields.put( SetHomeScreenNameFunction.NAME, new SetHomeScreenNameFunction() );
-        _fields.put( SetHomeScreenIconFunction.NAME, new SetHomeScreenIconFunction( _browserField ) );
+        _fields.put( SetHomeScreenIconFunction.NAME, new SetHomeScreenIconFunction( (BrowserField)_weakReferenceBrowserField.get()) );
         _fields.put( RequestForegroundFunction.NAME, new RequestForegroundFunction() );
         _fields.put( RequestBackgroundFunction.NAME, new RequestBackgroundFunction() );
         _fields.put( ExitFunction.NAME, new ExitFunction() );

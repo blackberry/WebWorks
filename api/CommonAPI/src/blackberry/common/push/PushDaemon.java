@@ -33,6 +33,7 @@ import net.rim.device.api.system.EventLogger;
 import net.rim.device.api.system.RuntimeStore;
 import net.rim.device.api.util.DataBuffer;
 import blackberry.common.util.ID;
+import blackberry.core.ApplicationRegistry;
 import blackberry.core.WidgetProperties;
 
 /**
@@ -42,6 +43,7 @@ import blackberry.core.WidgetProperties;
  * 
  */
 public class PushDaemon extends Application implements PushApplication {
+    
     // Registration status
     public static final int SUCCESS = 0;
     public static final int NETWORK_ERROR = 1;
@@ -54,6 +56,7 @@ public class PushDaemon extends Application implements PushApplication {
     private String _entryPage;
     private DaemonStore _daemonStore;
     private CommandListener _commandListener;
+    private ApplicationDescriptor _uiAppDesc;
 
     /**
      * Data object used between the daemon and widget to communicate
@@ -61,7 +64,6 @@ public class PushDaemon extends Application implements PushApplication {
     final public static class DaemonStore {
         private static final long DAEMON_STORE_ID;
         
-        private ApplicationDescriptor _uiAppDesc = null;
         private Vector _commandQueue;
         private Vector _messageQueue;
 
@@ -107,25 +109,6 @@ public class PushDaemon extends Application implements PushApplication {
             return _messageQueue;
         }
 
-        /**
-         * Get the app descriptor for the application expecting push notifications
-         * 
-         * @return app descriptor
-         */
-        public ApplicationDescriptor getUIAppDesc() {
-            return _uiAppDesc;
-        }
-
-        /**
-         * Set the app descriptor for the application expecting push notifications
-         * 
-         * @param uiAppDesc
-         *            app descriptor
-         */
-        public void setUIAppDesc( ApplicationDescriptor uiAppDesc ) {
-            _uiAppDesc = uiAppDesc;
-        }
-
     }
 
     /**
@@ -140,11 +123,13 @@ public class PushDaemon extends Application implements PushApplication {
         _entryPage = entryPage;
         _maxQueueCap = maxQueueCap;
 
-        _daemonStore = (DaemonStore) DaemonStore.loadFromStore();
+        _daemonStore = DaemonStore.loadFromStore();
         _daemonStore.getCommandQueue().removeAllElements(); // clear all commands
 
         _commandListener = new CommandListener();
         _commandListener.start();
+        
+        _uiAppDesc = new ApplicationDescriptor( ApplicationDescriptor.currentApplicationDescriptor(), PushPersistentStore.getAppDescArgs() );
         
         EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), "PushDaemon is started.".getBytes() );
     }
@@ -178,25 +163,24 @@ public class PushDaemon extends Application implements PushApplication {
 
     private void launchUI() {
         // launch UI if it is not running
-        ApplicationDescriptor uiAppDesc = _daemonStore.getUIAppDesc();
-        if( uiAppDesc != null && !isAppRunning( uiAppDesc ) ) {
-            ApplicationDescriptor newAppDesc = new ApplicationDescriptor( uiAppDesc, new String[] { _entryPage } );
+        EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "Check if application is running" ).getBytes(),
+                EventLogger.DEBUG_INFO );
+        if( !ApplicationRegistry.isAppRunning() ) {
+            EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "Launch application" ).getBytes(),
+                    EventLogger.DEBUG_INFO );
+            ApplicationDescriptor newAppDesc = new ApplicationDescriptor( _uiAppDesc, new String[] { _entryPage } );
             try {
-                ApplicationManager.getApplicationManager().runApplication( (ApplicationDescriptor) newAppDesc, false );
+                ApplicationManager.getApplicationManager().runApplication( newAppDesc, false );
             } catch( ApplicationManagerException e ) {
-                throw new RuntimeException( "Failed to launch UI application, details: " + e.getMessage() );
+                EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "Error launching UI" ).getBytes(),
+                        EventLogger.ERROR );
             }
         }
     }
 
-    private static boolean isAppRunning( ApplicationDescriptor desc ) {
-        ApplicationManager mgr = ApplicationManager.getApplicationManager();
-        return mgr.getProcessId( desc ) != -1;
-    }
-
     private void handleMessage( PushInputStream inputStream, StreamConnection conn ) {
 
-        EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "handleMessage is called." ).getBytes() );
+        EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "handleMessage is called." ).getBytes(), EventLogger.DEBUG_INFO );
         
         DataBuffer db = null;
         try {
@@ -259,7 +243,7 @@ public class PushDaemon extends Application implements PushApplication {
         boolean simChange = false;
         int status = applicationStatus.getStatus();
 
-        EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "handleStatusChange is called, status:" + status ).getBytes() );
+        EventLogger.logEvent( WidgetProperties.getInstance().getGuid(), ( "handleStatusChange is called, status:" + status ).getBytes(), EventLogger.DEBUG_INFO );
 
         if( status == PushApplicationStatus.STATUS_ACTIVE ) {
             result = SUCCESS;
@@ -349,4 +333,4 @@ public class PushDaemon extends Application implements PushApplication {
             System.exit( 0 );
         }
     }
-}
+ }
