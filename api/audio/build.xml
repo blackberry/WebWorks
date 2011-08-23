@@ -1,0 +1,33 @@
+<project name="Audio Extension" basedir="." default="BuildAudioExtension">
+   <echo>
+      Building Audio Extension...
+   </echo>
+   
+   <property name="dependencies.location" location="${basedir}/../../api-builds/extensions_workspace/dependencies" />
+   <property name="doc.dir" location="${basedir}/../../api-docs/blackberry/audio"/>
+   <property name="core.dir" location="../CommonAPI/src/blackberry/core"/>
+   <property name="common.dir" location="../CommonAPI/src/blackberry/common"/>
+   <property name="util.dir" location="${common.dir}/util"/>
+   <property name="delivery.dir" location="${basedir}/../../api-builds/extensions_workspace/output" />
+   <property name="extension.app.dir" location="${delivery.dir}/blackberry.audio" />
+  
+   <import file="${basedir}/../../api-builds/extensions/buildJava.xml" as="java"/>
+  
+   <target name="init">
+      <delete dir="${build.dir}"/>
+      <mkdir dir="${build.dir}"/>
+      <copy tofile="${build.dir}/src/blackberry/common/util/FeaturesHash.java" file="${util.dir}/FeaturesHash.java"/>
+      <copy tofile="${build.dir}/src/blackberry/core/FunctionSignature.java" file="${core.dir}/FunctionSignature.java"/>
+      <copy tofile="${build.dir}/src/blackberry/core/ScriptableFunctionBase.java" file="${core.dir}/ScriptableFunctionBase.java"/>
+    <copy tofile="${build.dir}/src/blackberry/core/EventService.java" file="${core.dir}/EventService.java"/>
+   	<copy tofile="${build.dir}/src/blackberry/core/ApplicationEventHandler.java" file="${core.dir}/ApplicationEventHandler.java"/>
+   	<copy todir="${build.dir}/src">
+         <fileset dir="${basedir}/src"/>
+      </copy>
+   </target>
+  
+   <target name="BuildAudioExtension" depends="init">
+      <antcall target="java.build"/>
+      <antcall target="java.package"/>
+   </target>
+</project>

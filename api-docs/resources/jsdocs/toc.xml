@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toc>
+	<section title="Extensions API Reference" >
+	<!--
+		<item topic="Accelerometer Extension"  safeName="accelerometer">
+			<api>blackberry.accelerometer</api>
+			<api>blackberry.accelerometer.Orientation</api>
+			<api>blackberry.accelerometer.XYZSample</api>
+		</item>
+      
+		<item topic="Notification Extension"  safeName="notification">
+			<api>blackberry.notification</api>
+		</item>
+      
+		<item topic="Status Extension"  safeName="status">
+			<api>blackberry.status</api>
+			<api>blackberry.status.Battery</api>
+		</item>
+    -->
+      
+		<item topic="Audio Extension"  safeName="audio" apiJarName="audio_api" extension="true">
+			<api>blackberry.audio</api>
+			<api>blackberry.audio.Player</api>
+		</item>
+		
+		<item topic="Phone Extension"  safeName="phone" apiJarName="phone_api" extension="true">
+			<api>blackberry.phone.Phone</api>
+			<api>blackberry.phone.Phone.Call</api>
+			<api>blackberry.phone.PhoneLogs</api>
+			<api>blackberry.phone.PhoneLogs.CallLog</api>
+			<api>blackberry.phone.Find.FilterExpression</api>
+		</item>
+		<item topic="SMS Extension"  safeName="sms" apiJarName="message_api" extension="true">
+			<api>blackberry.message.sms</api>
+		</item>	
+	</section>
+	
+	<section title="API Reference">
+		<item topic="Application"  safeName="app">
+			<api>blackberry.app</api>
+			<api>blackberry.app.event</api>
+		</item>
+		
+		<item topic="Browser Native"  safeName="browser">
+			<api>blackberry</api>
+			<api>blackberry.location</api>
+		</item>
+		
+		<item topic="File I/O"  safeName="io" >
+			<api>blackberry.io.dir</api>
+			<api>blackberry.io.file</api>
+			<api>blackberry.io.file.FileProperties</api>
+		</item>
+		
+		<item topic="Find"  safeName="find" >
+			<api>blackberry.find.FilterExpression</api>
+		</item>
+		
+		<item topic="Identity"  safeName="identity" >
+			<api>blackberry.identity</api>
+			<api>blackberry.identity.phone</api>
+			<api>blackberry.identity.Service</api>
+			<api>blackberry.identity.Transport</api>
+		</item>
+		
+		<item topic="Invoke"  safeName="invoke" >
+			<api>blackberry.invoke</api>
+			<api>blackberry.invoke.AddressBookArguments</api>
+			<api>blackberry.invoke.BrowserArguments</api>
+			<api>blackberry.invoke.CalendarArguments</api>
+			<api>blackberry.invoke.CameraArguments</api>
+			<api>blackberry.invoke.JavaArguments</api>
+			<api>blackberry.invoke.MapsArguments</api>
+			<api>blackberry.invoke.MemoArguments</api>
+			<api>blackberry.invoke.MessageArguments</api>
+			<api>blackberry.invoke.PhoneArguments</api>
+			<api>blackberry.invoke.SearchArguments</api>
+			<api>blackberry.invoke.TaskArguments</api>
+		</item>
+		
+		<item topic="Messaging"  safeName="message" >
+			<api>blackberry.message.Message</api>
+		</item>
+		
+		<item topic="PIM"  safeName="pim" >
+			<api>blackberry.pim.Address</api>
+			<api>blackberry.pim.Appointment</api>
+			<api>blackberry.pim.Attendee</api>
+			<api>blackberry.pim.category</api>
+			<api>blackberry.pim.Contact</api>
+			<api>blackberry.pim.Memo</api>
+			<api>blackberry.pim.Recurrence</api>
+			<api>blackberry.pim.Reminder</api>
+			<api>blackberry.pim.Task</api>
+		</item>
+		
+		<item topic="Push Data"  safeName="push" >
+			<api>blackberry.push</api>
+			<api>blackberry.push.Data</api>
+		</item>
+		
+		<item topic="System"  safeName="system" >
+			<api>blackberry.system</api>
+			<api>blackberry.system.event</api>
+		</item>
+		
+		<item topic="User Interface"  safeName="ui" >
+			<api>blackberry.ui.dialog</api>
+			<api>blackberry.focus</api>
+			<api>blackberry.ui.menu</api>
+			<api>blackberry.ui.menu.MenuItem</api>
+		</item>
+		
+		<item topic="Utilities"  safeName="utils" >
+			<api>blackberry.utils</api>
+			<api>blackberry.utils.URL</api>
+		</item>
+		
+		<item topic="Widget Cache"  safeName="widgetcache" >
+			<api>blackberry.widgetcache</api>
+			<api>blackberry.widgetcache.CacheInformation</api>
+		</item>
+	</section>
+</toc>

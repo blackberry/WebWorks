@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: BlackBerry WebWorks SDK Plug-in
+Bundle-SymbolicName: net.rim.browser.tools.wcpc;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: net.rim.browser.tools.wcpc.WcpcPlugin
+Bundle-Vendor: Research In Motion
+Require-Bundle: org.eclipse.core.runtime,
+ net.rim.browser.tools.debug
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

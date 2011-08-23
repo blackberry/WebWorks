@@ -1,0 +1,25 @@
+<project name="BuildLibrary" basedir=".">
+
+    <property name="rapc.executable" value="${dependencies.location}/rapc.exe" />
+    <property name="rapc.file" value="${dependencies.location}/RegularProject.rapc" />
+    <property name="build.dir" location="${basedir}/build" />
+	
+    <property name="rapc.imports" value="${net.rim.api.jar};${lbstest.jar}" />
+    <property name="application.type" value="library" />
+	
+    <target name="executeRapc" if="cod.name">
+        <echo>Invoking RAPC build...</echo>
+        <apply executable="${rapc.executable}" dir="${build.dir}" parallel="true" failonerror="true">
+            <arg value="-noshortname" />
+            <arg value="-quiet" />
+            <arg value='-import=${rapc.imports}' />
+            <arg value='-${application.type}=${cod.name}' />
+            <arg value='${rapc.file}' />
+            
+            <dirset dir="${build.dir}">
+                <include name="**/bin" />
+                <include name="**/res" />
+            </dirset>
+        </apply>
+    </target>
+</project>

@@ -1,0 +1,35 @@
+<project name="BuildJava" basedir=".">
+   <property name="net.rim.api.jar" location="${dependencies.location}/net_rim_api.jar" />
+   <property name="build.dir" location="${basedir}/build" />
+   <property name="class.output.folder" value="${build.dir}/bin" />
+   <property name="build.src.dir" location="${build.dir}/src" />
+   <property name="src.dir" location="${basedir}/src" />
+   
+   <!-- Classpath definition -->
+   <path id="java.cp">
+      <pathelement location="${net.rim.api.jar}"/>
+   </path>
+   
+   <target name="cleanOutput">
+      <delete dir="${class.output.folder}" />
+      <mkdir dir="${class.output.folder}" />
+   </target>
+	
+   <target name="build" depends="cleanOutput">
+      <javac srcdir="${build.src.dir}" destdir="${class.output.folder}" includeAntRuntime="false" includeJavaRuntime="false" failonerror="true" source="1.3" target="1.1" verbose="true" bootclasspathref="java.cp">
+         <classpath refid="java.cp"/>
+      </javac>
+   </target>
+   
+   <target name="package">
+      <delete dir="${extension.app.dir}" />
+      <mkdir dir="${extension.app.dir}" />
+      <copy todir="${extension.app.dir}">
+         <fileset dir="${src.dir}" />
+      </copy>
+      <copy todir="${extension.app.dir}">
+         <fileset dir="${doc.dir}" />
+      </copy>
+   </target>
+	
+</project>

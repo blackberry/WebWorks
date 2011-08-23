@@ -1,0 +1,40 @@
+<project name="Web API Extensions" basedir=".">
+    <property file="${basedir}/build.properties" />
+	
+	<target name="init.dependencies">
+		<copy todir="${external.dependencies.dir}" flatten="true">
+			<fileset dir="${jde.dir}/bin" includes="JavaLoader.exe, rapc.jar, rapc.exe, preverify.exe, SignatureTool.jar" />
+			<fileset dir="${jde.dir}/lib" includes="net_rim_api.jar" />
+		</copy>
+	</target>
+	
+    <target name="init.api.build">
+        <delete file="${extensions.archive}" />
+        <delete dir="${workspace.dir}" />
+        <mkdir dir="${workspace.dir}" />
+        <mkdir dir="${output.dir}" />
+        <mkdir dir="${dependencies.dir}" />
+        <mkdir dir="${ondevice.output.dir}" />
+		<mkdir dir="${external.dependencies.dir}" />
+
+		<antcall target="init.dependencies" />
+		
+		<copy todir="${dependencies.dir}" flatten="true">
+            <fileset dir="${external.dependencies.dir}">
+                <include name="net_rim_api.jar" />
+            </fileset>
+        </copy>
+    </target>
+	
+    <target name="build.apiExtensions">
+        <echo>Building API Extensions...</echo>
+        <subant>
+            <fileset dir="${api.location}" includes="**/build.xml" excludes="**/bin/build.xml" />
+        </subant>
+    </target>
+	
+    <target name="package.apiExtensions">
+        <echo>Packaging extensions to ${extensions.archive}...</echo>
+        <zip destfile="${extensions.archive}" basedir="${output.dir}" />
+    </target>
+</project>
