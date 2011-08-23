@@ -1,0 +1,16 @@
+<project name="tumbler" basedir="." default="relocation">
+   
+   <property name="projects.tumbler.dir" location="C:/projects/tumbler-2.0" />
+   
+   <target name="relocation"> 
+      <echo>clean up all the folder...</echo>
+      <delete dir="${projects.tumbler.dir}" />
+      
+      <echo>Creating the work folder...</echo>
+      <mkdir dir="${projects.tumbler.dir}" />
+      
+      <copy todir="${projects.tumbler.dir}" overwrite="yes">
+         <fileset dir="${basedir}/.." />
+      </copy>
+   </target>
+</project>

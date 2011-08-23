@@ -1,0 +1,73 @@
+<project name="BuildDocs" basedir=".">
+	
+	<property name="docs.properties.file" location="${basedir}/build.properties" />
+	<property file="${docs.properties.file}" />
+	
+	<target name="init">
+      <delete file="${js_main_dir}/docs.zip" />
+      
+		<delete dir="${docs.deploy.local.dir}" />
+		<mkdir dir="${docs.deploy.local.dir}" />
+		
+		<copy todir="${docs.deploy.local.dir}">
+			<fileset dir="${jsdocs.html.dir}" includes="*" />
+		</copy>
+	</target>
+	
+	<target name="concatenate.libraries" depends="init">
+		<java jar="${saxon.jar}" dir="${basedir}" fork="true" failonerror="true">
+			<arg value="-s:${library.concat.manifest}" />
+			<arg value="-xsl:${library.concat.xsl}" />
+			<arg value="-o:${library.concat.output}" />
+		</java>
+	</target>
+	
+	<target name="build.docs" depends="concatenate.libraries">
+		<echo>Generating table of contents page:</echo>
+		<echo>Transforming ${toc.xml} with ${toc.xsl} to ${toc.html}</echo>
+		<java dir="${basedir}" jar="${saxon.jar}" fork="true" failonerror="true">
+			<arg value="-s:${toc.xml}" />
+			<arg value="-xsl:${toc.xsl}" />
+			<arg value="-o:${toc.html}" />
+		</java>
+		
+		<echo>Generating library summary document:</echo>
+		<echo>Transforming ${toc.xml} with ${summary.xsl} to ${summary.xml}</echo>
+		<java dir="${basedir}" jar="${saxon.jar}" fork="true" failonerror="true">
+			<arg value="-s:${toc.xml}" />
+			<arg value="-xsl:${summary.xsl}" />
+			<arg value="-o:${summary.xml}" />
+		</java>
+		
+		<echo>Generating summary pages:</echo>
+		<echo>Transforming ${summary.xml} with ${html.summary.xsl}</echo>
+		<java dir="${basedir}" jar="${saxon.jar}" fork="true" failonerror="true">
+			<arg value="-s:${summary.xml}" />
+			<arg value="-xsl:${html.summary.xsl}" />
+			<arg value="outputFolder=${docs.deploy.local.dir}" />
+		</java>
+		
+		<echo>Generating detail pages:</echo>
+		<echo>Transforming ${summary.xml} with ${html.detail.xsl}</echo>
+		<java dir="${basedir}" jar="${saxon.jar}" fork="true" failonerror="true">
+			<arg value="-s:${summary.xml}" />
+			<arg value="-xsl:${html.detail.xsl}" />
+			<arg value="outputFolder=${docs.deploy.local.dir}" />
+		</java>
+		
+	</target>
+	
+	<target name="package" depends="build.docs">
+		<zip basedir="${docs.deploy.local.dir}" destfile="docs.zip" />
+	</target>
+	
+	<target name="deploy">
+		<copy todir="${docs.deploy.location}">
+			<fileset dir="${docs.deploy.local.dir}" />
+		</copy>
+	</target>
+	
+	<target name="cleanup">
+		<delete file="${summary.xml}" quiet="true" />
+	</target>
+</project>

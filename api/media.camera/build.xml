@@ -1,0 +1,27 @@
+<project name="Camera Extension" basedir="." default="BuildMediaExtension">
+  <echo>
+    Building Camera Extension...
+  </echo>
+  
+  <property name="dependencies.location" location="${basedir}/../../api-builds/extensions_workspace/dependencies"/>
+  <property name="doc.dir" location="${basedir}/../../api-docs/blackberry/media"/>
+  <property name="common.dir" location="../CommonAPI/src"/>
+  <property name="delivery.dir" location="${basedir}/../../api-builds/extensions_workspace/output"/>
+  <property name="extension.app.dir" location="${delivery.dir}/blackberry.media.camera"/>
+  
+  <import file="${basedir}/../../api-builds/extensions/buildJava.xml" as="java"/>
+  
+  <target name="init">
+    <delete dir="${build.dir}"/>
+    <mkdir dir="${build.dir}"/>
+    <copy todir="${build.dir}/src">
+      <fileset dir="${common.dir}"/>
+      <fileset dir="${basedir}/src"/>
+    </copy>
+  </target>
+  
+  <target name="BuildMediaExtension" depends="init">
+    <antcall target="java.build"/>
+    <antcall target="java.package"/>
+  </target>
+</project>

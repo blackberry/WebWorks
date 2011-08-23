@@ -1,0 +1,150 @@
+﻿.wiki-content p {
+        margin: 10px 0;
+        padding: 0;
+        }
+
+        .wiki-content,
+        .wiki-content p,
+        .wiki-content table,
+        .wiki-content tr,
+        .wiki-content td,
+        .wiki-content th,
+        .wiki-content ol,
+        .wiki-content ul,
+        .wiki-content li {
+        font-size: 10pt;
+        line-height: 13pt;
+        }
+
+        body, p, td, table, tr, .bodytext, .stepfield {
+        font-size: 8.5pt;
+        font-family: Verdana;
+        line-height: 1.3;
+        color: #484848;
+        font-weight: normal;
+        }
+
+        .wiki-content .confluenceTable, .grid {
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding: 0;
+        }
+
+        table.confluenceTable {
+        margin: 5px;
+        border-collapse: collapse;
+        }
+
+        table {
+        clear: left;
+        }
+
+        th.confluenceTh, table.confluenceTable th.confluenceTh {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        background-color: #f0f0f0;
+        text-align: left;
+        vertical-align: top;
+        }
+
+        .wiki-content th.confluenceTh {
+        margin: 0;
+        padding: 0;
+        color: #484848;
+        }
+
+        td.confluenceTd, td.confluenceTd {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        vertical-align: top;
+        }
+
+        table.confluenceTable  {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        vertical-align: top;
+        width :70%;
+        }
+
+        .wiki-content td.confluenceTd {
+        margin: 0;
+        padding: 0;
+        padding-right: 10px;
+        }
+
+        div.title {
+        font-weight : bold;
+        font-size: 12pt;
+        }
+
+        div.smallTitle {
+        font-weight : bold;
+        font-size: 10pt;
+        }
+
+        table.scriptTable {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        vertical-align: top;
+        margin: 5px;
+        width : 70%;
+        background-color: #F5F5F5;
+        }
+
+        td.scriptTd {
+        color: #484848;
+        vertical-align: top;
+        background-color: #F5F5F5;
+        }
+
+        table.functionTable  {
+        border-collapse: collapse;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        margin: 5px;
+        vertical-align: top;
+        width :800px;
+        }
+
+        td.functionHeaderTd {
+        color: #484848;
+        vertical-align: top;
+        background-color: #F5F5F5;
+        }
+
+        td.functionTd {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        vertical-align: top;
+        width : 720px;
+        }
+
+        td.functionCol1Td {
+        border-width: 1px;
+        border-style: solid;
+        border-color: #ccc;
+        padding: 5px;
+        vertical-align: center;
+        width : 80px;
+        }
+
+        A:link {text-decoration: underline; color: #484848}
+        A:visited {text-decoration: underline; color: #484848}
+        A:hover {text-decoration: underline; color: navy;}
+
+        A.details:link {text-decoration: underline; color: blue}
+        A.details:visited {text-decoration: underline; color: blue}

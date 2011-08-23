@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   
+   <parent>
+      <groupId>net.rim.webworks</groupId>
+      <artifactId>webworks</artifactId>
+      <version>${PRODUCT_VERSION}</version>
+   </parent>
+   
+   <artifactId>build</artifactId>
+
+   <packaging>pom</packaging>
+   
+   
+   
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+   
+   <dependencies>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>3.8.1</version>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+            <groupId>net.rim.webworks</groupId>
+            <artifactId>net_rim_api</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/../api/lib/net_rim_api.jar</systemPath>
+      </dependency>
+   </dependencies>
+   
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <configuration>
+                     <target>
+                        <ant antfile="${basedir}/build.xml">
+                           <target name="dependencies" />
+                           <target name="init" />
+                           <target name="buildTumblerJar" />
+                           <target name="buildLauncher" />
+                           <target name="buildDocs" />
+                           <target name="buildInstallerDependancies" />
+                           <target name="buildInstaller" />
+                           <!-- <target name="buildEclipsePlugin" /> -->
+                           <target name="buildMiniBBWP" /> <!--build a shrinked bbwp.zip for other SCM build products-->
+                        </ant>
+                     </target>
+                  </configuration>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+</project>

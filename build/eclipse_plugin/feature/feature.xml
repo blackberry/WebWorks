@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="net.rim.browser.tools.wcpc.feature"
+      label="BlackBerry WebWorks SDK"
+      version="1.0.0"
+      provider-name="Research In Motion"
+      plugin="net.rim.browser.tools.wcpc">
+
+   <description>
+      BlackBerry WebWorks SDK
+   </description>
+
+   <copyright>
+      (c) Copyright Research In Motion Limited 2010.  All rights reserved.
+Portions copyright:
+(c) Copyright Eclipse contributors and others 2000, 2004.  All
+rights reserved.
+Visit http://www.eclipse.org/platform
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <plugin
+         id="net.rim.browser.tools.wcpc"
+         download-size="0"
+         install-size="0"
+         version="1.0.0"/>
+
+</feature>

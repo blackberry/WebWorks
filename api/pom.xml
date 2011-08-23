@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   
+   <!-- The Basics -->
+   <parent>
+      <groupId>net.rim.webworks</groupId>
+      <artifactId>webworks</artifactId>
+      <version>${PRODUCT_VERSION}</version>
+   </parent>
+   
+   <artifactId>api</artifactId>
+
+   <packaging>pom</packaging>
+   
+   <modules>
+      <module>app</module>
+      <module>audio</module>
+      <module>dialog</module>
+      <module>find</module>
+      <module>identity</module>
+      <module>invoke</module>
+      <module>io</module>
+      <module>media.camera</module>
+      <module>media.microphone</module>
+      <module>menu</module>
+      <module>message</module>
+      <module>messaging</module>
+      <module>phone</module>
+      <module>pim</module>
+      <module>push</module>
+      <module>system</module>
+      <module>utils</module>
+   </modules>
+   
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+   
+   <dependencies>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>3.8.1</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+   
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <configuration>
+                     <target>
+                        <copy todir="${basedir}/lib">
+                           <fileset dir="//rim.net/software/SQA_Builds/JDE/5.0.0/Deliverables/JDE_RUNTIME/bundle047/Release_x" includes="*.jar" />
+                        </copy>
+                     </target>
+                  </configuration>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+</project>

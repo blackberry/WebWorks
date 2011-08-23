@@ -1,0 +1,82 @@
+<project name="Web API Extensions" basedir=".">
+    <property file="${basedir}/build.properties" />
+	
+    <target name="init.api.build">
+        <delete file="${extensions.archive}" />
+        <delete dir="${workspace.dir}" />
+        <mkdir dir="${workspace.dir}" />
+        <mkdir dir="${output.dir}" />
+        <mkdir dir="${dependencies.dir}" />
+        
+        <copy todir="${dependencies.dir}" flatten="true">
+            <fileset dir="${jde.scm.dir}">
+                <include name="JDE_RUNTIME/bundle${jde.bundle}/Release_x/*.jar"/>
+            </fileset>
+        </copy>
+    </target>
+	
+    <target name="init.test.build">
+        <delete dir="${workspace.dir}" />
+        <mkdir dir="${workspace.dir}" />
+        <mkdir dir="${output.dir}" />
+        <mkdir dir="${dependencies.dir}" />
+        <mkdir dir="${simpack.dir}" />
+		
+        <copy todir="${dependencies.dir}" flatten="true">
+            <fileset dir="${jde.scm.dir}">
+                <include name="JDE_RUNTIME/bundle${jde.bundle}/Internal/*.jar"/>
+                <include name="JDE/bundle${jde.bundle}/JDETree/bin/rapc*"/>
+                <include name="JDE/bundle${jde.bundle}/JDETree/bin/preverify*"/>
+                <include name="JDE_SIMPKG/bundle${jde.bundle}/Distributable/*simpackage.fledge_JDE.zip"/>
+            </fileset>
+            <fileset dir="${lib}" includes="*.rapc" />
+        </copy>
+		
+        <unzip dest="${simpack.dir}">
+            <fileset dir="${dependencies.dir}" includes="*.zip" />
+        </unzip>
+    </target>
+	
+    <target name="build.lbsTest">
+        <echo>Building LBS Test Library...</echo>
+        <subant>
+            <fileset dir="${tests.location}/lbstest" includes="**/build.xml" excludes="**/bin/build.xml" />
+        </subant>
+		
+        <copy file="${tests.location}/lbstest/build/lbstest.jar" todir="${dependencies.dir}" />
+    </target>
+	
+    <target name="build.appRunner">
+        <echo>Building App Runner...</echo>
+        <subant>
+            <fileset dir="${tests.location}/AppRunner" includes="**/build.xml" excludes="**/bin/build.xml" />
+        </subant>
+    </target>
+	
+    <target name="build.apiExtensions">
+        <echo>Building API Extensions...</echo>
+        <subant>
+            <fileset dir="${api.location}" includes="**/build.xml" excludes="**/bin/build.xml" />
+        </subant>
+    </target>
+	
+    <target name="build.apiExtensionsTests">
+        <echo>Building Extensions Tests...</echo>
+        <subant>
+            <fileset dir="${tests.location}" includes="**/*tests/build.xml" excludes="**/*tests/bin/build.xml" />
+        </subant>
+    </target>
+	
+    <target name="package.apiExtensions">
+        <echo>Packaging extensions to ${extensions.archive}...</echo>
+        <zip destfile="${extensions.archive}" basedir="${output.dir}" />
+    </target>
+		
+    <target name="launchFledge">
+        <echo>Launching Fledge...</echo>
+        <exec executable="${simpack.dir}/fledge.exe" dir="${simpack.dir}" failonerror="true">
+            <arg value="/handheld=9700" />
+        </exec>
+    </target>
+    
+</project>

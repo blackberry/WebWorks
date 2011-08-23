@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Tumbler Eclipse Plugin Build" default="dist-full" basedir=".">
+
+	<tstamp>
+	   <format property="start.timestamp" pattern="yyyyMMddHHmm" />
+	</tstamp>
+	<!-- loads the settings file properties -->
+	<!-- the default property file name, we can override it for dev, scm, etc.  -->
+	<property name="propFileName" value="settings.properties"/> 
+	<loadproperties>
+		<file file="${propFileName}"/>
+	</loadproperties>
+
+	<property name="build.dir" location="${basedir}/build"/>
+	<property name="output.dir" location="${basedir}/output"/>
+	<property name="eclipse.installation.dir" location="${basedir}/fakeEclipseInstall" />
+	<property name="scm.ninja.dir" location="${basedir}/ninja" />
+	<property name="scm.bbeula.dir" value="bbeula" /> <!-- the default value-->
+	<property name="scm.bbeula.license.filename" value="SDK_license_English" />
+
+	<property name="wcpcPlugin-name" value="net.rim.browser.tools.wcpc" />
+	<property name="wcpcfeature-name" value="net.rim.browser.tools.wcpc.feature" />
+
+    <!-- Note: values of following properties will be dynamically changed by our customized ant task TimeStampedSCMProductVersionGenerator -->
+	<property name="wcpc.timestampedversion" value="empty"/>
+
+	<!--====================clean build and output dirs==================================================================================-->
+	<target name="clean">
+		<echo message="clean build and output dirs"/>
+		<delete dir="${build.dir}" quiet="true"/>
+		<delete dir="${output.dir}" quiet="true"/>
+	</target>
+
+	<!--====================add our tasks==================================================================================-->
+	<target name="addTasks">
+		<echo message="add our tasks"/>
+
+	    <path id="lib.path">
+		  <fileset dir="lib" includes="*.jar"/>
+	    </path>
+
+		<taskdef name="generateTimeStampedVersion4SCMProduct" 
+			classname="net.rim.browser.tools.anttasks.TimeStampedSCMProductVersionGenerator" 
+			classpathref="lib.path" /> 
+		
+		<taskdef name="pluginConfiguration" 
+			classname="net.rim.browser.tools.anttasks.PluginConfiguration" 
+			classpathref="lib.path" /> 
+
+		<taskdef name="featureConfiguration" 
+			classname="net.rim.browser.tools.anttasks.FeatureConfiguration" 
+			classpathref="lib.path" /> 
+
+		<taskdef name="configureSimulator" 
+			classname="net.rim.browser.tools.anttasks.simulator.ConfigureSimulatorTask" 
+			classpathref="lib.path" /> 
+
+		<taskdef name="MDSCSConfiguration" 
+			classname="net.rim.browser.tools.anttasks.MDSCSConfiguration" 
+			classpathref="lib.path" /> 
+
+	</target>
+
+
+	<!--==============init==============================================================================================-->
+	<target name="init" depends="clean, addTasks">
+		<echo message="ant.java.version= ${ant.java.version}"/>
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${output.dir}"/>
+	</target>
+
+
+	<target name="dist-full" depends="init">
+		<unzip src="${scm.wcpc.dir}/bbwp.zip" dest="${basedir}" overwrite="true">
+		    <patternset>
+				<include name="version.properties"/>
+		    </patternset>
+		</unzip>
+
+		<!-- retrieve scm.wcpc.version.internal property -->
+		<loadproperties>
+			<file file="${basedir}/version.properties"/>
+		</loadproperties>
+
+		<generateTimeStampedVersion4SCMProduct productPluginName="${wcpcPlugin-name}"
+			productVersion="${scm.wcpc.version.internal}"
+			timeStamp="${start.timestamp}"
+			timeStampedProductVersionPropertyName="wcpc.timestampedversion" />
+		<echo message="***wcpc time stamped version: ${wcpc.timestampedversion}"/>
+
+		<!-- create feature for tumbler -->
+		<antcall target="createFeature"/>
+
+		<!-- create plugin for tumbler -->
+		<antcall target="createPlugin"/>
+
+		<!-- create site.xml for tumbler -->
+		<antcall target="createSiteXml"/>
+	</target>
+		
+	
+	<target name="createPlugin">
+		<property name="local.plugin.dir" value="${build.dir}/${wcpcPlugin-name}"/>
+		<mkdir dir="${local.plugin.dir}"/>
+		<copy todir="${local.plugin.dir}">
+			<fileset dir="${basedir}/plugin" includes="**/*.*" />
+		</copy>
+
+		<!--unzips wcpc package to the wcpc folder -->
+		<unzip dest="${local.plugin.dir}/wcpc">
+			<fileset dir="${scm.wcpc.dir}">
+			        <include name="bbwp.zip"/>
+			 </fileset>
+		</unzip>
+
+		<!-- Configure simulator: Modify the device xml files to add the application ninjaengine.cod -->
+		<configureSimulator tumblerRootDir="${local.plugin.dir}/wcpc" 
+			ninjaCodeLinesRootDir="${scm.ninja.dir}"/>
+
+		<!-- Configure MDS-CS: change port to 28080 -->
+		<MDSCSConfiguration MdscsDir="${local.plugin.dir}/wcpc/mds" />
+
+		<!-- update about.mappings file-->
+		<propertyfile file="${local.plugin.dir}/about.mappings">
+			<entry  key="0" value="${wcpc.timestampedversion}"/>
+		</propertyfile>
+
+		<!-- update plugin manifest -->
+		<pluginConfiguration pluginDir="${local.plugin.dir}" pluginVersionNumber="${wcpc.timestampedversion}" handleRequiredBundle="false" /> 
+
+		<!-- create plugin jar file-->
+		<jar destfile="${output.dir}/${wcpcPlugin-name}_${wcpc.timestampedversion}.jar" 
+			basedir="${local.plugin.dir}" 
+			manifest="${local.plugin.dir}/META-INF/MANIFEST.MF">
+		</jar>
+	</target>
+
+	<target name="createFeature">
+		<property name="local.feature.dir" value="${build.dir}/${wcpcfeature-name}"/>
+		<mkdir dir="${local.feature.dir}"/>
+		<copy todir="${local.feature.dir}">
+			<fileset dir="${basedir}/feature" includes="*.*" />
+			<fileset dir="${scm.bbeula.dir}" includes="${scm.bbeula.license.filename}.html" />
+		</copy>
+
+		<!-- update feature.xml -->
+		<featureConfiguration featureDir="${local.feature.dir}" 
+			featureVersionNumber="${wcpc.timestampedversion}" 
+			includedPluginVersionNumber="${wcpc.timestampedversion}" handleRequiredBundle="false"
+			licenseFilePath = "${scm.bbeula.dir}"
+			licenseFileName = "${scm.bbeula.license.filename}"/>
+		
+		<!-- create feature jar file -->
+		<jar destfile="${output.dir}/${wcpcfeature-name}_${wcpc.timestampedversion}.jar"
+			basedir="${local.feature.dir}">
+		</jar>
+	</target>
+
+	<target name="createSiteXml">
+		<copy todir="${output.dir}">
+			<fileset dir="${basedir}/updatesite" includes="site.xml" />
+		</copy>
+
+		<replace file="${output.dir}/site.xml" token="#WCPC_VERSION#" value="${wcpc.timestampedversion}"/>
+	</target>
+
+</project>
