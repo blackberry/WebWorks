@@ -24,9 +24,11 @@ import net.rim.tumbler.exception.CommandLineException;
 import net.rim.tumbler.exception.PackageException;
 import net.rim.tumbler.log.LogType;
 import net.rim.tumbler.log.Logger;
+import net.rim.tumbler.os.OperatingSystems;
 import net.rim.tumbler.session.SessionManager;
 
 public class CmdLineHandler {
+    private static final String         EXE_SUFFIX = ".exe";
     private static final String         FILE_SEP = System.getProperty("file.separator");
     private static final String         OPTION_SOURCEDIR = "/s";
     private static final String         OPTION_PASSWORD = "/g";    
@@ -120,6 +122,11 @@ public class CmdLineHandler {
     }
       
     private String getAbsolutePath(String filePath) {
+        
+        if( !OperatingSystems.isWindows() && filePath.endsWith( EXE_SUFFIX )){
+            filePath = filePath.replace( EXE_SUFFIX, "" );
+        }
+        
         try {
             return (new File(filePath)).getCanonicalFile().getAbsolutePath();
         } catch (Exception e) {
@@ -182,7 +189,13 @@ public class CmdLineHandler {
 
         // Populate correct source directory
         if (!_requireSource) {
-            _sourceDir = System.getProperty("java.io.tmpdir") + "widgetGen."
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            if( !tmpDir.endsWith( File.separator ) && !OperatingSystems.isWindows() ) {
+                // we probably won't have permissions to create a new top-level directory, so ensure the generated _sourceDir is under the existing tmpDir.
+                tmpDir += File.separator;
+            }
+            
+            _sourceDir = tmpDir + "widgetGen."
                     + new Random().nextInt(2147483647) + new Date().getTime()
                     + ".tmp";
         } else {

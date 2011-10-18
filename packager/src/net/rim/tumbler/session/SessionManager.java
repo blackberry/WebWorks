@@ -169,8 +169,9 @@ public class SessionManager {
         if (home.equals("")) {
             return System.getProperty("user.dir");
         } else {
+            
             return home
-                    .substring(0, home.lastIndexOf("\\bin"));
+                .substring(0, home.lastIndexOf(File.separator + "bin"));
         }
     }
     

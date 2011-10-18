@@ -241,6 +241,7 @@ import java.util.Vector;
 
 import net.rim.tumbler.config.WidgetConfig;
 import net.rim.tumbler.file.FileManager;
+import net.rim.tumbler.os.OperatingSystems;
 import net.rim.tumbler.session.BBWPProperties;
 import net.rim.tumbler.session.SessionManager;
 
@@ -263,6 +264,7 @@ public class Rapc {
     private String              _className;
     private String              _codeName;
     private String              _additional;
+    private String              _previfyDirectory;
     private String              _javac;
 
     // Paths
@@ -291,6 +293,7 @@ public class Rapc {
 			}
 		}
         
+		_previfyDirectory = bbwpProperties.getPreverifyDirectory();
         _javac = bbwpProperties.getJavac();
         _cwd = SessionManager.getInstance().getSourceFolder();
         _codeName = SessionManager.getInstance().getArchiveName();
@@ -328,13 +331,27 @@ public class Rapc {
         }
 
         if (_imports.size() > 0) {
-            param.append("-import=\"");
+            param.append("-import=");
+            if( OperatingSystems.isWindows() ) {
+                param.append("\"");
+            }
+            
             for (int i = 0; i < _imports.size(); ++i) {
                 param.append(_imports.get(i));
                 if (i < _imports.size() - 1 && _imports.size() != 1)
                     param.append(";");
             }
-            param.append("\" ");
+            
+            if( OperatingSystems.isWindows() ) {
+                param.append( "\"" );
+            }
+            param.append(" ");
+        }
+
+        if ( _previfyDirectory != null && !_previfyDirectory.trim().isEmpty() ) {
+            param.append( "-exepath=" );
+            param.append( _previfyDirectory );
+            param.append( " " );
         }
 
         if (_javac != null && !_javac.trim().isEmpty()) {
@@ -442,6 +459,14 @@ public class Rapc {
     }
 
     // / <summary>
+    // / Preverify directory supported rapc arguments to pass
+    // / to the executable
+    // / </summary>
+    public String getPrevifyDirectory() {
+        return _previfyDirectory;
+    }
+    
+    // / <summary>
     // / Java compiler supported rapc arguments to pass
     // / to the executable
     // / </summary>
@@ -455,7 +480,7 @@ public class Rapc {
     // / </summary>
     private String getJavaBin(String javaHome) {
     	if(javaHome != null && !javaHome.trim().isEmpty()) {
-            return javaHome + "\\bin";
+    	    return javaHome + File.separator + "bin";
     	}
     	
     	return "";
@@ -491,7 +516,13 @@ public class Rapc {
         Process proc;
         try {
             File dir = new File(this._cwd);
-            proc = Runtime.getRuntime().exec("\"" + _bin + "\" " + parameters,
+            
+            String command = "\"" + _bin + "\"";
+            if( !OperatingSystems.isWindows() ) {
+                command = "java -jar " + _bin;
+            }
+            
+            proc = Runtime.getRuntime().exec(command + " " + parameters,
                     envList.toArray(new String[envList.size()]), dir);
         } catch (IOException ex) {
             System.err.println(ex);
