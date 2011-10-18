@@ -11,18 +11,19 @@ The project is open source under the [Apache 2.0](http://www.apache.org/licenses
 * Powerful Integration
 * Open
  
-[Read more](http://blackberry.github.com/webworks/index.html) about the BlackBerry WebWorks open source project
+[Read more](http://blackberry.github.com) about the BlackBerry WebWorks open source project
 
 ## Downloads
-Full installers for Windows can be found on the [product download page](http://us.blackberry.com/developers/browserdev/widgetsdk.jsp)
+Full installers for Windows can be found on the [product download page](http://developer.blackberry.com/html5/download/sdk)
 
 ## Reference Material &amp; Community
 You can also find associated reference material for the BlackBerry WebWorks platform as well as community forums for building and contributing to the BlackBerry WebWorks project
 
-* [API Reference](http://www.blackberry.com/developers/docs/webworks/api/)
-* [Developer Guides](http://docs.blackberry.com/en/developers/subcategories/?userType=21&category=BlackBerry+Widgets&subCategory=BlackBerry+Widget+Development+Guides)
+* [API Reference](http://developer.blackberry.com/html5/api)
+* [Installation and Developer Guides](http://developer.blackberry.com/html5/documentation)
 * [Community Forums](http://supportforums.blackberry.com/t5/Web-Development/bd-p/browser_dev)
 * [Project Contributor Forums](http://supportforums.blackberry.com/t5/BlackBerry-WebWorks/bd-p/ww_con)
+* [Open Source Project Contributor Forums](http://supportforums.blackberry.com/t5/BlackBerry-WebWorks/bd-p/ww_con)
 
 ## Building the Source Code
 *Coming Soon*
