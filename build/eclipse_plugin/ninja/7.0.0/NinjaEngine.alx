@@ -1,0 +1,28 @@
+<loader version="1.0">
+        <application id="net.rim.browser.ninjaengine">
+                <name>
+                        Browser Debugging Engine
+                </name>
+                <description>
+                        
+                </description>
+                <version>1.0.2.17</version>
+                <vendor>
+                        Research In Motion
+                </vendor>
+                <copyright>
+                        Copyright (c) 2010 Research In Motion
+                </copyright>
+                <fileset Java="1.0">
+                        <requires id="net.rim.java.browser"/>
+                        <directory SystemSize="normal">Java</directory>
+                        <files>
+                                net_rim_bb_browser_ninjaengine.cod
+                                net_rim_bb_browser_ninjalib.cod
+                        </files>
+
+                </fileset>
+
+        </application>
+
+</loader>

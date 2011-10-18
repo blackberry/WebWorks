@@ -1,0 +1,309 @@
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  IIIIIII SSSSSS                                                            
+//    II    SS                          InstallShield (R)                     
+//    II    SSSSSS      (c) 1996-2002, InstallShield Software Corporation     
+//    II        SS                     All rights reserved.             
+//  IIIIIII SSSSSS                  
+//                                                                            
+//                                                                            
+//  This template script provides the code necessary to build an entry-point 
+//  function to be called in an InstallScript custom action. 
+//                                                                            
+//                                                                            
+//    File Name:  Setup.rul                                                   
+//                                                                            
+//  Description:  InstallShield script                                        
+//
+////////////////////////////////////////////////////////////////////////////////
+
+// Include Ifx.h for built-in InstallScript function prototypes, for Windows 
+// Installer API function prototypes and constants, and to declare code for 
+// the OnBegin and OnEnd events.
+#include "ifx.h"
+
+//
+// The following was taken from the macrovision website - supposed to grant access to files
+//
+///////////////////////////////////////////////////////////////////////////////
+//
+// File Name: ntperm.h
+//
+// Description: Header file for ntperm.rul
+//
+// Comments: #include this file (ntperm.h) around the top of
+// Setup.rul (where the other header files are included) and
+// this file's corresponding rul file (ntperm.rul) at
+// the end.
+//
+// Author: Klaus Ewinger, Ruf Informatik AG (klaus.ewinger@ruf.ch)
+//
+//
+///////////////////////////////////////////////////////////////////////////////
+
+// Windows NT Security
+#define DACL_SECURITY_INFORMATION 0x00000004
+#define GENERIC_ALL 0x10000000
+#define NO_INHERITANCE 0x0
+#define SUB_CONTAINERS_AND_OBJECTS_INHERIT 0x3
+#define SE_FILE_OBJECT 1
+#define SE_PRINTER 3
+#define SE_REGISTRY_KEY 4
+#define TRUSTEE_IS_SID 0
+#define TRUSTEE_IS_UNKNOWN 0
+#define NO_MULTIPLE_TRUSTEE 0
+#define SET_ACCESS 2
+
+
+// Windows Security: TRUSTEE structure
+typedef TRUSTEE
+begin
+POINTER pMultipleTrustee;
+LONG MultipleTrusteeOperation;
+LONG TrusteeForm;
+LONG TrusteeType;
+POINTER ptstrName; 
+end;
+
+// Windows Security: EXPLICIT_ACCESS structure
+typedef EXPLICIT_ACCESS
+begin
+NUMBER grfAccessPermissions;
+LONG grfAccessMode;
+NUMBER grfInheritance;
+TRUSTEE Trustee;	
+end;
+
+// Windows Security: SID_IDENTIFIER_AUTHORITY
+typedef SID_IDENTIFIER_AUTHORITY
+begin
+CHAR Value1;
+CHAR Value2;
+CHAR Value3;
+CHAR Value4;
+CHAR Value5;
+CHAR Value6;
+end;
+
+// Windows Security
+prototype LONG advapi32.GetNamedSecurityInfoA(BYREF STRING, LONG, LONG, POINTER, POINTER, POINTER, POINTER, POINTER);
+prototype LONG advapi32.SetNamedSecurityInfoA(BYREF STRING, LONG, LONG, POINTER, POINTER, POINTER, POINTER);
+prototype LONG advapi32.SetEntriesInAclA(LONG, POINTER, POINTER, POINTER);
+prototype LONG advapi32.AllocateAndInitializeSid(POINTER, CHAR, LONG, LONG, LONG, LONG, LONG, LONG, LONG, LONG, POINTER);
+prototype LONG advapi32.FreeSid(LONG);
+
+// Common Windows API
+prototype LONG KERNEL.LocalFree(HWND);
+
+// Function prototypes 
+prototype GrantFullAccess(BYVAL STRING, BYVAL LONG, BYVAL BOOL);
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// File Name: ntperm.rul
+//
+// Description: Function to set file, registry or printer permissions on NT
+//
+// Comments: #include this file's header file (ntperm.h) around the top of
+// Setup.rul (where the other header files are included) and
+// this file (ntperm.rul) at
+// the end.
+//
+// Author: Klaus Ewinger, Ruf Informatik AG (klaus.ewinger@ruf.ch)
+//
+//
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// Function: GrantFullAccess
+//
+// Purpose: Grants full access rights to files or registry keys to everyone
+//
+// Input: sObjectName - Path of a File a Registry Key or a Printer. Example: "MACHINE\Software\..."
+// Abkürzungen für Registry-Basisschlüssel sind "CLASSES_ROOT", "CURRENT_USER", "MACHINE" und "USERS"
+// nObjectType - File or Folder: SE_OBJECT_FILE
+// Printer: SE_PRINTER
+// Registry Key: SE_REGISTRY_KEY
+// bInherit - TRUE: Subfolders and subelements inherit the permissions
+// FALSE: No inheritance
+//
+// Output: Returnvalue = -1 - An error occured
+// 0 - No error
+//
+///////////////////////////////////////////////////////////////////////////////////////////
+function GrantFullAccess(sObjectName, nObjectType, bInherit)
+
+NUMBER nResult;
+POINTER pOldDACL, pNewDACL, pSD, pWorldSID;
+CHAR cWorldSIDBuffer(100);	
+EXPLICIT_ACCESS MyEA;
+SID_IDENTIFIER_AUTHORITY MySIDAuth;
+
+begin
+
+// Only on NT/2000/XP/2003...
+if !SYSINFO.WINNT.bWinNT then return -1; endif;
+
+// Get pointer to the DACL of the object
+nResult = GetNamedSecurityInfoA(sObjectName, nObjectType, DACL_SECURITY_INFORMATION, 0, 0, &pOldDACL, 0, &pSD);
+if nResult != 0 then return -1; endif;
+
+// Create an EXPLICIT_ACCESS structure
+
+// Create well known SID for world (everyone)
+MySIDAuth.Value1 = 0;
+MySIDAuth.Value2 = 0;
+MySIDAuth.Value3 = 0;
+MySIDAuth.Value4 = 0;
+MySIDAuth.Value5 = 0;
+MySIDAuth.Value6 = 1;
+pWorldSID = &cWorldSIDBuffer;
+nResult = AllocateAndInitializeSid(&MySIDAuth, 1,0,0,0,0,0,0,0,0,&pWorldSID);
+if nResult = 0 then return -1; endif;
+
+// Fill structure
+MyEA.grfAccessPermissions = GENERIC_ALL;
+MyEA.grfAccessMode = SET_ACCESS;
+MyEA.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+MyEA.Trustee.pMultipleTrustee = 0;
+MyEA.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+MyEA.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+MyEA.Trustee.TrusteeType = TRUSTEE_IS_UNKNOWN;
+MyEA.Trustee.ptstrName = pWorldSID;
+
+// Create new ACL from old ACL applying EXPLICIT_ACCESS structure
+nResult = SetEntriesInAclA(1, &MyEA, pOldDACL, &pNewDACL);
+if nResult != 0 then LocalFree(pSD); return -1; endif;
+
+// Pass new ACL to object
+nResult = SetNamedSecurityInfoA(sObjectName, nObjectType, DACL_SECURITY_INFORMATION, 0, 0, pNewDACL, 0);
+if nResult != 0 then LocalFree(pSD); LocalFree(pNewDACL); return -1; endif;
+
+// Release Resources
+LocalFree(pSD);
+LocalFree(pNewDACL);
+
+return 0;
+
+end;
+
+//
+//  End 'external' source
+//                       
+
+// The keyword export identifies MyFunction() as an entry-point function.
+// The argument it accepts must be a handle to the Installer database.
+export prototype MyFunction(HWND);    
+export prototype RemoveSimDumpFiles(HWND);  
+export prototype CopyMDSPatch(HWND);  
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+// Function:  MyFunction
+//                                                                           
+// Purpose:  This function will set a property of where the JAVA JDK is located
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function MyFunction(hMSI)    
+	STRING sztest;
+    STRING szJavaRegVersion, szJavaHome;     
+	STRING szKey, szWin7Key, szNumName;
+	NUMBER nType, nSize, nResult;
+begin           	
+    // retrieve the JAVA_JDK_VERSION set during system search
+	MsiGetProperty (hMSI, "JAVA_JDK_VERSION", szJavaRegVersion, nSize);     
+	
+	nSize = 256;  
+    szKey = "SOFTWARE\\JavaSoft\\Java Development Kit\\" + szJavaRegVersion;        
+    szWin7Key = "SOFTWARE\\Wow6432Node\\JavaSoft\\Java Development Kit\\" + szJavaRegVersion;
+    szNumName = "JavaHome";
+    nType      = REGDB_STRING; 
+    nSize      = -1;  
+	
+	// retreive the JavaHome value from registry using the version specified
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	
+	nResult = RegDBGetKeyValueEx (szKey, szNumName, nType, szJavaHome, nSize);
+	
+	if (szJavaHome = "") then
+		// no value found - check win7 key
+		nResult = RegDBGetKeyValueEx (szWin7Key, szNumName, nType, szJavaHome, nSize);
+	endif;
+	
+	// if still no value found, don't set anything
+	if (szJavaHome != "") then		
+		// save the property to be retrieved later
+		MsiSetProperty(hMSI, "JAVA_HOME", szJavaHome);
+	endif;
+end;
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+// Function:  RemoveSimDumpFiles
+//                                                                           
+//  Purpose:  This function will be called by the script engine when 
+//            Windows(TM) Installer executes your custom action (see the "To 
+//            Do," above).
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function RemoveSimDumpFiles(hMSI)
+                string fledgePath;   
+                string svMatchingFileName; 
+                number bufferSize;  
+                number nResult;
+begin
+    bufferSize = 512;
+    
+    MsiGetProperty(hMSI, "SIMPACK", fledgePath, bufferSize); 
+      
+    nResult = FindAllFiles (fledgePath, "*.dmp", svMatchingFileName, RESET);
+
+    while(nResult = 0)
+        DeleteFile(svMatchingFileName);
+        nResult = FindAllFiles(fledgePath, "*.dmp", svMatchingFileName, CONTINUE);
+    endwhile;
+end;
+        
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+// Function:  CopyMDSPatch
+//                                                                           
+//  Purpose:  This function copies a patch .bat file over the mds/run.bat after
+//				renaming the original run.bat.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function CopyMDSPatch(hMSI)
+                string mdsPath;   
+                string originalRunBat; 
+                string patchRunBat;         
+                string javahome;               
+                string binPath;
+                number bufferSize;
+                number nResult;    
+begin
+    bufferSize = 512;         
+    
+    // grab/update properties    
+    MsiGetProperty(hMSI, "MDS", mdsPath, bufferSize); 
+    MsiGetProperty(hMSI, "JAVA_HOME", javahome, bufferSize);
+    javahome = "set BBWPTEMP2=" + javahome;
+    patchRunBat = mdsPath ^ "run_original.bat";           
+    originalRunBat = mdsPath ^ "run.bat";   
+    binPath = mdsPath ^ "..\\bin\\";
+                                                 
+	// insert line
+    nResult = FileInsertLine (patchRunBat, javahome, 4, REPLACE);
+    
+	// rename files - do some extra renaming because
+	// we want to make sure the InstallShield deletes the file
+	// on uninstall
+	RenameFile (originalRunBat, mdsPath ^ "run_original_temp.bat");
+	RenameFile (patchRunBat, mdsPath ^ "run.bat");
+	RenameFile (mdsPath ^ "run_original_temp.bat", mdsPath ^ "run_original.bat"); 
+	  
+	// patch for tooling - grant FullControl to mds and bin directory	
+	GrantFullAccess(mdsPath, SE_FILE_OBJECT, FALSE);       
+	GrantFullAccess(binPath, SE_FILE_OBJECT, FALSE);
+end;  
+  

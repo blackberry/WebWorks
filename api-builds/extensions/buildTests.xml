@@ -1,0 +1,39 @@
+<project name="BuildTests" basedir=".">
+    <echo>Building Tests...</echo>
+	
+    <property name="dependencies.location" location="../../api-tests/lib" />
+    <property name="net.rim.api.jar" location="${dependencies.location}/net_rim_api_unmodified.jar" />
+    <property name="lbstest.jar" location="${dependencies.location}/lbstest.jar" />
+    <property name="common.api.location" location="../../api/CommonAPI" />
+    
+    <property name="build.dir" location="${basedir}/build" />
+    <property name="class.output.folder" value="${build.dir}/bin" />
+    <property name="src.dir" location="${build.dir}/src" />
+    
+    <import file="buildLibrary.xml" />
+
+    <!-- Classpath definition -->
+    <path id="java.cp">
+        <pathelement location="${net.rim.api.jar}"/>
+        <pathelement location="${lbstest.jar}"/>
+    </path>
+    
+    <target name="cleanOutput">
+        <delete dir="${class.output.folder}"/>
+        <mkdir dir="${class.output.folder}" />
+    </target>
+	
+    <target name="build" depends="cleanOutput">
+        <javac srcdir="${src.dir}" destdir="${class.output.folder}" includeAntRuntime="false" includeJavaRuntime="false" failonerror="true" source="1.3" target="1.1" verbose="true" bootclasspathref="java.cp">
+            <classpath refid="java.cp"/>
+        </javac>
+    </target>
+    
+    <target name="copyCommonSources">
+        <copy todir="${build.dir}/src">
+            <fileset dir="${common.api.location}/src"/>
+        </copy>
+    </target>
+    
+    <target name="buildCodFile" depends="copyCommonSources, build, BuildLibrary.executeRapc" if="cod.name" />
+</project>

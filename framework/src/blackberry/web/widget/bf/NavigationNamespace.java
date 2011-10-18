@@ -1,53 +1,54 @@
 /*
-* Copyright 2010-2011 Research In Motion Limited.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2010-2011 Research In Motion Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package blackberry.web.widget.bf;
 
 import blackberry.web.widget.bf.navigationcontroller.NavigationController;
 import net.rim.device.api.script.Scriptable;
 import net.rim.device.api.script.ScriptableFunction;
+import java.lang.ref.WeakReference;
 
 public class NavigationNamespace extends Scriptable {
 
-    public static final String NAME                		= "blackberry.focus";
+    public static final String NAME = "blackberry.focus";
 
-    public static final String LABEL_RIGHT         		= "RIGHT";
-    public static final String LABEL_LEFT          		= "LEFT";
-    public static final String LABEL_UP            		= "UP";
-    public static final String LABEL_DOWN          		= "DOWN";
+    public static final String LABEL_RIGHT = "RIGHT";
+    public static final String LABEL_LEFT = "LEFT";
+    public static final String LABEL_UP = "UP";
+    public static final String LABEL_DOWN = "DOWN";
 
-    public static final String LABEL_SET_FOCUS     		= "setFocus";
-    public static final String LABEL_GET_FOCUS     		= "getFocus";
-    public static final String LABEL_GET_OLDFOCUS  		= "getOldFocus";
-    public static final String LABEL_GET_DIRECTION 		= "getDirection";
-    public static final String LABEL_UPDATE_FOCUS_MAP   = "updateFocusMap";
+    public static final String LABEL_SET_FOCUS = "setFocus";
+    public static final String LABEL_GET_FOCUS = "getFocus";
+    public static final String LABEL_GET_OLDFOCUS = "getOldFocus";
+    public static final String LABEL_GET_DIRECTION = "getDirection";
+    public static final String LABEL_UPDATE_FOCUS_MAP = "updateFocusMap";
 
-    private BrowserFieldScreen _widgetScreen;
+    private WeakReference _widgetScreenWeakReference;
 
-    private String             _oldFocused;
-    private String             _currentFocused;
-    private int                _direction;
+    private String _oldFocused;
+    private String _currentFocused;
+    private int _direction;
 
-    private SetRimFocus        _funcSetRimFocus;
-    private GetRimFocus        _funcGetRimFocus;
-    private GetOldFocus        _funcGetOldFocus;
-    private GetDirection       _funcGetDirection;
-    private UpdateFocusMap     _funcUpdateFocusMap;
+    private SetRimFocus _funcSetRimFocus;
+    private GetRimFocus _funcGetRimFocus;
+    private GetOldFocus _funcGetOldFocus;
+    private GetDirection _funcGetDirection;
+    private UpdateFocusMap _funcUpdateFocusMap;
 
     public NavigationNamespace( BrowserFieldScreen widgetScreen ) {
-        _widgetScreen = widgetScreen;
+        _widgetScreenWeakReference = new WeakReference( widgetScreen );
 
         _oldFocused = "";
         _currentFocused = "";
@@ -58,6 +59,15 @@ public class NavigationNamespace extends Scriptable {
         _funcGetOldFocus = new GetOldFocus();
         _funcGetDirection = new GetDirection();
         _funcUpdateFocusMap = new UpdateFocusMap();
+    }
+
+    private BrowserFieldScreen getWidgetScreen() {
+        Object o = _widgetScreenWeakReference.get();
+        if( o instanceof BrowserFieldScreen ) {
+            return (BrowserFieldScreen) o;
+        } else {
+            return null;
+        }
     }
 
     public void setOldFocusedId( String id ) {
@@ -135,7 +145,7 @@ public class NavigationNamespace extends Scriptable {
         public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args != null && args.length == 1 && args[ 0 ] != null ) {
                 String id = args[ 0 ].toString();
-                _widgetScreen.getNavigationController().setRimFocus( id );
+                getWidgetScreen().getNavigationController().setRimFocus( id );
                 return UNDEFINED;
             }
 
@@ -183,7 +193,7 @@ public class NavigationNamespace extends Scriptable {
         /* @Override */
         public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args == null || args.length == 0 ) {
-                _widgetScreen.getNavigationController().update();
+                getWidgetScreen().getNavigationController().update();
                 return UNDEFINED;
             }
 

@@ -24,6 +24,7 @@ public class DeviceInfo {
 
     private String _phoneOS;
     private boolean _isBB6;
+    private boolean _isBB5;
 
     public static final int OS_VERSION_6 = 6;
     public static final int OS_VERSION_5 = 5;
@@ -42,6 +43,41 @@ public class DeviceInfo {
         return _instance._isBB6;
     }
 
+    /**
+     * Convenience method to determine if the current OS is 5.0
+     * 
+     * @return true if the OS is 5, false otherwise
+     */
+    public static boolean isBlackBerry5() {
+        return _instance._isBB5;
+    }
+
+    /**
+     * Check if current device OS version is equal or greater than the specified version.
+     * 
+     * @param targetVersion
+     *            the specified version
+     * @return true if device OS version is equal or greater than the passed version, false otherwise.
+     */
+    public static boolean isCompatibleVersion( int targetVersion ) {
+        String phoneOSVersion = _instance._phoneOS;
+
+        if( ( phoneOSVersion != null ) && ( phoneOSVersion.length() > 0 ) ) {
+            // Check first value for major revision
+            int majorOSRev;
+            try {
+                majorOSRev = Integer.parseInt( phoneOSVersion.substring( 0, phoneOSVersion.indexOf( '.' ) ) );
+            } catch( Exception e ) {
+                // Set the value to 0 if there is some sort of error.
+                majorOSRev = 0;
+            }
+
+            return ( majorOSRev >= targetVersion );
+        }
+
+        return false;
+    }
+
     private DeviceInfo() {
         init();
     }
@@ -55,11 +91,13 @@ public class DeviceInfo {
                 // Check first value for major revision
                 int majorOSRev = Integer.parseInt( _phoneOS.substring( 0, _phoneOS.indexOf( '.' ) ) );
                 _isBB6 = !( majorOSRev < 6 );
+                _isBB5 = majorOSRev == OS_VERSION_5;
             }
         } catch( Exception e ) {
             // Set the value to 0 if there is some sort of error.
             // 0 will be the value for simulators
             _isBB6 = false;
+            _isBB5 = false;
         }
     }
 }

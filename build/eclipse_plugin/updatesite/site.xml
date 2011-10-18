@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/net.rim.browser.tools.wcpc.feature_#WCPC_VERSION#.jar" id="net.rim.browser.tools.wcpc.feature" version="#WCPC_VERSION#">
+      <category name='net_rim_browser_tools_wcpc'/>
+   </feature>
+
+   <category-def name='net_rim_browser_tools_wcpc' label='BlackBerry WebWorks SDK Category'/>
+</site>

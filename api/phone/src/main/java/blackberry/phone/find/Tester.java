@@ -30,9 +30,27 @@ public class Tester {
                 return false;
             }
         } else if( fieldToTest instanceof String ) {
-            return testByString( (String) fieldToTest, (String) objective, operator );
+            if( objective == null ) {
+                switch( operator ) {
+                    case FilterExpressionConstructor.OPERATOR_NOT_EQUAL:
+                        if( fieldToTest.toString().length() == 0 ) {
+                            return false;
+                        }
+                        return true;
+                    case FilterExpressionConstructor.OPERATOR_EQUAL:
+                        if( fieldToTest.toString().length() == 0 ) {
+                            return true;
+                        }
+                        return false;
+                }
+                throw new IllegalArgumentException( "rightField can't be null" );
+            } else {
+                return testByString( (String) fieldToTest, (String) objective, operator );
+            }
         } else if( fieldToTest instanceof Date ) {
             return testByDate( (Date) fieldToTest, objective, operator, optional );
+        } else if( fieldToTest == null ) {
+            return testNullCase( objective, operator );
         } else {
             // should not happen
             return false;
@@ -194,4 +212,25 @@ public class Tester {
         return false;
     }
 
+    private static boolean testNullCase( final Object objective, final int operator ) {
+        switch( operator ) {
+            case FilterExpressionConstructor.OPERATOR_NOT_EQUAL:
+                if( objective != null ) {
+                    if( objective.toString().length() > 0 ) {
+                        return true;
+                    }
+                }
+                break;
+            case FilterExpressionConstructor.OPERATOR_EQUAL:
+                if( objective == null ) {
+                    return true;
+                } else {
+                    if( objective.toString().length() == 0 ) {
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
+    }
 }

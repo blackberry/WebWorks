@@ -19,6 +19,7 @@ import net.rim.device.api.script.Scriptable;
 import net.rim.device.api.script.ScriptableFunction;
 
 import blackberry.web.widget.bf.BrowserFieldScreen;
+import java.lang.ref.WeakReference;
 
 public class WidgetCacheNamespace extends Scriptable {
 
@@ -30,7 +31,7 @@ public class WidgetCacheNamespace extends Scriptable {
     public static final String LABEL_CLEAR_CACHE = "clearCache";
     public static final String LABEL_HAS_CACHE = "hasCache";
 
-    private BrowserFieldScreen _widgetScreen;
+    private WeakReference _widgetScreenWeakReference;
 
     private GetCurrentSize _funcGetCurrentSize;
     private GetCachesInformation _funcGetCachesInformation;
@@ -39,7 +40,7 @@ public class WidgetCacheNamespace extends Scriptable {
     private HasCache _funcHasCache;
 
     public WidgetCacheNamespace( BrowserFieldScreen widgetScreen ) {
-        _widgetScreen = widgetScreen;
+        _widgetScreenWeakReference = new WeakReference(widgetScreen);
 
         _funcGetCurrentSize = new GetCurrentSize();
         _funcGetCachesInformation = new GetCachesInformation();
@@ -80,10 +81,19 @@ public class WidgetCacheNamespace extends Scriptable {
         return false;
     }
 
+    private BrowserFieldScreen getWidgetScreen() {
+        Object o = _widgetScreenWeakReference.get();
+        if (o instanceof BrowserFieldScreen) {
+            return (BrowserFieldScreen) o;
+        } else {
+            return null;
+        }
+    }
+    
     private class GetCurrentSize extends ScriptableFunction {
         /* @Override */public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args == null || args.length == 0 ) {
-                CacheManager mgr = _widgetScreen.getCacheManager();
+                CacheManager mgr = getWidgetScreen().getCacheManager();
                 if( mgr != null ) {
                     int size = mgr.getTotalCacheSize();
                     return new Integer( size );
@@ -99,7 +109,7 @@ public class WidgetCacheNamespace extends Scriptable {
     private class GetCachesInformation extends ScriptableFunction {
         /* @Override */public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args == null || args.length == 0 ) {
-                CacheManager mgr = _widgetScreen.getCacheManager();
+                CacheManager mgr = getWidgetScreen().getCacheManager();
                 if( mgr != null ) {
                     return mgr.getScriptableCacheItems();
                 } else {
@@ -114,7 +124,7 @@ public class WidgetCacheNamespace extends Scriptable {
     private class ClearAll extends ScriptableFunction {
         /* @Override */public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args == null || args.length == 0 ) {
-                CacheManager mgr = _widgetScreen.getCacheManager();
+                CacheManager mgr = getWidgetScreen().getCacheManager();
                 if( mgr != null ) {
                     mgr.clearAll();
                     return UNDEFINED;
@@ -130,7 +140,7 @@ public class WidgetCacheNamespace extends Scriptable {
     private class ClearCache extends ScriptableFunction {
         /* @Override */public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args != null && args.length == 1 && args[ 0 ] != null ) {
-                CacheManager mgr = _widgetScreen.getCacheManager();
+                CacheManager mgr = getWidgetScreen().getCacheManager();
                 if( mgr != null ) {
                     mgr.clearCache( args[ 0 ].toString() );
                     return UNDEFINED;
@@ -146,7 +156,7 @@ public class WidgetCacheNamespace extends Scriptable {
     private class HasCache extends ScriptableFunction {
         /* @Override */public Object invoke( Object thiz, Object[] args ) throws Exception {
             if( args != null && args.length == 1 && args[ 0 ] != null ) {
-                CacheManager mgr = _widgetScreen.getCacheManager();
+                CacheManager mgr = getWidgetScreen().getCacheManager();
                 if( mgr != null ) {
                     return new Boolean( mgr.hasCache( args[ 0 ].toString() ) );
                 } else {

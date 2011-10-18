@@ -1,0 +1,218 @@
+<project name="tumbler" basedir=".">
+   <property environment="env"/>
+   
+   <!-- Set the build.properties as the default properties file -->
+   <!-- Setup all properties from build.properties or the file provided by user -->
+   <property name="property.file" location="${basedir}/build.properties"/>
+   <property name="tumbler.work.dir" location="${basedir}/.." />
+   <property file="${property.file}"/>
+   
+   <property name="x.version.to.build" value="2.1.1.${env.BUNDLE_NUMBER}" />
+   
+   <target name="dependencies">
+      <echo>Copying external components...</echo>
+      
+      <echo>Creating ${tumbler.external.dependencies.dir} folder...</echo>
+      <delete dir="${tumbler.external.dependencies.dir}" />
+      <mkdir dir="${tumbler.external.dependencies.dir}" />
+      
+      <echo>Copying RAPC tools to ${tumbler.external.dependencies.dir}...</echo>
+      <copy todir="${tumbler.external.dependencies.dir}" overwrite="yes">
+         <fileset dir="${rim.net.sqa.dir}/JDE/${jde.version}/Deliverables/JDE/bundle${jde.bundle.number}/JDETree/bin" includes="JavaLoader.exe, rapc.jar, rapc.exe, preverify.exe, SignatureTool.jar" />
+         <fileset file="${rim.net.sqa.dir}/JDE/${jde.version}/Deliverables/JDE_RUNTIME/bundle067/Release_x/net_rim_api.jar" />
+         <fileset dir="${rim.net.sqa.dir}/BBCOmmonEULAs/ProductFiles/DevToolsSLAs/1.0.0/${devToolsSLAs.version}/Production" includes="SDK_license_English.*" />
+      </copy>
+      
+      <echo>Creating ${external.mds.dir} folder...</echo>
+      <delete dir="${external.mds.dir}" />
+      <mkdir dir="${external.mds.dir}" />
+      
+      <echo>Copying mds to ${external.mds.dir} folder...</echo>
+      <copy todir="${external.mds.dir}" overwrite="yes">
+         <!--<fileset dir="${mds.dir}" />-->
+         <fileset dir="${rim.net.sqa.dir}\MDS\${mds.version}\${mds.version}.${mds.bundle.number}\release_x\sdk\mds" />
+      </copy>
+   </target>
+   
+   <target name="init">
+      <echo>Creating ${tumbler.classes.dir} folder...</echo>
+      <delete dir="${tumbler.classes.dir}" />
+      <mkdir dir="${tumbler.classes.dir}" />
+      
+      <echo>Creating ext folder...</echo>
+      <delete dir="${tumbler.ext.dir}" />
+      <mkdir dir="${tumbler.ext.dir}" />
+      
+      <echo>Creating ${tumbler.deliverable.location} folder...</echo>
+      <delete dir="${tumbler.deliverable.location}" />
+      <mkdir dir="${tumbler.deliverable.location}" />
+      
+      <echo>Creating ${eclipse.plugin.dir}\net.rim.browser.tools.wcpc folder...</echo>
+      <delete dir="${eclipse.plugin.dir}" />
+      <mkdir dir="${eclipse.plugin.dir}\net.rim.browser.tools.wcpc" />
+      
+      <echo>Creating ${tumbler.simpack.dir} folder...</echo>
+      <delete dir="${tumbler.simpack.dir}" />
+      <mkdir dir="${tumbler.simpack.dir}" />
+      
+      <echo>Cleaning up ${tumbler.installer.release.dir} folder...</echo>
+      <delete dir="${tumbler.installer.release.dir}" />
+      
+      <attrib readonly="false" verbose="true">
+         <fileset dir="${tumbler.installer.dir}" includes="TumblerInstall.ism"/>
+         <fileset dir="${tumbler.installer.dir}\TumblerInstall" />
+      </attrib>
+   </target>
+   
+   <target name="buildTumblerJar">
+      <!-- Replace version takens in Main_Class.txt that will be bundled with the .jar file -->
+      <!-- make sure there is no trailing blank spaces after PackageWidget -->
+      <echo>Replacing version tokens in ${version.file}...</echo>
+      <echo>Version: ${x.version.to.build}</echo>
+      <copy file="${tumbler.build.dependencies.dir}\Main_Class.txt" tofile="${version.file}" overwrite="yes" />
+      <replace file="${version.file}" token="@version@" value="${x.version.to.build}" failOnNoReplacements="ture" />    
+      
+      <echo>Compiling .java files to .class files</echo>
+      <javac fork="true" executable="${env.JAVA_HOME}/bin/javac" srcdir="${tumbler.packager.src.dir}" destdir="${tumbler.classes.dir}" classpath="${tumbler.external.dependencies.dir}\net_rim_api.jar" debug="true" />
+      
+      <echo>Compiling everying into the bin directory</echo>
+      <!-- delete everything in bin file except bbwp.properties and tld.txt -->
+      <delete>
+         <dirset dir="${tumbler.bin.dir}"/>
+         <fileset dir="${tumbler.bin.dir}" excludes="bbwp.properties, tld.txt" />
+      </delete>
+      
+      <copy todir="${tumbler.classes.dir}" overwrite="yes">
+         <fileset dir="${tumbler.packager.src.dir}" includes="**\*.properties" />
+      </copy>
+      <jar destfile="${tumbler.bin.dir}\bbwp.jar" basedir="${tumbler.classes.dir}" manifest="${version.file}" />
+      
+      <delete file="${version.file}" />
+   </target>
+   
+   <target name="buildLauncher">
+      <!-- set environment variables for msbuild to work -->
+      <exec dir="${basedir}" executable="cmd" failonerror="true">
+         <arg line="/c TumblerLauncher.bat ${tumbler.packager.src.dir} ${tumbler.bin.dir}" />
+      </exec>
+      
+      <delete>
+         <fileset dir="${basedir}" includes="*.obj, *.idb, *.pdb" />
+      </delete>
+   </target>
+   
+   <target name="buildDocs">
+      <echo>*** Copying library.xml ***</echo>
+      <copy file="${jam.library.xml.dir}/library.xml" tofile="${tumbler.install.files.dir}/library.xml" overwrite="yes" />
+   </target>
+   
+   <target name="buildInstallerDependancies">
+      <copy todir="${tumbler.ext.dir}" overwrite="yes">
+         <fileset dir="${tumbler.external.dependencies.dir}" excludes="${sdk.license}.*" />
+      </copy>
+      
+      <copy file="${tumbler.external.dependencies.dir}/${sdk.license}.rtf" tofile="${tumbler.install.files.dir}/${sdk.license}.rtf" flatten="true"  overwrite="yes" />
+      
+      <replaceregexp file="${tumbler.mds.dir}/config/rimpublic.property" match="WebServer.listen.port=8080" replace="WebServer.listen.port=28080" />
+
+      <copy file="${simpack.dir.7}\${sim.file}" tofile="${tumbler.build.dependencies.dir}/${sim.file}" overwrite="yes" />
+      <unzip src="${tumbler.build.dependencies.dir}/${sim.file}" dest="${tumbler.simpack.dir}/${java.apps.7.0.version}" overwrite="yes" />
+   </target>
+   
+   <target name="buildInstaller">
+      <!-- Step 0 -->
+      <echo>*** Copy ${tumbler.build.dependencies.dir}\info.xml to ${tumbler.bin.dir} ***</echo>
+      <copy file="${tumbler.build.dependencies.dir}\info.xml" tofile="${tumbler.bin.dir}\info.xml" flatten="true" overwrite="yes" />
+      
+      <!-- Step 1 -->
+      <exec dir="${basedir}" executable="${INSTALLSHIELD_BUILD_COMMAND}" failonerror="true">
+         <arg line='-p ${tumbler.installer.dir}\TumblerInstall.ism -a "RELEASE" -r "ECLIPSE_PLUGIN" -b ${tumbler.installer.dir} -y ${x.version.to.build} -z "ProductName=BlackBerry WebWorks SDK"' />
+      </exec>
+      
+      <!-- Step 2 -->
+      <copy file="${tumbler.bin.dir}/bbwp.properties" tofile="${release.eclipse.plugin.dir}/bin/bbwp.properties" flatten="true"/>
+      
+      
+      <!-- DELETE after the docs folder is added into SCM plan -->
+      <copy file="${api.docs.dir}/docs.zip" tofile="${release.eclipse.plugin.dir}/docs.zip" flatten="true"/>
+      
+      
+      <echo message="scm.wcpc.version.internal=${x.version.to.build}" file="${release.eclipse.plugin.dir}/version.properties" />
+      
+      <zip destfile="${tumbler.deliverable.location}/bbwp.zip" basedir="${release.eclipse.plugin.dir}" update="yes"/> 
+      <!-- Step 3 -->
+      
+      <exec dir="${basedir}" executable="${INSTALLSHIELD_BUILD_COMMAND}" failonerror="true">
+         <arg line='-p ${tumbler.installer.dir}\TumblerInstall.ism -a "RELEASE" -r "SETUP_EXE" -b ${tumbler.installer.dir} -y ${x.version.to.build} -z "ProductName=BlackBerry WebWorks SDK v${x.version.to.build}"' />
+      </exec>
+      <copy file="${release.setup.exe.dir}/setup.exe" tofile="${tumbler.deliverable.location}/setup.exe" flatten="true" overwrite="yes" />
+      <!-- Step 4 -->
+      
+      <exec dir="${basedir}" executable="${INSTALLSHIELD_BUILD_COMMAND}" failonerror="true">
+         <arg line='-p ${tumbler.installer.dir}\TumblerInstall.ism -a "RELEASE" -r "MSI" -b ${tumbler.installer.dir} -y ${x.version.to.build} -z "ProductName=BlackBerry WebWorks SDK v${x.version.to.build}"' />
+      </exec>
+      <copy file="${release.msi.dir}/BlackBerry WebWorks SDK v${x.version.to.build}.msi" tofile="${tumbler.deliverable.location}/BlackBerry WebWorks SDK.msi" flatten="true" overwrite="yes" />
+   </target>
+   
+   <target name="buildEclipsePlugin">
+      <echo>*** Build Eclipse Plugin ***</echo>
+      <ant antfile="${basedir}/eclipse_plugin/buildTumblerPlugin.xml" dir="${basedir}/eclipse_plugin" />
+      
+      <echo>*** Copy plugin output to ${eclipse.plugin.dir} ***</echo>
+      <copy todir="${eclipse.plugin.dir}/net.rim.browser.tools.wcpc" flatten="true" overwrite="yes">
+         <fileset dir="${basedir}/eclipse_plugin/output" />
+      </copy>
+   </target>
+   
+   <target name="buildMiniBBWP">
+      <echo>*** deleting bbwp.zip *** </echo>
+      <delete>
+         <fileset dir="${tumbler.deliverable.location}" includes="bbwp.zip"/>
+      </delete>
+      <echo>*** regenerating shrinked bbwp.zip *** </echo>
+      <zip destfile="${tumbler.deliverable.location}/bbwp.zip"
+           basedir="${release.eclipse.plugin.dir}"
+           excludes="**/mds/**, **/simpack/**"
+           update="yes"/>
+   </target>
+
+   <target name="cleanup">
+      <echo>Cleaning up ${tumbler.external.dependencies.dir} folder...</echo>
+      <delete dir="${tumbler.external.dependencies.dir}" />
+      
+      <echo>Cleaning up ${tumbler.classes.dir} folder...</echo>
+      <delete dir="${tumbler.classes.dir}" />
+      
+      <echo>Cleaning up ${jam.docs.output.dir} folder...</echo>
+      <delete dir="${jam.docs.output.dir}" />
+      
+      <echo>Cleaning up ${jsdocs.output.dir} folder...</echo>
+      <delete dir="${jsdocs.output.dir}" />
+      
+      <echo>Cleaning up ${tumbler.ext.dir} folder...</echo>
+      <delete dir="${tumbler.ext.dir}" />
+      
+      <echo>Cleaning up ${tumbler.mds.dir} folder...</echo>
+      <delete dir="${tumbler.mds.dir}" />
+      
+      <echo>Cleaning up ${tumbler.bin.dir} folder...</echo>
+      <delete>
+         <fileset dir="${tumbler.bin.dir}" excludes="bbwp.properties, tld.txt" />
+      </delete>
+      
+      <echo>Cleaning up ${tumbler.installer.release.dir} folder...</echo>
+      <delete dir="${tumbler.installer.release.dir}" />
+      
+      <echo>Cleaning up ${tumbler.install.files.dir}/${sdk.license}.rtf file...</echo>
+      <delete file="${tumbler.install.files.dir}/${sdk.license}.rtf" />
+      
+      <echo>Cleaning up ${tumbler.simpack.dir} folder...</echo>
+      <delete dir="${tumbler.simpack.dir}" />
+      
+      <attrib readonly="true" verbose="true">
+         <fileset dir="${tumbler.installer.dir}" includes="TumblerInstall.ism"/>
+         <fileset dir="${tumbler.installer.dir}/TumblerInstall" />
+      </attrib>
+   </target>
+   
+</project>

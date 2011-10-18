@@ -25,7 +25,7 @@ import net.rim.device.api.script.ScriptableFunction;
 import net.rim.device.api.ui.UiApplication;
 import blackberry.core.FunctionSignature;
 import blackberry.core.ScriptableFunctionBase;
-import blackberry.media.CallbackDispatcherEvent;
+import blackberry.core.threading.CallbackDispatcherEvent;
 import blackberry.media.JournalListener;
 import blackberry.media.ProcessCheckThread;
 
@@ -177,6 +177,7 @@ public class TakeVideoFunction extends ScriptableFunctionBase {
         }
 
         try {
+            _currentVideoPath = "";
             VideoJournalListener listener = new VideoJournalListener( callback, onErrorCallback );
             VideoCheckThread checkThread = new VideoCheckThread( listener, callback, onCloseCallback );
 

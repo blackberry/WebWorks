@@ -37,6 +37,8 @@ import blackberry.web.widget.WidgetScreen;
 import blackberry.web.widget.bf.navigationcontroller.NavigationController;
 import blackberry.web.widget.caching.CacheManager;
 import blackberry.web.widget.caching.WidgetCacheNamespace;
+import blackberry.web.widget.device.DeviceInfo;
+import blackberry.web.widget.html5.GearsHTML5Extension;
 import blackberry.web.widget.impl.WidgetConfigImpl;
 import blackberry.web.widget.loadingScreen.PageManager;
 import blackberry.web.widget.util.WidgetUtil;
@@ -49,6 +51,7 @@ public final class BrowserFieldScreen extends WidgetScreen {
             TransportInfo.TRANSPORT_TCP_WIFI, TransportInfo.TRANSPORT_TCP_CELLULAR, TransportInfo.TRANSPORT_WAP2,
             TransportInfo.TRANSPORT_WAP };
 
+    private GearsHTML5Extension _HTML5ToGearsExtension;
     private BrowserField _browserField;
     private BrowserFieldConfig _bfConfig;
     private Manager _manager;
@@ -136,6 +139,14 @@ public final class BrowserFieldScreen extends WidgetScreen {
         // Disable MDS transcoding since it interferes with whitelist on external sites.
         _bfConfig.setProperty( BrowserFieldConfig.MDS_TRANSCODING_ENABLED, Boolean.FALSE );
 
+        // Enable web inspector debugging if required
+        if( _wConfig instanceof WidgetConfigImpl ) {
+            WidgetConfigImpl configObj = (WidgetConfigImpl) _wConfig;
+            if( DeviceInfo.isCompatibleVersion( 7 ) && configObj.isDebugEnabled() ) {
+                _bfConfig.setProperty( "ENABLE_WEB_INSPECTOR", Boolean.TRUE );
+            }
+        }
+
         // Check for our Config type and cast.
         if( _wConfig instanceof WidgetConfigImpl ) {
             // Update the transport order.
@@ -214,6 +225,10 @@ public final class BrowserFieldScreen extends WidgetScreen {
             }
             _widgetCacheExtension = new WidgetCacheNamespace( this );
         }
+
+        if( DeviceInfo.isBlackBerry5() ) {
+            _HTML5ToGearsExtension = new GearsHTML5Extension();
+        }
     }
 
     /**
@@ -288,6 +303,10 @@ public final class BrowserFieldScreen extends WidgetScreen {
         // Set BrowserFieldConfig.
         _bfConfig.setProperty( BrowserFieldConfig.CONNECTION_FACTORY, connFact );
 
+    }
+
+    public GearsHTML5Extension getHTML5Extension() {
+        return _HTML5ToGearsExtension;
     }
 
     public NavigationNamespace getNavigationExtension() {

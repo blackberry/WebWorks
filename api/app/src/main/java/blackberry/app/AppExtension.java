@@ -15,6 +15,8 @@
  */
 package blackberry.app;
 
+import java.lang.ref.WeakReference;
+
 import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.script.ScriptEngine;
 import net.rim.device.api.script.Scriptable;
@@ -34,7 +36,7 @@ public class AppExtension implements WidgetExtension {
     public static final String FEATURE_APP_EVENT = "blackberry.app.event";
 
     private WidgetConfig _widgetConfig;
-    private BrowserField _browserField;
+    private WeakReference _weakReferenceBrowserField;
     private AppNamespaceHandler _namespaceHandler;
     private String _currentDocUri;
 
@@ -66,7 +68,7 @@ public class AppExtension implements WidgetExtension {
         }
 
         if( feature.equals( FEATURE_APP ) ) {
-            _namespaceHandler.setNamespace( new AppNamespace( _browserField, _widgetConfig ) );
+            _namespaceHandler.setNamespace( new AppNamespace( (BrowserField)_weakReferenceBrowserField.get(), _widgetConfig ) );
             scriptEngine.addExtension( FEATURE_APP, _namespaceHandler );
         } else if( feature.equals( FEATURE_APP_EVENT ) ) {
             _namespaceHandler.setNamespace( new AppEventNamespace() );
@@ -80,7 +82,7 @@ public class AppExtension implements WidgetExtension {
      */
     public void register( WidgetConfig widgetConfig, BrowserField browserField ) {
         _widgetConfig = widgetConfig;
-        _browserField = browserField;
+        _weakReferenceBrowserField = new WeakReference(browserField);
     }
 
     /**
