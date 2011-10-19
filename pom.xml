@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+
+   <groupId>net.rim.webworks</groupId>
+   <artifactId>webworks</artifactId>
+   <version>2.3.0.0</version>
+   
+   <packaging>pom</packaging>
+   
+   <modules>
+      <module>api</module>
+      <module>archiver</module>
+   </modules>
+   
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+   
+   <dependencies>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>3.8.1</version>
+         <scope>test</scope>
+      </dependency>
+   </dependencies>
+   <build>
+      <directory>${basedir}/target</directory>
+      <plugins>         
+         <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>2.4.1</version>  
+            <executions>
+                <execution> 
+                 <id>clean-root</id>
+                    <phase>initialize</phase>
+                    <goals>
+                        <goal>clean</goal>
+                    </goals>                
+                    <configuration>
+                        <filesets>
+                             <fileset>
+                                <directory>api/output</directory>  
+                                <followSymlinks>false</followSymlinks>
+                            </fileset>
+                             <fileset>
+                                <directory>${basedir}/target</directory>  
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </execution> 
+            </executions>
+        </plugin>
+        
+      </plugins>
+   </build>
+</project>

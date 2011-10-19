@@ -1,0 +1,4 @@
+Main-Class: net.rim.tumbler.WidgetPackager
+X-COMMENT: Main-Class will be added automatically by build
+Implementation-Vendor: Research In Motion
+Implementation-Version: @version@

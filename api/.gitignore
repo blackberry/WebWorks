@@ -1,0 +1,8 @@
+*/build/
+*/bin/
+*/target/
+*/deliverables/
+*/.settings/
+/output/
+/target/
+/lib/

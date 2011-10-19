@@ -1,0 +1,23 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>build</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <baseDirectory>/</baseDirectory>
+
+<fileSets>
+    <fileSet>
+            <directory>target\installdata</directory>
+            <excludes>
+            <exclude>bbwp</exclude>
+            <exclude>\bin\javaloader</exclude>
+            <exclude>\bin\preverify</exclude>
+            </excludes>
+            <outputDirectory>\</outputDirectory>
+    </fileSet>
+</fileSets>
+
+</assembly>

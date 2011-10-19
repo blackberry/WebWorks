@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   
+   <!-- The Basics -->
+   <parent>
+      <groupId>net.rim.webworks</groupId>
+      <artifactId>api</artifactId>
+      <version>2.3.0.0</version>
+   </parent>
+   
+   <artifactId>CommonAPI</artifactId>
+   <packaging>pom</packaging>
+      
+   <properties>
+      <api.source>${basedir}/sharedglobal</api.source>      
+      <api.docs>${basedir}/../../api-docs/blackberry/app</api.docs>
+      <api.output.folder>${basedir}/../output/common/sharedglobal</api.output.folder>
+   </properties>
+   
+   <build>
+      <plugins>                  
+         <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+               <execution>
+                  <phase>package</phase>
+                  <configuration>
+                     <target>
+                        <echo>Copying sharedglobal file to api output folder</echo>
+                        <copy todir="${api.output.folder}">
+                           <fileset dir="${api.source}" includes="*/**" />
+                        </copy>
+                     </target>
+                  </configuration>
+                  <goals>
+                     <goal>run</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+
+   <reporting>
+      <plugins>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <version>2.3.2-SNAPSHOT</version>
+            <configuration>                
+               <threshold>Normal</threshold>
+               <xmlOutput>true</xmlOutput>
+               <findbugsXmlOutput>true</findbugsXmlOutput>                  
+               <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+            </configuration>
+         </plugin>
+      </plugins>
+   </reporting>
+</project>

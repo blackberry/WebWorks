@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.invoke">
+    <entryClass>blackberry.invoke.InvokeExtension</entryClass>
+
+    <dependencies>
+      <extension id="blackberry.identity"/>
+      <extension id="blackberry.message"/>
+      <extension id="blackberry.pim"/>
+    </dependencies>
+  </extension>
+  
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+    </configuration>
+  </configurations>  
+  
+  <features>
+    <feature id="blackberry.invoke" version="1.0.0" required="true">blackberry.invoke</feature>
+    <feature id="blackberry.invoke.AddressBookArguments" version="1.0.0" required="true">blackberry.invoke.AddressBookArguments</feature>
+    <feature id="blackberry.invoke.BrowserArguments" version="1.0.0" required="true">blackberry.invoke.BrowserArguments</feature>
+    <feature id="blackberry.invoke.CalendarArguments" version="1.0.0" required="true">blackberry.invoke.CalendarArguments</feature>
+    <feature id="blackberry.invoke.CameraArguments" version="1.0.0" required="true">blackberry.invoke.CameraArguments</feature>
+    <feature id="blackberry.invoke.JavaArguments" version="1.0.0" required="true">blackberry.invoke.JavaArguments</feature>
+    <feature id="blackberry.invoke.MapsArguments" version="1.0.0" required="true">blackberry.invoke.MapsArguments</feature>
+    <feature id="blackberry.invoke.MemoArguments" version="1.0.0" required="true">blackberry.invoke.MemoArguments</feature>
+    <feature id="blackberry.invoke.MessageArguments" version="1.0.0" required="true">blackberry.invoke.MessageArguments</feature>
+    <feature id="blackberry.invoke.PhoneArguments" version="1.0.0" required="true">blackberry.invoke.PhoneArguments</feature>
+    <feature id="blackberry.invoke.SearchArguments" version="1.0.0" required="true">blackberry.invoke.SearchArguments</feature>
+    <feature id="blackberry.invoke.TaskArguments" version="1.0.0" required="true">blackberry.invoke.TaskArguments</feature>
+  </features>
+</library>
