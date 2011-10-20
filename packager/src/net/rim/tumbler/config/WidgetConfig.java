@@ -63,6 +63,8 @@ public class WidgetConfig {
 	private String _configXML;
 	private Hashtable<WidgetAccess, Vector<WidgetFeature>> _accessTable;
 	private Vector<String> _extensionClasses;
+	private Vector<String> _extensionJSFiles;
+	private Vector<String> _sharedGlobalJSFiles;
 
 	// Cache fields
     private Boolean               _cacheEnabled;
@@ -424,6 +426,22 @@ public class WidgetConfig {
 
 	public Vector<String> getExtensionClasses() {
 		return _extensionClasses;
+	}
+	
+	public void setExtensionJSFiles(Vector<String> extensionJSFiles) {
+		_extensionJSFiles = extensionJSFiles;
+	}
+	
+	public Vector<String> getExtensionJSFiles() {
+		return _extensionJSFiles;
+	}
+	
+	public void setSharedGlobalJSFiles(Vector<String> sharedGlobalJSFiles) {
+		_sharedGlobalJSFiles = sharedGlobalJSFiles;
+	}
+	
+	public Vector<String> getSharedGlobalJSFiles() {
+		return _sharedGlobalJSFiles;
 	}
 	
 	// Cache field functions

@@ -36,6 +36,7 @@ import org.w3c.dom.html2.HTMLSelectElement;
 import org.w3c.dom.html2.HTMLTextAreaElement;
 
 import blackberry.core.threading.Dispatcher;
+import blackberry.core.threading.GenericDispatcherEvent;
 import blackberry.web.widget.bf.BrowserFieldScreen;
 import blackberry.web.widget.bf.NavigationNamespace;
 import blackberry.web.widget.bf.WidgetFieldManager;
@@ -299,13 +300,24 @@ final public class NavigationController {
         return ( node instanceof HTMLObjectElement );
     }
 
-    boolean fireMouseEvent( String type, Node node ) {
+    boolean fireMouseEvent( final String type, final Node node ) {
         if( node == null )
             return false;
-        DocumentEvent domEvent = (DocumentEvent) _dom;
-        Event mouseEvent = domEvent.createEvent( "MouseEvents" );
-        mouseEvent.initEvent( type, true, true );
-        ( (EventTarget) node ).dispatchEvent( mouseEvent );
+        
+        // if the JS triggered by this mouse event blocks this thread for too long, the browser will timeout/crash.
+        // Dispatch it into another thread.
+        new GenericDispatcherEvent() {
+            protected void dispatch() {
+                try {
+                    DocumentEvent domEvent = (DocumentEvent) _dom;
+                    Event mouseEvent = domEvent.createEvent( "MouseEvents" );
+                    mouseEvent.initEvent( type, true, true );
+                    ( (EventTarget) node ).dispatchEvent( mouseEvent );
+                } catch( Exception e ) {
+                }
+            }
+        }.Dispatch();
+        
         return true;
     }
 

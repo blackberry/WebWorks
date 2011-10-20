@@ -7,24 +7,21 @@
   <platforms>
     <platform value="JAVA">
       <target version="default" config="JAVA_XHR" />
-      <target version="5.0" config="JAVA_XHR_BlackBerry" />
     </platform>
   </platforms>
-  
+
   <configurations>
     <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
       <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+      <src type="text/javascript" path="js/common/system_dispatcher.js" comment="System JS XHR dispatcher" />
+      <src type="text/javascript" path="js/common/system_ns.js" comment="System JS interface" />
     </configuration>
-    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
-      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
-    </configuration>
-  </configurations>  
-  
+  </configurations>
+
   <features>
     <feature id="blackberry.system" version="1.0.0"/>
-    <feature id="blackberry.system.event" version="1.0.0"/>
   </features>
-  
+
   <object name="blackberry.system" shortName="System" introduced="1.0.0" comment="The System object allows you to get access to system level functions and attributes of the BlackBerry device.">
     <features>
       <feature id="blackberry.system" version="1.0.0"/>

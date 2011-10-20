@@ -42,7 +42,10 @@ public final class ShowBannerIndicatorFunction extends ScriptableFunctionBase {
         try {
             ApplicationIcon icon = new ApplicationIcon( image );
 
-            reg.unregister();
+            if( reg.getApplicationIndicator() != null ) {
+                reg.unregister();
+            }
+
             ApplicationIndicator indicator;
             if( args.length > 1 ) {
                 // Set icon and value

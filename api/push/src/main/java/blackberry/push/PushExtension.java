@@ -29,7 +29,6 @@ import org.w3c.dom.Document;
 public final class PushExtension implements WidgetExtension {
 
     public static final String FEATURE_NAME = "blackberry.push";
-    private String _currentDocUri;
 
     /**
      * @see WidgetExtension#getFeatureList()
@@ -45,14 +44,6 @@ public final class PushExtension implements WidgetExtension {
             throws Exception {
         Object obj = null;
 
-        // Reset the feature handler when a new doc is detected
-        if( _currentDocUri == null ) {
-            _currentDocUri = doc.getDocumentURI();
-        } else if( doc != null && !doc.getDocumentURI().equals( _currentDocUri ) ) {
-            resetListeners();
-            _currentDocUri = doc.getDocumentURI();
-        }
-        
         if( feature.equals( FEATURE_NAME ) ) {
             obj = new PushNamespace();
         }
@@ -73,7 +64,8 @@ public final class PushExtension implements WidgetExtension {
      * @see WidgetExtension#unloadFeatures(Document)
      */
     public void unloadFeatures( Document doc ) {
-        // do nothing
+        // Reset listeners when page is done
+        resetListeners();
     }
     
     private void resetListeners() {

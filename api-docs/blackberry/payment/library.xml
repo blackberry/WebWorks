@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.payment">
+    <entryClass>blackberry.payment.PaymentExtension</entryClass>  
+  </extension>
+  
+  <dependencies>
+    <jar path="paymentapi.jar"/>
+  </dependencies>
+
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+      <target version="5.0" config="JAVA_XHR_BlackBerry" />
+    </platform>
+  </platforms>
+  
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+	  <src type="text/javascript" path="js/common/payment_dispatcher.js" comment="Payment JS XHR dispatcher" />
+      <src type="text/javascript" path="js/common/payment_ns.js" comment="Payment JS interface" />
+    </configuration>
+    <configuration name="JAVA_XHR_BlackBerry" version="1.0" comment="For XHR architecture for Java implementation for OS 5.0">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+	  <src type="text/javascript" path="js/common/payment_dispatcher.js" comment="Payment JS XHR dispatcher" />
+      <src type="text/javascript" path="js/common/payment_ns.js" comment="Payment JS interface" />
+    </configuration>
+  </configurations> 
+  
+  <features>
+    <feature id="blackberry.payment" version="1.0.0"></feature>
+  </features>
+</library>

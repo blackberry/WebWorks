@@ -1,18 +1,18 @@
 /*
- * Copyright 2010-2011 Research In Motion Limited.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2010-2011 Research In Motion Limited.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package blackberry.web.widget.impl;
 
 import java.util.Enumeration;
@@ -30,6 +30,8 @@ import net.rim.device.api.browser.field2.BrowserFieldRequest;
 import net.rim.device.api.io.http.HttpHeaders;
 import net.rim.device.api.system.CodeModuleManager;
 import net.rim.device.api.system.KeyListener;
+import net.rim.device.api.util.Comparator;
+import net.rim.device.api.util.SimpleSortingVector;
 import net.rim.device.api.web.WidgetAccess;
 import net.rim.device.api.web.WidgetConfig;
 import net.rim.device.api.web.WidgetExtension;
@@ -37,6 +39,7 @@ import net.rim.device.api.web.WidgetFeature;
 import net.rim.device.api.xml.parsers.DocumentBuilder;
 import net.rim.device.api.xml.parsers.DocumentBuilderFactory;
 
+import blackberry.core.IJSExtension;
 import blackberry.web.widget.bf.BrowserFieldScreen;
 import blackberry.web.widget.caching.WidgetCacheExtension;
 import blackberry.web.widget.loadingScreen.TransitionConstants;
@@ -44,68 +47,72 @@ import blackberry.web.widget.util.WidgetUtil;
 
 public abstract class WidgetConfigImpl implements WidgetConfig {
 
-    // Provided by WidgetConfigImpl file 
+    // Provided by WidgetConfigImpl file
     // - parsed/populated by Web Component Pack generated file
-    protected Hashtable    _accessList;
-    protected String       _author;
-    protected String       _authorURL;
-    protected String       _authorEmail;
-    protected String       _copyright;
-    protected String       _configXML;
-    protected String       _content;
-    protected String       _contentCharset;
-    protected String       _contentType;
-    protected HttpHeaders  _customHeaders;
-    protected String       _description;
-    protected String       _icon;
-    protected String       _iconHover;
-    protected String       _id;
-    protected String       _license;
-    protected String       _licenseURL;
-    protected String       _name;
+    protected Hashtable _accessList;
+    protected String _author;
+    protected String _authorURL;
+    protected String _authorEmail;
+    protected String _copyright;
+    protected String _configXML;
+    protected String _content;
+    protected String _contentCharset;
+    protected String _contentType;
+    protected HttpHeaders _customHeaders;
+    protected String _description;
+    protected String _icon;
+    protected String _iconHover;
+    protected String _id;
+    protected String _license;
+    protected String _licenseURL;
+    protected String _name;
     // Key: name of the profile. Value: unique for registering the profile
-    protected Hashtable    _notifications;       
-    protected String       _loadingScreenColor;
-    protected int[]        _preferredTransports;
-    protected Integer      _transportTimeout;
-    protected String       _backButtonBehaviour;
-    protected boolean      _hasMultiAccess;
-    protected boolean      _widgetNavigationMode;
+    protected Hashtable _notifications;
+    protected String _loadingScreenColor;
+    protected int[] _preferredTransports;
+    protected Integer _transportTimeout;
+    protected String _backButtonBehaviour;
+    protected boolean _hasMultiAccess;
+    protected boolean _widgetNavigationMode;
 
     // private fields
-    protected Vector       _widgetExtensions;
-    private Vector         _keyListeners;
-    private Hashtable      _featureTable;
+    protected Vector _widgetExtensions;
+    private Vector _keyListeners;
+    private Hashtable _featureTable;
     private WidgetAccess[] _accessArray;
-    private Document       _configXMLDoc;
-    private String         _version;
+    private Document _configXMLDoc;
+    private String _version;
 
     // loading screen configuration
-    protected String       _backgroundImage;
-    protected String       _foregroundImage;
-    protected boolean      _firstPageLoad;
-    protected boolean      _remotePageLoad;
-    protected boolean      _localPageLoad;
-    protected int          _transitionType;
-    protected int          _transitionDuration;
-    protected int          _transitionDirection;
+    protected String _backgroundImage;
+    protected String _foregroundImage;
+    protected boolean _firstPageLoad;
+    protected boolean _remotePageLoad;
+    protected boolean _localPageLoad;
+    protected int _transitionType;
+    protected int _transitionDuration;
+    protected int _transitionDirection;
 
     // caches configuration
-    protected boolean      _cacheEnabled;
-    protected boolean      _aggressivelyCaching;
-    protected int          _aggressiveCacheAge;
-    protected int          _overrodeAge;
-    protected int          _maxCacheable;
-    protected int          _maxCacheSize;
+    protected boolean _cacheEnabled;
+    protected boolean _aggressivelyCaching;
+    protected int _aggressiveCacheAge;
+    protected int _overrodeAge;
+    protected int _maxCacheable;
+    protected int _maxCacheSize;
     // Key: file extension. Value: mime type
-    protected Hashtable    _allowedUriTypes;     
+    protected Hashtable _allowedUriTypes;
 
     // Auto-Startup members
-    protected boolean      _runOnStartup;
-    protected boolean      _allowInvokeParams;
-    protected String       _backgroundSource;
-    protected String       _foregroundSource;
-    protected boolean      _debugEnabled = false;
+    protected boolean _runOnStartup;
+    protected boolean _allowInvokeParams;
+    protected String _backgroundSource;
+    protected String _foregroundSource;
+    protected boolean _debugEnabled = false;
+
+    // JavaScript paths need to be injected.
+    protected SimpleSortingVector _jsInjectionPaths = new SimpleSortingVector();
+    protected SimpleSortingVector _sharedGlobalJSInjectionPaths = new SimpleSortingVector();
 
     /**
      * Protected construtor.
@@ -185,6 +192,10 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
 
     public WidgetExtension getExtensionForFeature( String featureID ) {
         return (WidgetExtension) _featureTable.get( featureID );
+    }
+
+    public Object getExtensionObjectForFeature( String featureID ) {
+        return _featureTable.get( featureID );
     }
 
     public String getIcon() {
@@ -321,28 +332,27 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     public boolean isDebugEnabled() {
         return _debugEnabled;
     }
-    
+
     /**
-     * Checks all classes specified as WidgetExtension - determines if they also
-     * implement KeyListener. Then adds them to a KeyListener vector.
+     * Checks all classes specified as WidgetExtension - determines if they also implement KeyListener. Then adds them to a
+     * KeyListener vector.
      * 
-     * @return a vector of KeyListener objects; an empty vector if no
-     *         KeyListener objects are found.
+     * @return a vector of KeyListener objects; an empty vector if no KeyListener objects are found.
      */
     public Vector getKeyListeners() {
-        if ( _keyListeners == null ) {
+        if( _keyListeners == null ) {
             _keyListeners = new Vector();
             Object ext = null;
-            for ( Enumeration e = _widgetExtensions.elements(); e.hasMoreElements(); ) {
+            for( Enumeration e = _widgetExtensions.elements(); e.hasMoreElements(); ) {
                 ext = e.nextElement();
-                if ( ext instanceof KeyListener ) {
+                if( ext instanceof KeyListener ) {
                     _keyListeners.addElement( ext );
                 }
             }
         }
         return _keyListeners;
     }
-    
+
     public WidgetAccess[] getAccessList() {
         if( _accessArray != null ) {
             return _accessArray;
@@ -390,13 +400,37 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
         return _configXMLDoc;
     }
 
+    public Hashtable getFeatureTable() {
+        return _featureTable;
+    }
+
     public boolean allowMultiAccess() {
         return _hasMultiAccess;
     }
 
     /**
-     * <description> Obtains the BrowserFieldConfig object by accessing the Screen.
+     * <description> Retrieve paths of shared global JavaScript files to be injected.
+     *
+     * @return Vector contains JavaScript paths.
+     */
+
+    public SimpleSortingVector getSharedGlobalJSInjectionPaths() {
+        return _sharedGlobalJSInjectionPaths;
+    }
+    
+    /**
+     * <description> Retrieve paths of extension JavaScript files to be injected.
      * 
+     * @return Vector contains JavaScript paths.
+     */
+
+    public SimpleSortingVector getJSInjectionPaths() {
+        return _jsInjectionPaths;
+    }
+
+    /**
+     * <description> Obtains the BrowserFieldConfig object by accessing the Screen.
+     *
      * @return <description>
      */
     private BrowserFieldConfig getBrowserFieldConfig() {
@@ -441,8 +475,13 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     private void matchFeature( String featureID, Hashtable featureTable ) {
         Enumeration e = _widgetExtensions.elements();
         while( e.hasMoreElements() ) {
-            WidgetExtension we = (WidgetExtension) e.nextElement();
-            String[] features = we.getFeatureList();
+            Object we = e.nextElement();
+            String[] features;
+            if( we instanceof WidgetExtension ) {
+                features = ( (WidgetExtension) we ).getFeatureList();
+            } else {
+                features = ( (IJSExtension) we ).getFeatureList();
+            }
             for( int a = 0; a < features.length; a++ ) {
                 if( features[ a ].equals( featureID ) ) {
                     featureTable.put( featureID, we );

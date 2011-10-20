@@ -50,7 +50,7 @@ public class PushDataObject extends Scriptable {
     /*
      * Properties
      */
-    private static final String PROPERTY_IS_CHANNEL_ENCRYPED = "isChannelEnrypted";
+    private static final String PROPERTY_IS_CHANNEL_ENCRYPTED = "isChannelEncrypted";
     private static final String PROPERTY_PAYLOAD = "payload";
 
     /*
@@ -85,7 +85,7 @@ public class PushDataObject extends Scriptable {
             return new Integer( DECLINE_USERREQ );
         } else if( name.equals( DECLINE_USERRFS_VALUE ) ) {
             return new Integer( DECLINE_USERRFS );
-        } else if( name.equals( PROPERTY_IS_CHANNEL_ENCRYPED ) ) {
+        } else if( name.equals( PROPERTY_IS_CHANNEL_ENCRYPTED ) ) {
             return new Boolean( _pushData.isChannelEncrypted() );
         } else if( name.equals( PROPERTY_PAYLOAD ) ) {
             return parsePayload( _pushData.getPayload() );

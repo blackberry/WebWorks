@@ -198,8 +198,11 @@ public final class BrowserFieldScreen extends WidgetScreen {
 
         // Register extensions.
         Enumeration ext = _wConfig.getExtensions();
-        while( ext.hasMoreElements() ) {
-            ( (WidgetExtension) ext.nextElement() ).register( _wConfig, _browserField );
+        while(ext.hasMoreElements()) {
+        	Object extension = ext.nextElement();
+        	if( extension instanceof WidgetExtension ){
+        		((WidgetExtension) extension ).register( _wConfig, _browserField );
+        	}
         }
 
         // Update the static reference of browser field.

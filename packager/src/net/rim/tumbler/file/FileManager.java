@@ -583,6 +583,18 @@ public class FileManager {
         extClasses.addAll( _featureManager.getExtensionClasses() );
         return extClasses;
     }
+    
+    public Vector< String > getSharedGlobalJSFiles() {
+        Vector< String > sharedGlobalJS = new Vector< String >();
+        sharedGlobalJS.addAll( _featureManager.getSharedGlobalJSFiles() );
+        return sharedGlobalJS;
+    }
+    
+    public Vector< String > getExtensionJSFiles() {
+        Vector< String > extensionJS = new Vector< String >();
+        extensionJS.addAll( _featureManager.getExtensionJSFiles() );
+        return extensionJS;
+    }
 
     public List< String > getCompiledJARDependencies() {
         List< String > jarDependencies = new ArrayList< String >();

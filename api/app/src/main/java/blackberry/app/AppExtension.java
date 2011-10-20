@@ -87,7 +87,8 @@ public class AppExtension implements WidgetExtension {
      * @see net.rim.device.api.web.WidgetExtension#unloadFeatures(Document)
      */
     public void unloadFeatures( Document doc ) {
-        // do nothing
+        // Reset feature handler when page is done
+        _namespaceHandler.resetFeatures();
     }
 
     private static class AppNamespaceHandler extends Scriptable {

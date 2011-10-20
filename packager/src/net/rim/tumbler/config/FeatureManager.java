@@ -61,9 +61,13 @@ public class FeatureManager {
     // for storing common API
     private String                                _commonAPIDir       = "common";
     private HashSet< String >                     _extensionClasses;
+    
+    private HashSet< String >                     _sharedGlobalJSFiles;
+    private HashSet< String >                     _extensionJSFiles;
+	
 	// List of compiled JARs that the extensions might depend on
     private HashSet< String >                     _compiledJARDependencies;
-	
+    
     private HashSet< String >                     _curPaths           = new HashSet< String >();
     private HashSet< String >                     _commonAPIPaths     = new HashSet< String >();
     private File                                  _temporaryDirectory;
@@ -74,20 +78,26 @@ public class FeatureManager {
 
     private static final String                   TEMPORARY_DIRECTORY = "~temporaryextensionsource";
     private static final String                   EXTENSION_DIRECTORY = "extension";
+    private static final String                   JS_DIRECTORY        = "WebWorksApplicationSharedJsRepository0";
+    private static final String                   COMMON_JS_DIRECTORY = "sharedglobal";
     private static final String                   LIBRARY_XML         = "library.xml";
-
+    
 	/**
 	 * Stores the extension's library.xml information and the paths to source
 	 * code in repository.
 	 */
 	public static class ExtensionInfo {
 		private Library _lib;
-		private HashSet<String> _repPaths;
+		private HashSet<String> _javaPaths;
 		private HashSet<String> _jarPaths;
+		private HashSet<String> _jsPaths;
+		
+		private File _extensionFolder;
 
-		public ExtensionInfo(Library lib, HashSet<String> repPaths) {
+		public ExtensionInfo(Library lib, HashSet<String> javaPaths, HashSet<String> jsPaths) {
 			_lib = lib;
-			_repPaths = repPaths;
+			_javaPaths = javaPaths;
+			_jsPaths = jsPaths;
 		}
 
 		public Library getLibrary() {
@@ -106,8 +116,12 @@ public class FeatureManager {
 			return null;
 		}
 
-		public HashSet<String> getRepositoryPaths() {
-			return _repPaths;
+		public HashSet<String> getRepositoryJavaPaths() {
+			return _javaPaths;
+		}
+		
+		public HashSet<String> getRepositoryJavaScriptPaths() {
+			return _jsPaths;
 		}
 		
 		public HashSet<String> getCompiledJARPaths() {
@@ -121,14 +135,24 @@ public class FeatureManager {
 			
 			_jarPaths.add(path);
 		}
+		
+		public void setExtensionFolder(File extFolder) {
+			_extensionFolder = extFolder;
+		}
+		
+		public File getExtensionFolder() {
+			return _extensionFolder;
+		}
 
 		@Override
 		public String toString() {
 			StringBuffer buf = new StringBuffer();
 			buf.append("{lib: ");
 			buf.append(_lib);
-			buf.append(", paths: ");
-			buf.append(_repPaths);
+			buf.append(", javaPaths: ");
+			buf.append(_javaPaths);
+			buf.append(", jsPaths: ");
+			buf.append(_jsPaths);			
 			buf.append("}");
 			return buf.toString();
 		}				
@@ -143,6 +167,8 @@ public class FeatureManager {
 		_requiredFeatures = getRequiredFeatures(accessTable);
 		_extensionClasses = new HashSet<String>();
 		_compiledJARDependencies = new HashSet<String>();
+		_sharedGlobalJSFiles = new HashSet<String>();
+		_extensionJSFiles = new HashSet<String>();
 		
 		// TODO temp workaround, treat widgetcache features as exceptions
 		// will not throw error when the code fails to find them in extension
@@ -204,6 +230,14 @@ public class FeatureManager {
 
 	public HashSet<String> getExtensionClasses() {
 		return _extensionClasses;
+	}
+	
+	public HashSet<String> getExtensionJSFiles() {
+		return _extensionJSFiles;
+	}
+
+	public HashSet<String> getSharedGlobalJSFiles() {
+		return _sharedGlobalJSFiles;
 	}
 	
 	/**
@@ -372,7 +406,7 @@ public class FeatureManager {
 	        String key = entry.getKey();
 	        ExtensionInfo value = entry.getValue();
 	        if (_requiredFeatures.contains(key)) {
-	            copyExtensionPathsToSourceDir(value.getRepositoryPaths());
+	            copyExtensionPathsToSourceDir(value.getRepositoryJavaPaths(), getExtensionPath(), null);
 				_resolvedPaths.addAll((HashSet<String>) _curPaths.clone());
 	            _extensionClasses.add(value.getLibrary().getEntryClass());
 
@@ -381,6 +415,18 @@ public class FeatureManager {
 	            _requiredFeatures.remove(key);
 	        }
 	    }
+	}
+	
+	private static HashSet<String> getJSRelativePaths(HashSet<String> fullPaths) {
+		String relPath = null;
+		HashSet<String> relativePaths = new HashSet<String>();
+		
+		for (String path : fullPaths) {
+			relPath = new File(SessionManager.getInstance().getSourceFolder()).toURI().relativize(new File(path).toURI()).getPath();
+			relativePaths.add(relPath);
+		}
+		
+		return relativePaths;
 	}
 
 	/**
@@ -435,10 +481,19 @@ public class FeatureManager {
 		extensions = edm.resolveExtensions(extensions);
 				
 		for (String extensionId : extensions) {
-			HashSet<String> repPaths = _extensionLookupTable.get(extensionId)
-					.getRepositoryPaths();
-			copyExtensionPathsToSourceDir(repPaths);
+			ExtensionInfo info = _extensionLookupTable.get(extensionId);
+			HashSet<String> javaPaths = info.getRepositoryJavaPaths();
+			copyExtensionPathsToSourceDir(javaPaths, getExtensionPath(), info.getExtensionFolder());
 			_resolvedPaths.addAll((HashSet<String>) _curPaths.clone());
+			
+			HashSet<String> jsPaths = info.getRepositoryJavaScriptPaths();
+			copyExtensionPathsToSourceDir(jsPaths, getJavaScriptPath()
+					+ File.separator
+					+ getEscapedEntryClass(info.getLibrary().getEntryClass())
+					+ File.separator, info.getExtensionFolder());
+			_resolvedPaths.addAll((HashSet<String>) _curPaths.clone());
+			
+			_extensionJSFiles.addAll(getJSRelativePaths(_curPaths));
 			
 			// extension can be found in lookup table for sure, otherwise
 			// exception would have been thrown in ExtensionDependencyManager.resolve
@@ -451,15 +506,28 @@ public class FeatureManager {
 	private void copyCommonAPI() {
 		File dir = new File(_repositoryDir + File.separator + _commonAPIDir);		
 		File[] files = dir.listFiles();
+		boolean sharedGlobalJS = false;
 		
 		for (File f : files) {
 			if (f.exists()) {
 				try {
-					File destFile = new File(getExtensionPath() + f.getName());
+					File destFile = null;
+					
+					if (f.isDirectory() && f.getName().equals(COMMON_JS_DIRECTORY)) {
+						destFile = new File(getJavaScriptPath() + f.getName());
+						sharedGlobalJS = true;
+					} else {
+						destFile = new File(getExtensionPath() + f.getName());
+					}
+					
 					_curPaths.clear();
 					copyFiles(f, destFile);
 					_commonAPIPaths
 							.addAll((HashSet<String>) _curPaths.clone());
+					
+					if (sharedGlobalJS) {
+						_sharedGlobalJSFiles = getJSRelativePaths(_curPaths);
+					}
                 } catch (IOException e) {
                     Logger.logMessage(LogType.ERROR, "EXCEPTION_IO_COPY_FILES",
                             new String[] {f.getAbsolutePath(), e.getMessage()});
@@ -576,7 +644,8 @@ public class FeatureManager {
 		}		
 		
 		ArrayList<WidgetFeature> features = lib.getFeatures();
-		HashSet<String> paths = new HashSet<String>();		
+		HashSet<String> javaPaths = new HashSet<String>();
+		HashSet<String> jsPaths = new HashSet<String>();
 		Hashtable<String, ExtensionInfo> availableFeatures = new Hashtable<String, ExtensionInfo>();		
 		
 		if (allowBackwardCompatibility) {
@@ -584,10 +653,10 @@ public class FeatureManager {
 			File[] files = _temporaryDirectory.listFiles();
 			
 			for (File f : files) {
-				paths.add(f.getAbsolutePath());
+				javaPaths.add(f.getAbsolutePath());
 			}				
 		} else {
-			ExtensionInfo info = new ExtensionInfo(lib, paths);
+			ExtensionInfo info = new ExtensionInfo(lib, javaPaths, jsPaths);
 			boolean extensionIdFound = false;
 			
 			if (lib.getExtension() != null) {
@@ -603,6 +672,9 @@ public class FeatureManager {
 					}
 							
 					_extensionLookupTable.put(id, info);
+					
+					info.setExtensionFolder(libraryXML.getParentFile());
+					
 					extensionIdFound = true;
 				}
 			}
@@ -635,12 +707,18 @@ public class FeatureManager {
 
 			for (Src s : src) {
 				String path = s.getPath();
-				paths.add(extensionDir.getAbsolutePath() + File.separator
-						+ path);
+				
+				if (s.getType().equalsIgnoreCase("text/java")) {
+					javaPaths.add(extensionDir.getAbsolutePath() + File.separator
+							+ path);
+				} else if (s.getType().equalsIgnoreCase("text/javascript")) {
+					jsPaths.add(extensionDir.getAbsolutePath() + File.separator
+							+ path);
+				}
 			}
 		}
 
-		ExtensionInfo info = new ExtensionInfo(lib, paths);
+		ExtensionInfo info = new ExtensionInfo(lib, javaPaths, jsPaths);
 		
 		for (WidgetFeature feature : features) {
 			availableFeatures.put(feature.getID(), info);
@@ -668,22 +746,38 @@ public class FeatureManager {
 		return SessionManager.getInstance().getSourceFolder() + File.separator
 				+ EXTENSION_DIRECTORY + File.separator;
 	}
+	
+	private static String getJavaScriptPath() {
+		return SessionManager.getInstance().getSourceFolder() + File.separator
+				+ JS_DIRECTORY + File.separator;
+	}
 
 	private static String getTempExtensionPath() {
 		return SessionManager.getInstance().getSourceFolder()
 				+ TEMPORARY_DIRECTORY + File.separator;
 	}
+	
+	// simply replace all occurrences of "." with "_"
+	private static String getEscapedEntryClass(String entryClass) {
+		return entryClass.replace(".", "_");
+	}
 
-	private void copyExtensionPathsToSourceDir(HashSet<String> paths) {
+	private void copyExtensionPathsToSourceDir(HashSet<String> paths, String destDir, File extensionFolder) {
 		_curPaths.clear();
 
 		for (String path : paths) {
 			File file = new File(path);
+			String relativePath = "";
+			
+			if (extensionFolder != null) {
+				relativePath = extensionFolder.toURI().relativize(file.getParentFile().toURI()).getPath();
+				relativePath += File.separator;
+			}
 
 			if (file.exists()) {
 				try {
-					copyFiles(file, new File(getExtensionPath()
-							+ file.getName()));
+					copyFiles(file, new File(
+							destDir + relativePath + file.getName()));
 				} catch (IOException e) {
                     Logger.logMessage(LogType.ERROR, "EXCEPTION_IO_COPY_FILES",
                             new String[] {file.getAbsolutePath(), e.getMessage()});
@@ -728,6 +822,10 @@ public class FeatureManager {
 		} else {
 			// This was not a directory, just copy the file
 			try {
+				if (!dest.getParentFile().exists()) {
+					dest.getParentFile().mkdirs();
+				}
+				
 				// open the files for input and output
 				FileManager.copyFile(src, dest);
 				_curPaths.add(dest.getAbsolutePath());

@@ -37,7 +37,6 @@ public class MessagingExtension implements WidgetExtension {
     public static WidgetConfig _widgetConfig = null;
     private static Scriptable _smsNamespace = null;
     private final MessageFeaturesHandler _messageFeaturesHandler;
-    private String _currentDocUri;
 
     /**
      * Default constructor.
@@ -61,15 +60,6 @@ public class MessagingExtension implements WidgetExtension {
      * @see net.rim.device.api.web.WidgetExtension#loadFeature(String, String, Document, ScriptEngine)
      */
     public void loadFeature( String feature, String version, Document doc, ScriptEngine scriptEngine ) throws Exception {
-
-        // Reset the feature handler when a new doc is detected
-        if( _currentDocUri == null ) {
-            _currentDocUri = doc.getDocumentURI();
-        } else if( doc != null && !doc.getDocumentURI().equals( _currentDocUri ) ) {
-            _messageFeaturesHandler.resetFeatures();
-            _currentDocUri = doc.getDocumentURI();
-        }
-
         if( feature.equals( FEATURE_NAME ) ) {
             _messageFeaturesHandler.addFeature( feature, new MessagingNamespace() );
         } else if( feature.equals( getFormattedFeatureName( FEATURE_NAME_SMS ) ) ) {
@@ -93,7 +83,8 @@ public class MessagingExtension implements WidgetExtension {
      * @see net.rim.device.api.web.WidgetExtension#unloadFeatures(Document)
      */
     public void unloadFeatures( Document doc ) {
-        // do nothing
+        // Reset features when page is done
+        _messageFeaturesHandler.resetFeatures();
     }
 
     /**

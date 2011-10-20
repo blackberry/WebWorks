@@ -127,6 +127,8 @@ public class InvokeExtension implements WidgetExtension {
      * @see net.rim.device.api.web.WidgetExtension#unloadFeatures(org.w3c.dom.Document)
      */
     public void unloadFeatures( final Document doc ) {
+        // Reset features when page is done
+        invokeFeaturesHandler.resetFeatures();
     }
 
     private static String getFormattedFeatureName( final String featureName ) {
