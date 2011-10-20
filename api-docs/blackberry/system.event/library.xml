@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<library isWhitelist="true">
+  <extension id="blackberry.system.event">
+    <entryClass>blackberry.system.event.SystemEventExtension</entryClass>
+  </extension>
+
+  <platforms>
+    <platform value="JAVA">
+      <target version="default" config="JAVA_XHR" />
+    </platform>
+  </platforms>
+
+  <configurations>
+    <configuration name="JAVA_XHR" version="1.0" comment="For XHR architecture for Java implementation">
+      <src type="text/java" path="blackberry" comment="API implementation in JavaScript" />
+      <src type="text/javascript" path="js/common/system_event_dispatcher.js" comment="System event JS XHR dispatcher" />
+      <src type="text/javascript" path="js/common/system_event_ns.js" comment="System event JS interface" />
+    </configuration>
+  </configurations>
+
+  <features>
+    <feature id="blackberry.system.event" version="1.0.0"/>
+  </features>
+</library>

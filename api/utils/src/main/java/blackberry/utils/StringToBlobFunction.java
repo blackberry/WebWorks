@@ -27,14 +27,14 @@ public class StringToBlobFunction extends ScriptableFunctionBase {
 
     public static final String NAME = "stringToBlob";
 
-    private static final String DEFAULT_ENCODING = "UTF-16BE";
+    private static final String DEFAULT_ENCODING = "ISO-8859-1";
     private static final String BASE64_ENCODING = "BASE64";
     private static final String UTF8_ENCODING = "UTF-8";
 
     /**
      * Convert a String object into a Blob using the specified character encoding. BlackBerry supports the following character
      * encodings: "ISO-8859-1", "UTF-8", "UTF-16BE", "US-ASCII". If encoding information is not provided in the parameter,
-     * UTF-16BE encoding will be used by default.
+     * ISO-8859-1 encoding will be used by default.
      * 
      * @param thiz
      *            Context where this function was called.

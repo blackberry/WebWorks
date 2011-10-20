@@ -75,7 +75,7 @@ public final class HardwareKeyListener implements KeyListener {
     public boolean keyDown( int keycode, int time ) {
         _storedEvent = new StoredEvent( KEY_DOWN, keycode, time );
         int key = Keypad.key( keycode );
-        if( key == Keypad.KEY_SEND || key == Keypad.KEY_END ) {
+        if( key == Keypad.KEY_SEND || key == Keypad.KEY_END || key == Keypad.KEY_CONVENIENCE_1 || key == Keypad.KEY_CONVENIENCE_2 ) {
             // fire the event right away because these two keys do not trigger
             // WidgetScreen.keyCharUnhandled callback.
             return fireStoredEvent();

@@ -212,6 +212,18 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         	      .append(extensionClass).append("());").append(NL_LVL_0);
         	
         }
+
+        // Add extension JS files
+        for (int j = 0; j < _widgetConfig.getExtensionJSFiles().size(); j++) {
+            String extensionJSFile = _widgetConfig.getExtensionJSFiles().elementAt(j);
+            buffer.append("_jsInjectionPaths.addElement(\"").append(extensionJSFile).append("\");").append(NL_LVL_0);
+        }
+        
+        // Add shared global JS files
+        for (int j = 0; j < _widgetConfig.getSharedGlobalJSFiles().size(); j++) {
+            String sharedGlobalJSFile = _widgetConfig.getSharedGlobalJSFiles().elementAt(j);
+            buffer.append("_sharedGlobalJSInjectionPaths.addElement(\"").append(sharedGlobalJSFile).append("\");").append(NL_LVL_0);
+        }
         
         // Add transport
         if (_widgetConfig.getTransportTimeout() >= 0) {

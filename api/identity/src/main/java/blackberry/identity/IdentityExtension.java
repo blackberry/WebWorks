@@ -22,6 +22,7 @@ import net.rim.device.api.web.WidgetConfig;
 import net.rim.device.api.web.WidgetExtension;
 
 import blackberry.identity.phone.PhoneNamespace;
+import blackberry.identity.service.ServiceObject;
 
 import org.w3c.dom.Document;
 
@@ -35,9 +36,9 @@ public class IdentityExtension implements WidgetExtension {
 
     public static final String FEATURE_IDENTITY = "blackberry.identity";
     public static final String FEATURE_IDENTITY_PHONE = "blackberry.identity.phone";
+    public static final String IDENTITY_SERVICE = "Service";
 
     private IdentityNamespaceHandler _namespaceHandler;
-    private String _currentDocUri;
 
     /**
      * Constructor that initializes the identity namespace handler
@@ -59,15 +60,6 @@ public class IdentityExtension implements WidgetExtension {
      */
     public void loadFeature( final String feature, final String version, final Document doc, final ScriptEngine scriptEngine )
             throws Exception {
-
-        // Reset the feature handler when a new doc is detected
-        if( _currentDocUri == null ) {
-            _currentDocUri = doc.getDocumentURI();
-        } else if( doc != null && !doc.getDocumentURI().equals( _currentDocUri ) ) {
-            _namespaceHandler.resetFeatures();
-            _currentDocUri = doc.getDocumentURI();
-        }
-
         // Load features into the script engine
         if( feature.equals( FEATURE_IDENTITY ) ) {
             IdentityNamespace idNamespace = new IdentityNamespace();
@@ -91,6 +83,8 @@ public class IdentityExtension implements WidgetExtension {
      * @see net.rim.device.api.web.WidgetExtension#unloadFeatures(org.w3c.dom.Document)
      */
     public void unloadFeatures( final Document doc ) {
+        // Reset namespaces when page is done
+        _namespaceHandler.resetFeatures();
     }
 
     /**
@@ -100,6 +94,7 @@ public class IdentityExtension implements WidgetExtension {
 
         Scriptable _identityNamespace;
         Scriptable _phoneNamespace;
+        ServiceObject _serviceObjectNamespace = new ServiceObject( null, null, null, null, null );
 
         void setNamespace( IdentityNamespace namespace ) {
             _identityNamespace = namespace;
@@ -112,6 +107,8 @@ public class IdentityExtension implements WidgetExtension {
         public Object getField( String fieldName ) throws Exception {
             if( fieldName.equals( PhoneNamespace.NAME ) ) {
                 return _phoneNamespace != null ? _phoneNamespace : super.getField( fieldName );
+            } else if( fieldName.equals( IDENTITY_SERVICE ) ) {
+                return _serviceObjectNamespace;
             } else if( _identityNamespace != null ) {
                 return _identityNamespace.getField( fieldName );
             }

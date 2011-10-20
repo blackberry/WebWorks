@@ -15,27 +15,34 @@
  */
 package blackberry.web.widget.bf;
 
+import java.io.IOException;
+
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.InputConnection;
-
-import java.io.IOException;
 
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.blackberry.api.browser.BrowserSession;
 import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.browser.field2.BrowserFieldRequest;
+import net.rim.device.api.browser.field2.BrowserFieldResponse;
 import net.rim.device.api.browser.field2.ProtocolController;
 import net.rim.device.api.io.MIMETypeAssociations;
+import net.rim.device.api.io.URI;
 import net.rim.device.api.web.WidgetAccess;
 import net.rim.device.api.web.WidgetConfig;
-
+import blackberry.common.util.StringUtilities;
+import blackberry.core.IJSExtension;
+import blackberry.core.JSExtensionRequest;
+import blackberry.core.JSExtensionResponse;
+import blackberry.web.widget.MemoryMaid;
+import blackberry.web.widget.auth.Authenticator;
+import blackberry.web.widget.device.DeviceInfo;
 import blackberry.web.widget.exception.MediaHandledException;
 import blackberry.web.widget.impl.WidgetConfigImpl;
 import blackberry.web.widget.impl.WidgetException;
 import blackberry.web.widget.policy.WidgetPolicy;
 import blackberry.web.widget.policy.WidgetPolicyFactory;
-import blackberry.web.widget.device.DeviceInfo;
-import blackberry.web.widget.auth.Authenticator;
+import blackberry.web.widget.bf.HTTPResponseStatus;
 
 /**
  * 
@@ -67,6 +74,7 @@ public class WidgetRequestController extends ProtocolController {
     /**
      * @see net.rim.device.api.browser.field2.BrowserFieldController
      */
+
     public void handleNavigationRequest( BrowserFieldRequest request ) throws Exception {
         WidgetAccess access = _widgetPolicy.getElement( request.getURL(), _widgetConfig.getAccessList() );
         if( access == null && !_hasMultiAccess ) {
@@ -74,35 +82,21 @@ public class WidgetRequestController extends ProtocolController {
                 _browserField.getHistory().go( -1 );
             }
             throw new WidgetException( WidgetException.ERROR_WHITELIST_FAIL, request.getURL() );
+
         }
-
-        // Determine the MIME type of the url
-        String contentType = MIMETypeAssociations.getMIMEType( request.getURL() );
-
-        // Normalize and strip off parameters.
-        String normalizedContentType = MIMETypeAssociations.getNormalizedType( contentType );
-
-        // Determine protocol
-        String protocol = request.getProtocol();
 
         BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
 
         // Launch the browser if BF2 cannot handle the mime type
-        if( openWithBrowser( normalizedContentType, protocol, request.getURL() ) ) {
+        if( !openWithBrowser( request ) ) {
+            // Determine the MIME type of the url
+            String contentType = MIMETypeAssociations.getMIMEType( request.getURL() );
 
-            invokeBrowser( request.getURL() );
+            // Normalize and strip off parameters.
+            String normalizedContentType = MIMETypeAssociations.getNormalizedType( contentType );
 
-            // Reset the loading screen flags to ensure that the back button is enabled after the invoke
-            bfScreen.getPageManager().clearFlags();
-
-            if( DeviceInfo.isBlackBerry6() ) {
-                // Throw a special type of exception that will prevent the history from being updated
-                throw new MediaHandledException();
-            } else {
-                // On 5.0 devices we can simply go back once to counter the history updating before this.
-                _browserField.getHistory().go( -1 );
-            }
-        } else {
+            // Determine protocol
+            String protocol = request.getProtocol();
 
             bfScreen.getPageManager().setGoingBackSafe( false );
             InputConnection ic = null;
@@ -117,6 +111,7 @@ public class WidgetRequestController extends ProtocolController {
                             HttpConnection response = (HttpConnection) ic;
                             if( bfScreen.getCacheManager().isResponseCacheable( response ) ) {
                                 ic = bfScreen.getCacheManager().createCache( request.getURL(), response );
+
                             }
                         }
                     }
@@ -136,6 +131,7 @@ public class WidgetRequestController extends ProtocolController {
                     } else {
                         super.handleNavigationRequest( request );
                     }
+
                 }
 
                 if( !bfScreen.getPageManager().isRedirectableNavigation( protocol ) ) {
@@ -150,6 +146,7 @@ public class WidgetRequestController extends ProtocolController {
                 }
 
             } catch( Exception e ) {
+
                 bfScreen.getPageManager().hideLoadingScreen();
                 bfScreen.getPageManager().clearFlags();
 
@@ -163,9 +160,56 @@ public class WidgetRequestController extends ProtocolController {
      * @see net.rim.device.api.browser.field2.BrowserFieldController
      */
     public InputConnection handleResourceRequest( BrowserFieldRequest request ) throws Exception {
+
+        // Clean up memory
+        MemoryMaid mm = MemoryMaid.getInstance();
+        if( mm != null && mm.isAlive() ) {
+            mm.flagGC();
+        }
+
+        if( this._browserField == null ) {
+            return new HTTPResponseStatus( HTTPResponseStatus.SC_SERVER_ERROR, request ).getResponse();
+        }
+        if( request.getURL().startsWith( "http://localhost:8472/" ) ) {
+            URI requestURI = URI.create( request.getURL() );
+            String[] splitPath = StringUtilities.split( requestURI.getPath(), "/" );
+            String featureID = "";
+            for( int i = 0; i < splitPath.length - 1; i++ ) {
+                if( featureID == "" ) {
+                    featureID = featureID + splitPath[ i ];
+                } else {
+                    featureID = featureID + "." + splitPath[ i ];
+                }
+            }
+            Object ext = ( (WidgetConfigImpl) _widgetConfig ).getExtensionObjectForFeature( featureID );
+            if( ext != null && ext instanceof IJSExtension ) {
+                JSExtensionRequest req = new JSExtensionRequest( request.getURL(), request.getPostData(), request.getHeaders(),
+                        ( (WidgetConfigImpl) _widgetConfig ).getFeatureTable() );
+                JSExtensionResponse res = new JSExtensionResponse( request.getURL(), null, request.getHeaders() );
+                try {
+                    ( (IJSExtension) ext ).invoke( req, res );
+                    return new BrowserFieldResponse( res.getURL(), res.getPostData(), res.getHeaders() );
+                } catch( net.rim.device.api.web.WidgetException e ) {
+                    // this block is reached if the method cannot be found within the extension
+                    return new HTTPResponseStatus( HTTPResponseStatus.SC_NOT_IMPLEMENTED, request ).getResponse();
+                }
+            } else {
+                if( ext == null ) {
+                    return new HTTPResponseStatus( HTTPResponseStatus.SC_NOT_FOUND, request ).getResponse();
+                } else if( !( ext instanceof IJSExtension ) ) {
+                    return new HTTPResponseStatus( HTTPResponseStatus.SC_NOT_IMPLEMENTED, request ).getResponse();
+                }
+            }
+        }
         WidgetAccess access = _widgetPolicy.getElement( request.getURL(), _widgetConfig.getAccessList() );
         if( access == null && !_hasMultiAccess ) {
             throw new WidgetException( WidgetException.ERROR_WHITELIST_FAIL, request.getURL() );
+        }
+
+        // In this event, only rtsp link needs to open browser
+        if( request.getProtocol().equalsIgnoreCase( "rtsp" ) ) {
+            openWithBrowser( request );
+            return null;
         }
 
         BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
@@ -186,9 +230,7 @@ public class WidgetRequestController extends ProtocolController {
         } else {
             ic = super.handleResourceRequest( request );
         }
-
         ic = processAuthentication( ic, request );
-
         return ic;
     }
 
@@ -267,9 +309,48 @@ public class WidgetRequestController extends ProtocolController {
             return true;
         }
     }
-    
+
+    // Method to check if the browser needs to be launched to handle the file.
+    private boolean openWithBrowser( BrowserFieldRequest request ) throws Exception {
+        BrowserFieldScreen bfScreen = ( (BrowserFieldScreen) _browserField.getScreen() );
+
+        // Determine the MIME type of the url
+        String contentType = MIMETypeAssociations.getMIMEType( request.getURL() );
+
+        // Normalize and strip off parameters.
+        String normalizedContentType = MIMETypeAssociations.getNormalizedType( contentType );
+
+        // Determine protocol
+        String protocol = request.getProtocol();
+
+        // Launch the browser if BF2 cannot handle the mime type
+        if( openWithBrowser( normalizedContentType, protocol, request.getURL() ) ) {
+
+            invokeBrowser( request.getURL() );
+
+            // Reset the loading screen flags to ensure that the back button is enabled after the invoke
+            bfScreen.getPageManager().clearFlags();
+
+            if( DeviceInfo.isBlackBerry6() ) {
+                // Throw a special type of exception that will prevent the history from being updated
+                throw new MediaHandledException();
+            } else {
+                // On 5.0 devices we can simply go back once to counter the history updating before this.
+                _browserField.getHistory().go( -1 );
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // Method to check if the browser needs to be launched to handle the file.
     private boolean openWithBrowser( String mimeType, String protocol, String url ) {
+        // rtsp links should open in the browser.  BF2 does not support the protocol
+        if( protocol.equalsIgnoreCase( "rtsp" ) ) {
+            return true;
+        }
+
         if( mimeType != null ) {
 
             // Determine media type.
@@ -291,8 +372,10 @@ public class WidgetRequestController extends ProtocolController {
         }
 
         // If the type was null, check the file extension for .zip or .exe
-        // Mark .zip and .exe to be unsupported by BF2 so that the browser will be launched
-        // Local files must be opened by BF2 all the time since the browser has no access to those internal files
+        // Mark .zip and .exe to be unsupported by BF2 so that the browser will
+        // be launched
+        // Local files must be opened by BF2 all the time since the browser has
+        // no access to those internal files
         if( checkFileExtension( url ) && !protocol.equalsIgnoreCase( "local" ) ) {
             return true;
         } else {

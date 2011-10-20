@@ -36,6 +36,9 @@ import blackberry.media.ProcessCheckThread;
  */
 public class TakeVideoFunction extends ScriptableFunctionBase {
     public static final String NAME = "takeVideo";
+    
+    private static final String MEDIA_EXTENSION_3GP = ".3gp";
+    private static final String MEDIA_EXTENSION_MP4 = ".mp4";
 
     private CameraNamespace _context;
     private String _currentVideoPath = "";
@@ -65,7 +68,7 @@ public class TakeVideoFunction extends ScriptableFunctionBase {
          * @see blackberry.media.JournalListener#pathMatches(java.lang.String)
          */
         protected boolean pathMatches( String path ) {
-            return path.toLowerCase().endsWith( ".3gp" );
+            return path.toLowerCase().endsWith( MEDIA_EXTENSION_3GP ) || path.toLowerCase().endsWith( MEDIA_EXTENSION_MP4 );
         }
 
         /*

@@ -19,9 +19,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import net.rim.device.api.crypto.MD5Digest;
 import net.rim.device.api.script.Scriptable;
-
-import blackberry.core.Blob;
 
 /**
  * A WidgetBlob is a reference to an opaque block of binary data.
@@ -38,7 +37,10 @@ public final class WidgetBlob extends Scriptable implements Blob {
     // Content of the blob as byte array.
     private final byte[] _bytes;
     private final int _size;
+    private final String _id;
     private Hashtable _fields;
+    
+    private static Hashtable _registry = new Hashtable();
 
     /**
      * Constructs a Blob object.
@@ -51,12 +53,17 @@ public final class WidgetBlob extends Scriptable implements Blob {
         // the construction of the Blob objects.
         _bytes = bytes;
         _size = bytes.length;
+        _id = md5Hash( bytes );
 
-        // add JS fields/methods - length, slice(), getBytes()
+        // add JS fields/methods - length, slice(), getBytes(), id
         _fields = new Hashtable();
         _fields.put( "length", new Integer( _size ) );
         _fields.put( "getBytes", new GetBytesFunction() );
         _fields.put( "slice", new SliceFunction() );
+        _fields.put( "id", _id );
+        
+        // add blob to registry
+        _registry.put( _id, this );
     }
 
     /**
@@ -194,5 +201,32 @@ public final class WidgetBlob extends Scriptable implements Blob {
             fs.addParam( Integer.class, false );
             return new FunctionSignature[] { fs };
         }
+    }
+    
+    public static WidgetBlob getBlobById( String id ) {
+        return (WidgetBlob) _registry.get( id );
+    }
+    
+    private static String md5Hash( byte[] bytes ) {
+        MD5Digest md5 = new MD5Digest();
+        md5.reset();
+        md5.update( bytes, 0, bytes.length );
+        return new String( convertToHexStr( md5.getDigest() ).getBytes() );
+    }
+
+    private static String convertToHexStr( byte[] data ) {
+        StringBuffer buf = new StringBuffer();
+        for( int i = 0; i < data.length; i++ ) {
+            int halfbyte = ( data[ i ] >>> 4 ) & 0x0F;
+            int two_halfs = 0;
+            do {
+                if( ( 0 <= halfbyte ) && ( halfbyte <= 9 ) )
+                    buf.append( (char) ( '0' + halfbyte ) );
+                else
+                    buf.append( (char) ( 'a' + ( halfbyte - 10 ) ) );
+                halfbyte = data[ i ] & 0x0F;
+            } while( two_halfs++ < 1 );
+        }
+        return buf.toString();
     }
 }

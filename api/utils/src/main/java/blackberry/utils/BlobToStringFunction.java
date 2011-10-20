@@ -15,8 +15,6 @@
 */
 package blackberry.utils;
 
-import java.io.IOException;
-
 import net.rim.device.api.io.Base64OutputStream;
 import blackberry.core.Blob;
 import blackberry.core.FunctionSignature;
@@ -51,19 +49,15 @@ public final class BlobToStringFunction extends ScriptableFunctionBase {
 
         if( encoding == null ) {
             return new String( data );
-        } else {
-            if( encoding.equalsIgnoreCase( BASE64_ENCODING ) ) {
-                try {
-                    byte[] encoded = Base64OutputStream.encode( data, 0, data.length, false, false );
-                    String encodedStr = new String( encoded, UTF8_ENCODING );
-                    return encodedStr;
-                } catch( IOException ioe ) {
-                    throw ioe;
-                }
-            } else {
-                return new String( data, encoding );
-            }
         }
+
+        if( encoding.equalsIgnoreCase( BASE64_ENCODING ) ) {
+            byte[] encoded = Base64OutputStream.encode( data, 0, data.length, false, false );
+            String encodedStr = new String( encoded, UTF8_ENCODING );
+            return encodedStr;
+        }
+
+        return new String( data, encoding );
     }
 
     /**

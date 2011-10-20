@@ -32,7 +32,7 @@ public final class OpenFunction extends ScriptableFunctionBase {
 
     public static final String NAME = "open";
 
-    public static final String CLASSNAME = "net.rim.device.api.web.jse.blackberry.io.file.OpenFunction";
+    public static final String CLASSNAME = "blackberry.io.file.OpenFunction";
 
     /**
      * Open the specified file with the registered content handler
