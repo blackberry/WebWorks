@@ -179,8 +179,11 @@
 
 		blackberry.transport.call(url, opts, function (response) {
 			if (callback(response)) {
-				this.blackberry.transport.poll(url, opts, callback);
-			}
+                setTimeout(
+                    function() { this.blackberry.transport.poll(url, opts, callback); }, 
+                    0
+                    );
+            }
 		});
 	};
 })();

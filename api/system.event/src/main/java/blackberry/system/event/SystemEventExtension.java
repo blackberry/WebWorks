@@ -13,304 +13,119 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 package blackberry.system.event;
-
-import java.util.Vector;
 
 import org.w3c.dom.Document;
 
 import net.rim.device.api.browser.field2.BrowserField;
 import net.rim.device.api.script.ScriptEngine;
-import net.rim.device.api.system.CoverageInfo;
-import net.rim.device.api.system.CoverageStatusListener;
-import net.rim.device.api.system.KeyListener;
-import net.rim.device.api.ui.Keypad;
-import net.rim.device.api.util.IntEnumeration;
-import net.rim.device.api.util.IntHashtable;
+
 import net.rim.device.api.util.SimpleSortingVector;
 import net.rim.device.api.web.WidgetConfig;
 import net.rim.device.api.web.WidgetException;
 import blackberry.common.util.JSUtilities;
-import blackberry.common.util.json4j.JSONObject;
+
 import blackberry.core.IJSExtension;
 import blackberry.core.JSExtensionRequest;
 import blackberry.core.JSExtensionResponse;
-import blackberry.core.JSExtensionReturnValue;
+
+import blackberry.system.event.SystemEventManager;
+import blackberry.system.event.SystemEventReturnValue;
 
 /**
  * JavaScript extension for blackberry.system.event<br>
  * 
  * Uses long-polling to handle callbacks.<br>
  * 
- * When user starts listening for an event (by specifying a callback function), the following happens:
+ * When a callback is registered in JavaScript, the following sequence of events takes place:
  * <ol>
- * <li>The current thread blocks till the desired event occurs.</li>
- * <li>The thread is notified causing the HTTP request to return.</li>
- * <li>The callback function gets invoked on the client side.</li>
- * <li>Client side immediately issues a new request to listen for the event. (cycle continues until user unregisters the callback)</li>
+ * <li>A "register" call is made with the event name.</li>
+ * <li>If the event is recognized and successfully registered with the BlackBerry API, OK is returned.</li>
+ * <li>When the system event occurs, it is queued in an event queue for consumption by the "poll" call.</li>
+ * <li>The JavaScript layer makes a "poll" call as long as we are listening to at least one event. It waits on the event queue until an event occurs, at which point it returns it.</li>
+ * <li>Client side immediately issues a new request to listen for the event.<li>
+ * <li>Cycle continues until user unregisters the last callback and a stop listening event is sent back instead to release the last open polling connection.</li>
  * </ol>
- * @author rtse
+ * @author ababut
  */
-public class SystemEventExtension implements IJSExtension, ISystemEventExtensionConstants, KeyListener {
-    private static Vector SUPPORTED_METHODS;
-
-    static {
-        SUPPORTED_METHODS = new Vector();
-        SUPPORTED_METHODS.addElement( REQ_FUNCTION_ON_COVERAGE_CHANGE );
-        SUPPORTED_METHODS.addElement( REQ_FUNCTION_ON_HARDWARE_KEY );
-    }
+public class SystemEventExtension implements IJSExtension {
+    private static final String FUNCTION_REGISTER = "register";
+    private static final String FUNCTION_UNREGISTER = "unregister";
+    private static final String FUNCTION_POLL = "poll";
     
     private static String[] JS_FILES = { "system_event_dispatcher.js", "system_event_ns.js" };    
 
-    private CoverageMonitor _currentCoverageMonitor;
-    private IntHashtable _keyRegistry = new IntHashtable();
-
-    public String[] getFeatureList() {
-        String[] featureList;
-        featureList = new String[ 1 ];
-        featureList[ 0 ] = FEATURE_ID;
-        return featureList;
-    }
-
-    private static boolean parseBoolean( String str ) {
-        return ( str != null && str.equals( Boolean.TRUE.toString() ) );
-    }
-
-    private void reset() {
-        if( _currentCoverageMonitor != null && _currentCoverageMonitor.isListening() ) {
-            _currentCoverageMonitor.stop();
-        }
-        _currentCoverageMonitor = null;
-
-        if( !_keyRegistry.isEmpty() ) {
-            IntEnumeration keys = _keyRegistry.keys();
-
-            while( keys.hasMoreElements() ) {
-                Object tmp = _keyRegistry.remove( keys.nextElement() );
-
-                // even though the key is no longer being monitored, we still need to release any thread that is waiting on its
-                // lock
-                if( tmp != null ) {
-                    synchronized( tmp ) {
-                        tmp.notify();
-                    }
-                }
-            }
-        }
-    }
+    private SystemEventManager _eventManager = new SystemEventManager();
 
     /**
-     * Implements invoke() of interface IJSExtension. Methods of extension will be called here.
+     * Implements invoke() of interface IJSExtension. Responsible for parsing request method and its optional argument.
+     * The operation is one of (register/unregister/poll).
+     * The event argument is one of (onCoverageChange/onHardwareKey).
+     * The arg argument is optional and applies only to the hardware key event. It contains a numeric constant representing the key to listen for.     
+     *
      * @throws WidgetException 
      */
     public void invoke( JSExtensionRequest request, JSExtensionResponse response ) throws WidgetException {
-        String method = request.getMethodName();
+        String op = request.getMethodName();
         Object[] args = request.getArgs();
-        String msg = "";
-        int code = JSExtensionReturnValue.SUCCESS;
-        JSONObject data = new JSONObject();
-        JSONObject returnValue;
-
-        if( !SUPPORTED_METHODS.contains( method ) ) {
-            throw new WidgetException( "Undefined method: " + method );
-        }
-
+        
+        //Event and optional argument we'll be operating on, default to empty string to avoid NPEs
+        String event = (args != null && args.length > 0) ? (String) request.getArgumentByName( "event" ) : "";
+        String eventArg = (args != null && args.length > 1) ? (String) request.getArgumentByName( "arg" ) : "";
+        
+        SystemEventReturnValue returnValue = null;
+        
+        //Dispatch the function call or complain that we don't recognize it
         try {
-            if( method.equals( REQ_FUNCTION_ON_COVERAGE_CHANGE ) ) {
-                if( args != null && args.length > 0 ) {
-                    String monitor = (String) request.getArgumentByName( ARG_MONITOR );
-
-                    data.put( ARG_MONITOR, monitor );
-
-                    listenToCoverageChange( parseBoolean( monitor ) );
-                }
-            } else if( method.equals( REQ_FUNCTION_ON_HARDWARE_KEY ) ) {
-                if( args != null && args.length > 1 ) {
-                    int key = Integer.parseInt( (String) request.getArgumentByName( ARG_KEY ) );
-                    String monitor = (String) request.getArgumentByName( ARG_MONITOR );
-
-                    data.put( ARG_MONITOR, monitor );
-                    data.put( ARG_KEY, key );
-
-                    listenToKey( parseBoolean( monitor ), key );
-                }
+            if(FUNCTION_REGISTER.equals(op)) {
+                _eventManager.listenFor(event, eventArg);
+                returnValue = SystemEventReturnValue.getSuccessForOp(FUNCTION_REGISTER, event);
+            } else if(FUNCTION_UNREGISTER.equals(op)) {
+                _eventManager.stopListeningFor(event, eventArg);
+                returnValue = SystemEventReturnValue.getSuccessForOp(FUNCTION_UNREGISTER, event);
+            } else if(FUNCTION_POLL.equals(op)) {
+                returnValue = _eventManager.getNextWaitingEvent();
+            } else {
+                returnValue = SystemEventReturnValue.INVALID_METHOD;
             }
-        } catch( Exception e ) {
-            msg = e.getMessage();
-            code = JSExtensionReturnValue.FAIL;
+        } catch (RuntimeException e) {
+            returnValue = SystemEventReturnValue.getErrorForOp(op, event);
         }
-
-        returnValue = new JSExtensionReturnValue( msg, code, data ).getReturnValue();
-        response.setPostData( returnValue.toString().getBytes() );
-    }
-
-    private void listenToCoverageChange( boolean register ) throws Exception {
-        if( register ) {
-            if( _currentCoverageMonitor == null ) {
-                _currentCoverageMonitor = new CoverageMonitor();
-            }
-
-            // blocks
-            _currentCoverageMonitor.run();
-
-            // this block is hit when the thread gets notified by the de-registration
-            // throw exception to indicate to JS client that callback should not be invoked
-            if( !_currentCoverageMonitor.isListening() ) {
-                _currentCoverageMonitor = null;
-                throw new Exception( "Coverage change is no longer monitored" );
-            }
-        } else {
-            if( _currentCoverageMonitor != null && _currentCoverageMonitor.isListening() ) {
-                _currentCoverageMonitor.stop();
-            }
-        }
+        
+        response.setPostData( returnValue.getJSExtensionReturnValue().getReturnValue().toString().getBytes() );
     }
     
     /**
-     * Helper class to implement CoverageStatusListener
+     * @see blackberry.core.IJSExtension#getFeatureList()
      */
-    private class CoverageMonitor implements CoverageStatusListener {
-        private Object _lock;
-        private boolean _listening;
-
-        public CoverageMonitor() {
-            _lock = new Object();
-            _listening = true;
-            CoverageInfo.addListener( this );
-        }
-
-        public void coverageStatusChanged( int newCoverage ) {
-            synchronized( _lock ) {
-                _lock.notify();
-            }
-        }
-
-        public void run() throws InterruptedException {
-            synchronized( _lock ) {
-                _lock.wait();
-            }
-        }
-
-        public void stop() {
-            CoverageInfo.removeListener( this );
-            _listening = false;
-            synchronized( _lock ) {
-                _lock.notify();
-            }
-        }
-
-        public boolean isListening() {
-            return _listening;
-        }
-    }
-
-    public boolean keyChar( char arg0, int arg1, int arg2 ) {
-        return false;
-    }
-
-    private void listenToKey( boolean register, int key ) throws Exception {
-        Object lock = new Object();
-
-        if( register ) {
-            synchronized( lock ) {
-                _keyRegistry.put( key, lock );
-
-                if( !_keyRegistry.isEmpty() ) {
-                    // wait on the lock for the specific key
-                    lock.wait();
-                }
-            }
-
-            // this block is hit when the thread gets notified by the de-registration
-            // throw exception to indicate to JS client that callback should not be invoked
-            if( !_keyRegistry.containsKey( key ) ) {
-                throw new Exception( "Key " + key + " is no longer monitored" );
-            }
-        } else {
-            Object tmp = _keyRegistry.remove( key );
-
-            // even though the key is no longer being monitored, we still need to release any thread that is waiting on its
-            // lock
-            if( tmp != null ) {
-                synchronized( tmp ) {
-                    tmp.notify();
-                }
-            }
-        }
+    public String[] getFeatureList() {
+        return new String[] { "blackberry.system.event" };
     }
 
     /**
-     * @see net.rim.device.api.system.KeyListener#keyDown(int, int)
+     * @see blackberry.core.IJSExtension#loadFeature(String, String, Document, ScriptEngine, jsInjectionPaths)
      */
-    public boolean keyDown( int keycode, int time ) {
-        int keyPressed = Keypad.key( keycode );
-        int event;
-
-        switch( keyPressed ) {
-            case Keypad.KEY_CONVENIENCE_1:
-                event = IKEY_CONVENIENCE_1;
-                break;
-            case Keypad.KEY_CONVENIENCE_2:
-                event = IKEY_CONVENIENCE_2;
-                break;
-            case Keypad.KEY_MENU:
-                event = IKEY_MENU;
-                break;
-            case Keypad.KEY_SEND:
-                event = IKEY_STARTCALL;
-                break;
-            case Keypad.KEY_END:
-                event = IKEY_ENDCALL;
-                break;
-            case Keypad.KEY_ESCAPE:
-                event = IKEY_BACK;
-                break;
-            case Keypad.KEY_VOLUME_DOWN:
-                event = IKEY_VOLUME_DOWN;
-                break;
-            case Keypad.KEY_VOLUME_UP:
-                event = IKEY_VOLUME_UP;
-                break;
-            default:
-                return false;
-        }
-
-        if( _keyRegistry.containsKey( event ) ) {
-            Object lock = _keyRegistry.get( event );
-            synchronized( lock ) {
-                // notify the thread waiting for that specific key's lock
-                lock.notify();
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean keyRepeat( int arg0, int arg1 ) {
-        return false;
-    }
-
-    public boolean keyStatus( int arg0, int arg1 ) {
-        return false;
-    }
-
-    public boolean keyUp( int arg0, int arg1 ) {
-        return false;
-    }
-
     public void loadFeature( String feature, String version, Document document, ScriptEngine scriptEngine,
             SimpleSortingVector jsInjectionPaths ) {
         JSUtilities.loadJS( scriptEngine, JS_FILES, jsInjectionPaths );
     }
 
+    /**
+     * @see blackberry.core.IJSExtension#register(WidgetConfig, BrowserField)
+     */
     public void register( WidgetConfig widgetConfig, BrowserField browserField ) {
-
     }
 
+    /**
+     * @see blackberry.core.IJSExtension#unloadFeatures()
+     */
     public void unloadFeatures() {
-        // Clear states when page is done        
+        // Clear event listeners when page is done        
         reset();
+    }
+    
+    private void reset() {
+       _eventManager.shutDown();
     }
 }
