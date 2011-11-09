@@ -68,34 +68,6 @@ If you do not wish to use MacPorts simply use the following instructions.
 6. Make sure that JAVA_HOME is set to the location of your JDK, e.g. export JAVA_HOME=/usr/java/jdk1.5.0_02 and that $JAVA_HOME/bin is in your PATH environment variable.
 7. Run mvn --version to verify that it is correctly installed.
 
-### Download and install gcc compiler on Windows&reg;
-1. The first step is to download the automated installer for MinGW from 
-[here.](http://sourceforge.net/projects/mingw/files/).
-2. After the installer has been downloaded run the installer. Follow the
-installation instructions in the installer and make sure you note the
-installation directory for MingGW which is C:\MinGW by default.
-3. When you have installed MinGW on your machine navigate to the
-environment variable settings as stated above when installing Maven on Windows.
-4. Find the Path environment variable and click the "Edit" button.
-5. Append ";(Path to MinGW)\bin" to the value of the environment varible e.g.
-if MinGW is installed at C:\MinGW then you should append ";C:\MinGW\bin" to the
-Path environment variable.
-
-### Download and install gcc compiler on Mac OS X
-
-#### Register for an Apple Developer Connection Account
-1. Navigate to [http://connect.apple.com](http://connect.apple.com). You will
-be taken to a page with a prompt for your Apple ID. Click the "Join Now" link.
-2. On the next page scroll down to the bottom of the page and click on the
-"Learn More" link. On the following page click on the "Get Started" link and
-follow the instructions for the Apple Developer Registration process.
-
-#### Download and Install XCode
-Once you're registered. Navigate to 
-[http://connect.apple.com](http://connect.apple.com) and download the 
-XCode Tools (Version) disk image file. Double click the file and
-follow the installations steps to complete the installation.
-
 ### Build the project
  
 From command line, change to the root directory of the WebWorks repository and run the following commands:

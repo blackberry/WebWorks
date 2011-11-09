@@ -78,6 +78,8 @@
                         <resource>
                           <directory>${tumbler.work.dir}\packager\res</directory>
                           <includes>
+                            <include>bbwp</include>
+                            <include>bbwp.exe</include>
                             <include>bbwp.properties</include>
                             <include>tld.txt</include>
                           </includes>
@@ -99,6 +101,7 @@
                         <resource>
                           <directory>${tumbler.bin.dir}</directory>
                           <includes>
+						    <include>bbwp</include>
                             <include>bbwp.exe</include>
                           </includes>
                         </resource>
@@ -118,6 +121,8 @@
                         <resource>
                           <directory>${tumbler.bin.dir}</directory>
                           <includes>
+                            <include>bbwp</include>
+                            <include>bbwp.exe</include>
                             <include>bbwp.jar</include>
                             <include>tld.txt</include>
                             <include>bbwp.properties</include>
@@ -178,25 +183,6 @@
                       </resources>
                     </configuration>
                 </execution>     
-                <execution>
-                    <id>copy-resources-bbwp</id>
-                    <phase>compile</phase>
-                    <goals>
-                      <goal>copy-resources</goal>
-                    </goals>
-                    <configuration>
-                      <overwrite>true</overwrite>
-                      <outputDirectory>${installer.data.dir}</outputDirectory>
-                      <resources>
-                        <resource>
-                          <directory>${tumbler.work.dir}\packager\src\TumblerLauncher</directory>
-                          <includes>
-                            <include>bbwp</include>
-                          </includes>
-                        </resource>
-                      </resources>
-                    </configuration>
-                </execution>      
                 <execution>
                     <id>copy-resources-classes</id>
                     <phase>process-classes</phase>
@@ -282,26 +268,6 @@
             </execution>
             </executions>
          </plugin> 
-         <plugin>
-           <groupId>org.codehaus.mojo</groupId>
-           <artifactId>exec-maven-plugin</artifactId>
-           <version>1.2.1</version>
-           <executions>
-             <execution>
-               <phase>process-classes</phase>
-               <goals>
-                 <goal>exec</goal>
-               </goals>
-             </execution>
-           </executions>
-           <configuration>
-             <executable>TumblerLauncher.bat</executable>
-             <arguments>
-               <argument>${tumbler.packager.src.dir}</argument>
-               <argument>${tumbler.bin.dir}</argument>
-             </arguments>
-           </configuration>
-         </plugin>
 
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
