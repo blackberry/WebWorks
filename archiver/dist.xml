@@ -10,7 +10,7 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
 
 <fileSets>
     <fileSet>
-            <directory>target\installdata</directory>
+            <directory>target/installdata</directory>
             <outputDirectory>/installdata</outputDirectory>
     </fileSet>
 </fileSets>
