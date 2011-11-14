@@ -10,15 +10,17 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
 
 <fileSets>
     <fileSet>
-            <directory>target\installdata</directory>
+            <fileMode>755</fileMode>
+            <directoryMode>755</directoryMode>
+            <directory>target/installdata</directory>
             <excludes>
             <exclude>bbwp</exclude>
-            <exclude>\bin\bbwp</exclude>
-            <exclude>\bin\bbwp.exe</exclude>
-            <exclude>\bin\javaloader</exclude>
-            <exclude>\bin\preverify</exclude>
+            <exclude>/bin/bbwp</exclude>
+            <exclude>/bin/bbwp.exe</exclude>
+            <exclude>/bin/javaloader</exclude>
+            <exclude>/bin/preverify</exclude>
             </excludes>
-            <outputDirectory>\</outputDirectory>
+            <outputDirectory>/</outputDirectory>
     </fileSet>
 </fileSets>
 

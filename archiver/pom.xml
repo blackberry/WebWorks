@@ -26,7 +26,7 @@
       <tumbler.classes.dir>${tumbler.target.dir}/classes</tumbler.classes.dir>      
       <tumbler.file.dir>${tumbler.target.dir}/files</tumbler.file.dir>
       <manifest.file>${tumbler.target.dir}/manifest</manifest.file>
-      <installer.data.dir>${tumbler.target.dir}\installdata</installer.data.dir>
+      <installer.data.dir>${tumbler.target.dir}/installdata</installer.data.dir>
    </properties>
    
    <dependencies>
@@ -76,7 +76,7 @@
                       <outputDirectory>${tumbler.bin.dir}</outputDirectory>
                       <resources>
                         <resource>
-                          <directory>${tumbler.work.dir}\packager\res</directory>
+                          <directory>${tumbler.work.dir}/packager/res</directory>
                           <includes>
                             <include>bbwp</include>
                             <include>bbwp.exe</include>
@@ -116,7 +116,7 @@
                     </goals>
                     <configuration>
                       <overwrite>true</overwrite>
-                      <outputDirectory>${installer.data.dir}\bin</outputDirectory>
+                      <outputDirectory>${installer.data.dir}/bin</outputDirectory>
                       <resources>
                         <resource>
                           <directory>${tumbler.bin.dir}</directory>
@@ -139,10 +139,10 @@
                     </goals>
                     <configuration>
                       <overwrite>true</overwrite>
-                      <outputDirectory>${installer.data.dir}\device_templates</outputDirectory>
+                      <outputDirectory>${installer.data.dir}/device_templates</outputDirectory>
                       <resources>
                         <resource>
-                          <directory>${tumbler.work.dir}\framework\src</directory>
+                          <directory>${tumbler.work.dir}/framework/src</directory>
                           <includes>
                             <include>blackberry/</include>
                             <include>js/</include>
@@ -159,10 +159,10 @@
                     </goals>
                     <configuration>
                       <overwrite>true</overwrite>
-                      <outputDirectory>${installer.data.dir}\ext</outputDirectory>
+                      <outputDirectory>${installer.data.dir}/ext</outputDirectory>
                       <resources>
                         <resource>
-                          <directory>${tumbler.work.dir}\api\output</directory>
+                          <directory>${tumbler.work.dir}/api/output</directory>
                         </resource>
                       </resources>
                     </configuration>
@@ -175,10 +175,10 @@
                     </goals>
                     <configuration>
                       <overwrite>true</overwrite>
-                      <outputDirectory>${installer.data.dir}\ext\common\blackberry</outputDirectory>
+                      <outputDirectory>${installer.data.dir}/ext/common/blackberry</outputDirectory>
                       <resources>
                         <resource>
-                          <directory>${tumbler.work.dir}\api\CommonAPI\src\blackberry</directory>
+                          <directory>${tumbler.work.dir}/api/CommonAPI/src/blackberry</directory>
                         </resource>
                       </resources>
                     </configuration>
@@ -196,7 +196,7 @@
                         <resource>
                           <directory>${tumbler.packager.src.dir}</directory>
                           <includes>
-                            <include>**\*.properties</include>
+                            <include>**/*.properties</include>
                           </includes>
                         </resource>
                       </resources>
@@ -216,7 +216,7 @@
                        <goal>replace</goal>
                    </goals>     
             <configuration>
-               <file>target\manifest\Main_Class.txt</file>
+               <file>target/manifest/Main_Class.txt</file>
                <replacements>
                    <replacement>
                        <token>@version@</token>
@@ -258,7 +258,7 @@
             <finalName>bbwp</finalName>
             <outputDirectory>${tumbler.bin.dir}</outputDirectory>
             <archive>
-              <manifestFile>${manifest.file}\Main_Class.txt</manifestFile>
+              <manifestFile>${manifest.file}/Main_Class.txt</manifestFile>
             </archive>
           </configuration>
                    <phase>process-classes</phase>
