@@ -39,7 +39,7 @@ Note: In order to build the source code you must have the [Java SE Development K
 7. If JAVA_HOME is not listed as one of the variables under System Variables then add a new environment variable with "JAVA_HOME" as the name and the path to you JDK installation directory (not the bin folder) as the value.
 8. Click on the Path variable and click edit. Then add the following string to the end of value for path:
  
-        "%JAVA_HOME%\bin;%M2%"
+        %JAVA_HOME%\bin;%M2%
      
 9. Open up a command prompt and type "mvn --version". _NOTE: If you already had a command prompt open, close it and open a new one so that your changes are reflected._ You should see some information about your maven installation. If you get a prompt stating that the command was not found then you probably made a mistake in one of the previous steps.
 
@@ -72,9 +72,9 @@ If you do not wish to use MacPorts simply use the following instructions.
  
 From command line, change to the root directory of the WebWorks repository and run the following commands:
  
-        mvn clean install -DPRODUCT_VERSION=[version]
+        mvn clean install -DPRODUCT_VERSION=version
  
-The version is the WebWorks version that you want to build (e.g. 2.3.0.1).
+Where the version is the WebWorks version that you want to build (e.g. 2.3.0.1), which will be shown when you execute "bbwp" in the command line.
 The first time the build is run it will take up to 5 minutes to complete and will require an internet connection. Subsequent builds take around 2 minutes.
  
 If the build is successful two zip files will be generated in a "target" directory located in the root of the WebWorks repository.
