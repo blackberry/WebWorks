@@ -35,6 +35,9 @@ public class WidgetConfig {
 	private String _name;
 	private String _version;
 	
+	protected int _orientation; // Portrait 0, Landscape 1
+	protected boolean _orientationDefined;
+	
 	private String _loadingScreenColour;
 	private String _backgroundImage;
 	private String _foregroundImage;
@@ -106,6 +109,9 @@ public class WidgetConfig {
 	    _aggressiveCacheAge= null;    
 	    _maxCacheable = null; 
 	    _maxCacheSize = null; 
+		
+		_orientationDefined = false;
+		_orientation = -1;
 	    
 	    _runOnStartup=false;
 	    _allowInvokeParams=false;
@@ -151,6 +157,14 @@ public class WidgetConfig {
 		return _description;
 	}
 
+	public int getOrientation() {
+		return _orientation;
+	}
+	
+	public boolean getOrientationDefined() {
+		return _orientationDefined;
+	}
+	
 	public Vector<String> getHoverIconSrc() {
 		return _hoverIconSrc;
 	}
@@ -161,6 +175,11 @@ public class WidgetConfig {
 
 	public void setContent(String content) {
 		_content = content;
+	}
+	
+	public void setOrientation(int value) {
+		_orientation = value;
+		_orientationDefined = true;
 	}
 
 	public void setAuthor(String author) {

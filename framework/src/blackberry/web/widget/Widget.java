@@ -53,6 +53,18 @@ public class Widget extends UiApplication implements GlobalEventListener {
         initialize();
         _locationURI = locationURI;
 
+		// Set our orientation
+		WidgetConfigImpl configImpl = (WidgetConfigImpl) _wConfig;
+		if (configImpl.isOrientationDefined()) {
+			int direction;
+			if (configImpl.getOrientation() == 0) {
+				direction = net.rim.device.api.system.Display.DIRECTION_PORTRAIT;   
+			} else {
+				direction = net.rim.device.api.system.Display.DIRECTION_LANDSCAPE;   
+			}
+			net.rim.device.api.ui.Ui.getUiEngineInstance().setAcceptableDirections(direction);
+		}
+		
         // Create PageManager
         PageManager pageManager = new PageManager( this, (WidgetConfigImpl) _wConfig );
 
