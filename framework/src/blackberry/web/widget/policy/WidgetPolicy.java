@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package blackberry.web.widget2743472eaea143320a3fee8b4e6f6epackage.policy;
+package blackberry.web.widget.policy;
 
 import java.util.Hashtable;
 
@@ -21,7 +21,7 @@ import net.rim.device.api.io.MalformedURIException;
 import net.rim.device.api.io.URI;
 import net.rim.device.api.web.WidgetAccess;
 
-import blackberry.web.widget2743472eaea143320a3fee8b4e6f6epackage.util.WidgetUtil;
+import blackberry.web.widget.util.WidgetUtil;
 
 /**
  * 
