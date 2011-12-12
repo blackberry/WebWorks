@@ -19,8 +19,9 @@ import java.util.Vector;
 
 import net.rim.blackberry.api.mail.Address;
 import net.rim.blackberry.api.mail.AddressException;
-import net.rim.blackberry.api.mail.Message;
 import net.rim.blackberry.api.mail.Folder;
+import net.rim.blackberry.api.mail.Message;
+import net.rim.blackberry.api.mail.PINAddress;
 import net.rim.blackberry.api.mail.Store;
 
 /**
@@ -312,7 +313,11 @@ public class MessageUtility {
 
         for( int i = 0; i < emails.length; i++ ) {
             try {
-                addresses[ i ] = new Address( emails[ i ], emails[ i ] );
+            	if(MessageUtility.isPIN (emails[i])){
+   				     addresses[ i ] = new PINAddress( emails[ i ], emails[ i ]);
+   				} else {
+                     addresses[ i ] = new Address( emails[ i ], emails[ i ] );
+   				}
             } catch( AddressException e ) {
                 addresses[ i ] = null;
             }
@@ -320,4 +325,27 @@ public class MessageUtility {
 
         return addresses;
     }
+    
+    /**
+	 * Check whether the address given is PIN address.
+	 * PIN Address is in hexadecimal format [ 0-9, A-F ]
+	 * 
+	 * @param address address to be check
+	 * @return true when the address is a PIN address
+	 */
+	public static boolean isPIN ( String address ) {
+	    char[] check = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+		if(address.length()!=8) return false;
+		for(int i=0;i<address.length();i++){
+		    boolean pass = false;
+			for(int j=0;j<check.length;j++){
+				 if(address.charAt(i)==check[j]){
+				     pass = true;
+					 break;
+				 }
+			}
+			if(!pass) return false;
+		}
+	    return true;
+	}
 }
