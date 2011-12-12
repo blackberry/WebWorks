@@ -17,9 +17,15 @@ package blackberry.bbm.platform;
 
 import net.rim.blackberry.api.bbm.platform.BBMPlatformContext;
 import net.rim.blackberry.api.bbm.platform.BBMPlatformContextListener;
+import net.rim.blackberry.api.bbm.platform.profile.BBMPlatformContact;
+import net.rim.blackberry.api.bbm.platform.profile.Presence;
+import net.rim.blackberry.api.bbm.platform.profile.UserProfile;
 import net.rim.blackberry.api.bbm.platform.profile.UserProfileBoxItem;
+import net.rim.device.api.script.Scriptable;
 import net.rim.device.api.script.ScriptableFunction;
+import blackberry.bbm.platform.self.SelfNamespace;
 import blackberry.bbm.platform.self.profilebox.ScriptableProfileBoxItem;
+import blackberry.bbm.platform.users.BBMPlatformUser;
 import blackberry.bbm.platform.util.ConstantsUtil;
 import blackberry.bbm.platform.util.Util;
 
@@ -60,7 +66,7 @@ public class BBMPlatformContextListenerImpl extends BBMPlatformContextListener {
         Util.dispatchCallback(callback, args);
     }
 
-    public void appInvoked(int reason, Object param) {
+    public void appInvoked(int reason, Object param, Presence user) {
         final ScriptableFunction callback;
         try {
             callback = (ScriptableFunction) _platform.getField(BBMPlatformNamespace.EVENT_ON_APP_INVOKED);
@@ -68,15 +74,47 @@ public class BBMPlatformContextListenerImpl extends BBMPlatformContextListener {
             return;
         }
         
-        final Object[] args;
-        if(reason == BBMPlatformContext.INVOKE_PROFILE_BOX_ITEM) {
-            final ScriptableProfileBoxItem scriptItem =
-                new ScriptableProfileBoxItem(_platform.getProfileBox(), (UserProfileBoxItem) param);
-            args = new Object[] { "profilebox", scriptItem };
-        } else {
-            return;
+        // Get reason string and scriptable param
+        final String reasonStr;
+        final Object scriptableParam;
+        switch(reason) {
+            case BBMPlatformContext.INVOKE_PROFILE_BOX_ITEM:
+                reasonStr = "profilebox";
+                scriptableParam = new ScriptableProfileBoxItem(_platform.getProfileBox(), (UserProfileBoxItem) param);
+                break;
+            case BBMPlatformContext.INVOKE_PROFILE_BOX:
+                reasonStr = "profileboxtitle";
+                scriptableParam = Scriptable.UNDEFINED;
+                break;
+            case BBMPlatformContext.INVOKE_PERSONAL_MESSAGE:
+                reasonStr = "personalmessage";
+                scriptableParam = (String) param;
+                break;
+            case BBMPlatformContext.INVOKE_CHAT_MESSAGE:
+                reasonStr = "chatmessage";
+                scriptableParam = Scriptable.UNDEFINED;
+                break;
+            default:
+                // Don't invoke if we don't know what to do with the reason
+                return;
         }
         
+        // Get scriptable user: either self namespace of BBMPlatformUser instance
+        final Object scriptableUser;
+        if(user instanceof UserProfile) {
+            scriptableUser = SelfNamespace.getInstance();
+        } else if(user instanceof BBMPlatformContact) {
+            scriptableUser = new BBMPlatformUser(user);
+        } else {
+            scriptableUser = Scriptable.UNDEFINED;
+        }
+        
+        final Object[] args = {
+            reasonStr,
+            scriptableParam,
+            scriptableUser,
+        };
         Util.dispatchCallback(callback, args);
     }
+    
 }
