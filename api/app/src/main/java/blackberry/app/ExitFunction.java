@@ -35,6 +35,7 @@ public final class ExitFunction extends ScriptableFunctionBase {
 
     static class ExitRunner implements Runnable {
         public void run() {
+            System.gc(); // MemoryMaid
             System.exit( 0 );
         }
     }

@@ -143,11 +143,10 @@ public class Widget extends UiApplication implements GlobalEventListener {
                 waitForStartupComplete();
             }
             Widget widget = makeWidget( args, wConfig );
-            MemoryMaid mm = MemoryMaid.getInstance();
-            if( mm != null ) {
-                mm.start();
-            }
+            
             widget.enterEventDispatcher();
+			
+            MemoryMaid mm = MemoryMaid.getInstance();
             if( mm != null ) {
                 mm.stop();
             }
