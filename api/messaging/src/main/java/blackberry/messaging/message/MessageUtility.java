@@ -313,6 +313,7 @@ public class MessageUtility {
 
         for( int i = 0; i < emails.length; i++ ) {
             try {
+            	// Check if PIN address, use PINAddress instead of Address
             	if(MessageUtility.isPIN (emails[i])){
    				     addresses[ i ] = new PINAddress( emails[ i ], emails[ i ]);
    				} else {
@@ -335,6 +336,8 @@ public class MessageUtility {
 	 */
 	public static boolean isPIN ( String address ) {
 	    char[] check = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	    
+	    // PIN should in 8 length string
 		if(address.length()!=8) return false;
 		for(int i=0;i<address.length();i++){
 		    boolean pass = false;
