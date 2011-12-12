@@ -80,9 +80,12 @@ public class WidgetPolicy {
                 if ( schemeString.equals( "local" ) && folderAccess == null ) {
                     return _localAccess;
                 }
-
+                
                 if(folderAccess != null) {
                     fetchedAccess = folderAccess.getWidgetAccess( requestURI.getPath() + parseNull( requestURI.getQuery() ) );
+                }
+                if( !isMatch( fetchedAccess, requestURI ) ) {
+                    fetchedAccess = folderAccess.getWidgetAccess( requestURI.getPath() + "*" );
                 }
 
                 boolean failedToFindAccess = false;
@@ -126,6 +129,10 @@ public class WidgetPolicy {
     }
 
     private boolean isMatch( WidgetAccess access, URI toMatchURI ) {
+        if( access == null ) {
+            return false;
+        }
+
         // Look for local first
         if( WidgetUtil.isLocalURI( toMatchURI ) && access.isLocal() ) {
             // local access always allowed
@@ -172,6 +179,9 @@ public class WidgetPolicy {
         // 5. Compare path+query
         String refPath = referenceURI.getPath() + parseNull( referenceURI.getQuery() );
         String toMatchPath = toMatchURI.getPath() + parseNull( toMatchURI.getQuery() );
+        if( refPath.endsWith( "*" ) ) {
+            refPath = refPath.substring( 0, refPath.length() - 1 );
+        }
         if( !toMatchPath.startsWith( refPath ) ) {
             return false;
         }
