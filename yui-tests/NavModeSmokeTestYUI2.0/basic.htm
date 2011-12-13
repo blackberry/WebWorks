@@ -1,0 +1,290 @@
+<html>
+<head>
+<title>Nav Mode Smoke Test - Basic</title>
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="yui2.9.0/build/logger/assets/skins/sam/logger.css" />
+<link rel="stylesheet" type="text/css" href="yui2.9.0/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="yui2.9.0/build/yuitest/assets/skins/sam/yuitest.css" />
+<script type="text/javascript" src="yui2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="yui2.9.0/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui2.9.0/build/yuitest/yuitest-min.js"></script>
+<link rel="stylesheet" type="text/css" href="StyleSheet.css" />
+<script type="text/javascript">
+    function highlight(e) {
+       e.setAttribute("style", "background-color: red; outline-style: dotted; outline-color: blue");
+    }
+
+    function unhighlight(e) {
+       e.setAttribute("style", "");
+    }
+</script>
+<!-- load navmode-browser.js BEFORE  navmode.js, blackberry.focus needs to be defined first -->
+<script type="text/javascript" src="navmode-browser.js"></script>
+<!-- replace navmode.js from the one in current build's ext folder -->
+<script type="text/javascript" src="navmode.js"></script>
+<!-- load navmode-browser-direction.sj AFTER navmode.js, navigationController needs to be defined first -->
+<script type="text/javascript" src="navmode-browser-direction.js"></script>
+
+</head>
+<body class="yui-skin-sam">
+	<abbr title="National Basketball Association">NBA</abbr>
+	<br />
+	<acronym title="as soon as possible">ASAP</acronym>
+	<br />
+	<address>
+		Research In Motion<br /> 4701 Tahoe Blvd.<br /> Mississauga, ON,
+		Canada<br />
+	</address>
+	<br />
+	<hr />
+	<br />
+	<button id="center" class="b1" type="button"
+		onmouseover="highlight(this)" onmouseout="unhighlight(this)">Button</button>
+	<a id="bottom" class="a1" href="http://www.google.com/"
+		onmouseover="highlight(this)" onmouseout="unhighlight(this)">Link
+		to Google</a>
+	<select id="top" class="s1" onmouseover="highlight(this)"
+		onmouseout="unhighlight(this)">
+		<option value="volvo">Volvo</option>
+		<option value="saab">Saab</option>
+		<option value="mercedes">Mercedes</option>
+		<option value="audi">Audi</option>
+	</select>
+	<textarea id="left" class="t1" rows="1" cols="5"
+		onmouseover="highlight(this)" onmouseout="unhighlight(this)">Textarea</textarea>
+	<input id="right" class="in1" type="color"
+		onmouseover="highlight(this)" onmouseout="unhighlight(this)" />
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<div id="testLogger"></div>
+	<script type="text/javascript">
+	YAHOO.namespace("navmode.yuitest");
+
+
+	YAHOO.navmode.yuitest.BasicTestCase = new YAHOO.tool.TestCase({
+
+	    //name of the test case - if not provided, one is auto-generated
+	    name : "Nav Mode Smoke Test",
+
+	    //---------------------------------------------------------------------
+	    // setUp and tearDown methods - optional
+	    //---------------------------------------------------------------------
+
+	    /*
+	     * Sets up data that is needed by each test.
+	     */
+	    setUp : function() {
+
+	    },
+
+	    /*
+	     * Cleans up everything that was created by setUp().
+	     */
+	    tearDown : function() {
+
+	    },
+
+	    //---------------------------------------------------------------------
+	    // Test methods - names must begin with "test"
+	    //---------------------------------------------------------------------
+
+	    testInitialFocus : function() {
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("top", blackberry.focus.getFocus());
+	    },
+
+	    testDown : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.DOWN,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("center", blackberry.focus.getFocus());
+	    },
+
+	    testPriorFocus : function() {
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("top", blackberry.focus.getPriorFocus());
+	    },
+
+	    testLeft : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.LEFT,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("left", blackberry.focus.getFocus());
+	    },
+
+	    testRight : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.RIGHT,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("center", blackberry.focus.getFocus());
+	    },
+
+	    testUp : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.UP,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("top", blackberry.focus.getFocus());
+	    }
+	});
+
+	YAHOO.navmode.yuitest.BasicSuite = new YAHOO.tool.TestSuite("Nav Mode Smoke Test Suite");
+	YAHOO.navmode.yuitest.BasicSuite.add(YAHOO.navmode.yuitest.BasicTestCase);
+
+	YAHOO.util.Event.onDOMReady(function() {
+	    // create the logger
+	    var logger = new YAHOO.widget.LogReader("testLogger"); //*/new YAHOO.tool.TestLogger("testLogger", {verboseOutput: true});
+	    logger.hideCategory("global");
+	    logger.hideCategory("window");
+	    logger.hideSource("LogReader");
+	    var TestRunner = YAHOO.tool.TestRunner;
+	    TestRunner.add(YAHOO.navmode.yuitest.BasicSuite);
+
+	    //function to handle events generated by the testrunner
+	    function logEvent(event) {
+
+		//data variables
+		var message = "", messageType = "";
+
+		switch (event.type) {
+		case TestRunner.BEGIN_EVENT:
+		    message = "Testing began at " + (new Date()).toString() + ".";
+		    messageType = "info";
+		    break;
+
+		case TestRunner.COMPLETE_EVENT:
+		    message = YAHOO.lang.substitute("Testing completed at " + (new Date()).toString() + ".\n"
+			    + "Passed:{passed} Failed:{failed} " + "Total:{total} ({ignored} ignored)",
+			    event.results);
+		    messageType = "info";
+		    break;
+
+		case TestRunner.TEST_FAIL_EVENT:
+		    message = event.testName + ": failed.\n" + event.error.getMessage();
+		    messageType = "fail";
+		    break;
+
+		case TestRunner.TEST_IGNORE_EVENT:
+		    message = event.testName + ": ignored.";
+		    messageType = "ignore";
+		    break;
+
+		case TestRunner.TEST_PASS_EVENT:
+		    message = event.testName + ": passed.";
+		    messageType = "pass";
+		    break;
+
+		case TestRunner.TEST_SUITE_BEGIN_EVENT:
+		    message = "Test suite \"" + event.testSuite.name + "\" started.";
+		    messageType = "info";
+		    break;
+
+		case TestRunner.TEST_SUITE_COMPLETE_EVENT:
+		    message = YAHOO.lang.substitute("Test suite \"" + event.testSuite.name + "\" completed" + ".\n"
+			    + "Passed:{passed} Failed:{failed} " + "Total:{total} ({ignored} ignored)",
+			    event.results);
+		    messageType = "info";
+		    break;
+
+		case TestRunner.TEST_CASE_BEGIN_EVENT:
+		    message = "Test case \"" + event.testCase.name + "\" started.";
+		    messageType = "info";
+		    break;
+		case TestRunner.TEST_CASE_COMPLETE_EVENT:
+		    message = YAHOO.lang.substitute("Test case \"" + event.testCase.name + "\" completed.\n"
+			    + "Passed:{passed} Failed:{failed} " + "Total:{total} ({ignored} ignored)",
+			    event.results);
+		    messageType = "info";
+		    break;
+		default:
+		    message = "Unexpected event " + event.type;
+		    message = "info";
+		}
+
+		//only log if required
+		YAHOO.log(message, messageType, "TestRunner");
+	    }
+
+	    //listen for events to publish to the logger
+	    TestRunner.subscribe(TestRunner.BEGIN_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.COMPLETE_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_CASE_BEGIN_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_CASE_COMPLETE_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_SUITE_BEGIN_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_SUITE_COMPLETE_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_PASS_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_FAIL_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_IGNORE_EVENT, logEvent);
+
+
+	    // run the tests
+	    YAHOO.tool.TestRunner.run();
+	});
+
+    </script>
+
+</body>
+</html>

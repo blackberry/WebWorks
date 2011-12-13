@@ -1,0 +1,470 @@
+<html>
+<head>
+<title>Nav Mode Smoke Test - Table</title>
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="yui2.9.0/build/logger/assets/skins/sam/logger.css" />
+<link rel="stylesheet" type="text/css" href="yui2.9.0/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="yui2.9.0/build/yuitest/assets/skins/sam/yuitest.css" />
+<script type="text/javascript" src="yui2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="yui2.9.0/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui2.9.0/build/yuitest/yuitest-min.js"></script>
+<link rel="stylesheet" type="text/css" href="StyleSheet.css" />
+<script type="text/javascript">
+    function highlight(e) {
+       e.setAttribute("style", "background-color: red; outline-style: dotted; outline-color: blue");
+    }
+
+    function unhighlight(e) {
+       e.setAttribute("style", "");
+    }
+</script>
+<!-- load navmode-browser.js BEFORE  navmode.js, blackberry.focus needs to be defined first -->
+<script type="text/javascript" src="navmode-browser.js"></script>
+<!-- replace navmode.js from the one in current build's ext folder -->
+<script type="text/javascript" src="navmode.js"></script>
+<!-- load navmode-browser-direction.sj AFTER navmode.js, navigationController needs to be defined first -->
+<script type="text/javascript" src="navmode-browser-direction.js"></script>
+
+</head>
+<body class="yui-skin-sam">
+   <table id="table1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" border="1">
+        <caption>[table] element is focusable</caption>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption id="caption1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >[caption] element is focusable</caption>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption>[thead] element is focusable</caption>
+        <thead id="thead1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption>[tbody] element is focusable</caption>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody id="tbody1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >
+            <tr>
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption>[tfoot] element is focusable</caption>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot id="tfoot1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)"
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption>[tr] elements are focusable</caption>
+        <thead>
+            <tr id="tr1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="tr2" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr id="tr2" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr id="tr3" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption>[th] elements are focusable</caption>
+        <thead>
+            <tr>
+                <th id="th1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >Month</th>
+                <th id="th2" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>January</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>February</td>
+                <td>$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Sum</td>
+                <td>$180</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br />
+    <table border="1">
+        <caption>[td] elements are focusable</caption>
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Savings</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="td1" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >January</td>
+                <td id="td2" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >$100</td>
+            </tr>
+            <tr>
+                <td id="td3" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >February</td>
+                <td id="td4" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >$80</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td id="td5" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >Sum</td>
+                <td id="td6" x-blackberry-focusable="true" onmouseover="highlight(this)" onmouseout="unhighlight(this)" >$180</td>
+            </tr>
+        </tfoot>
+    </table>
+	<br>
+	<br>
+	<br>
+	<br>
+	<div id="testLogger"></div>
+	<script type="text/javascript">
+	YAHOO.namespace("navmode.yuitest");
+
+
+	YAHOO.navmode.yuitest.BasicTestCase = new YAHOO.tool.TestCase({
+
+	    //name of the test case - if not provided, one is auto-generated
+	    name : "Nav Mode Smoke Test",
+
+	    //---------------------------------------------------------------------
+	    // setUp and tearDown methods - optional
+	    //---------------------------------------------------------------------
+
+	    /*
+	     * Sets up data that is needed by each test.
+	     */
+	    setUp : function() {
+
+	    },
+
+	    /*
+	     * Cleans up everything that was created by setUp().
+	     */
+	    tearDown : function() {
+
+	    },
+
+	    //---------------------------------------------------------------------
+	    // Test methods - names must begin with "test"
+	    //---------------------------------------------------------------------
+
+	    testInitialFocus : function() {
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("table1", blackberry.focus.getFocus());
+	    },
+
+	    testDown1 : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.DOWN,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("caption1", blackberry.focus.getFocus());
+	    },
+
+	    testPriorFocus : function() {
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("table1", blackberry.focus.getPriorFocus());
+	    },
+
+		testDown2 : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.DOWN,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("thead1", blackberry.focus.getFocus());
+	    },
+
+	    testLeft : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.LEFT,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("thead1", blackberry.focus.getFocus());
+	    },
+
+	    testRight : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.RIGHT,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("thead1", blackberry.focus.getFocus());
+	    },
+
+	    testUp : function() {
+		blackberry.focus.onScroll({
+		    "direction" : blackberry.focus.UP,
+		    "delta" : 1,
+		    "zoomScale" : 1,
+		    "virtualHeight" : document.body.clientHeight,
+		    "virtualWidth" : document.body.clientWidth,
+		    "verticalScroll" : 0,
+		    "horizontalScroll" : 0,
+		    "height" : screen.height,
+		    "width" : screen.width
+		});
+		var Assert = YAHOO.util.Assert;
+		Assert.areEqual("caption1", blackberry.focus.getFocus());
+	    }
+	});
+
+	YAHOO.navmode.yuitest.BasicSuite = new YAHOO.tool.TestSuite("Nav Mode Smoke Test Suite");
+	YAHOO.navmode.yuitest.BasicSuite.add(YAHOO.navmode.yuitest.BasicTestCase);
+
+	YAHOO.util.Event.onDOMReady(function() {
+	    // create the logger
+	    var logger = new YAHOO.widget.LogReader("testLogger"); //*/new YAHOO.tool.TestLogger("testLogger", {verboseOutput: true});
+	    logger.hideCategory("global");
+	    logger.hideCategory("window");
+	    logger.hideSource("LogReader");
+	    var TestRunner = YAHOO.tool.TestRunner;
+	    TestRunner.add(YAHOO.navmode.yuitest.BasicSuite);
+
+	    //function to handle events generated by the testrunner
+	    function logEvent(event) {
+
+		//data variables
+		var message = "", messageType = "";
+
+		switch (event.type) {
+		case TestRunner.BEGIN_EVENT:
+		    message = "Testing began at " + (new Date()).toString() + ".";
+		    messageType = "info";
+		    break;
+
+		case TestRunner.COMPLETE_EVENT:
+		    message = YAHOO.lang.substitute("Testing completed at " + (new Date()).toString() + ".\n"
+			    + "Passed:{passed} Failed:{failed} " + "Total:{total} ({ignored} ignored)",
+			    event.results);
+		    messageType = "info";
+		    break;
+
+		case TestRunner.TEST_FAIL_EVENT:
+		    message = event.testName + ": failed.\n" + event.error.getMessage();
+		    messageType = "fail";
+		    break;
+
+		case TestRunner.TEST_IGNORE_EVENT:
+		    message = event.testName + ": ignored.";
+		    messageType = "ignore";
+		    break;
+
+		case TestRunner.TEST_PASS_EVENT:
+		    message = event.testName + ": passed.";
+		    messageType = "pass";
+		    break;
+
+		case TestRunner.TEST_SUITE_BEGIN_EVENT:
+		    message = "Test suite \"" + event.testSuite.name + "\" started.";
+		    messageType = "info";
+		    break;
+
+		case TestRunner.TEST_SUITE_COMPLETE_EVENT:
+		    message = YAHOO.lang.substitute("Test suite \"" + event.testSuite.name + "\" completed" + ".\n"
+			    + "Passed:{passed} Failed:{failed} " + "Total:{total} ({ignored} ignored)",
+			    event.results);
+		    messageType = "info";
+		    break;
+
+		case TestRunner.TEST_CASE_BEGIN_EVENT:
+		    message = "Test case \"" + event.testCase.name + "\" started.";
+		    messageType = "info";
+		    break;
+		case TestRunner.TEST_CASE_COMPLETE_EVENT:
+		    message = YAHOO.lang.substitute("Test case \"" + event.testCase.name + "\" completed.\n"
+			    + "Passed:{passed} Failed:{failed} " + "Total:{total} ({ignored} ignored)",
+			    event.results);
+		    messageType = "info";
+		    break;
+		default:
+		    message = "Unexpected event " + event.type;
+		    message = "info";
+		}
+
+		//only log if required
+		YAHOO.log(message, messageType, "TestRunner");
+	    }
+
+	    //listen for events to publish to the logger
+	    TestRunner.subscribe(TestRunner.BEGIN_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.COMPLETE_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_CASE_BEGIN_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_CASE_COMPLETE_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_SUITE_BEGIN_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_SUITE_COMPLETE_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_PASS_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_FAIL_EVENT, logEvent);
+	    TestRunner.subscribe(TestRunner.TEST_IGNORE_EVENT, logEvent);
+
+
+	    // run the tests
+	    YAHOO.tool.TestRunner.run();
+	});
+
+    </script>
+
+</body>
+</html>

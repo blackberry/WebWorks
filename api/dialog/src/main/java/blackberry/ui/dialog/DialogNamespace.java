@@ -17,6 +17,7 @@ package blackberry.ui.dialog;
 
 import java.util.Hashtable;
 
+import net.rim.device.api.script.ScriptEngine;
 import net.rim.device.api.script.Scriptable;
 import net.rim.device.api.ui.component.Dialog;
 
@@ -52,6 +53,9 @@ public class DialogNamespace extends Scriptable {
 
         _fields.put( StandardAskFunction.NAME, new StandardAskFunction() );
         _fields.put( CustomAskFunction.NAME, new CustomAskFunction() );
+        _fields.put( SelectAsyncFunction.NAME, new SelectAsyncFunction() );
+        _fields.put( DateTimeAsyncFunction.NAME, new DateTimeAsyncFunction() );
+        _fields.put( ColorPickerAsyncFunction.NAME, new ColorPickerAsyncFunction() );
         _fields.put( D_OK, new Integer( Dialog.D_OK ) );
         _fields.put( D_SAVE, new Integer( Dialog.D_SAVE ) );
         _fields.put( D_DELETE, new Integer( Dialog.D_DELETE ) );
