@@ -77,12 +77,12 @@ public class SelectAsyncFunction extends ScriptableFunctionBase {
                 labels[ i ] = (String) choice.getField( "label" );
                 enabled[ i ] = ( (Boolean) choice.getField( "enabled" ) ).booleanValue();
                 
-                canSelect = allowMultiple || !firstSelected;
-                selected[ i ] = canSelect && enabled[ i ] && ( (Boolean) choice.getField( "selected" ) ).booleanValue();
-                firstSelected = firstSelected || selected[ i ];
-                
                 type[ i ] = ( (String) choice.getField( "type" ) ).equals( "group" ) ? POPUP_ITEM_TYPE_GROUP
                         : POPUP_ITEM_TYPE_OPTION;
+                
+                canSelect = (type[ i ] != POPUP_ITEM_TYPE_GROUP) && (allowMultiple || !firstSelected);
+                selected[ i ] = canSelect && enabled[ i ] && ( (Boolean) choice.getField( "selected" ) ).booleanValue();
+                firstSelected = firstSelected || selected[ i ];
             }
         } catch( Exception e ) {
             throw new RuntimeException( e.getMessage() );
