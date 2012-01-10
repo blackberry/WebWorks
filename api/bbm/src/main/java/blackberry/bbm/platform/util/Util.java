@@ -73,6 +73,11 @@ public class Util {
     }
     
     public static Bitmap requestBitmap(String uri) throws Exception {
+        byte[] bmpBytes = requestBitmapBytes(uri);
+        return Bitmap.createBitmapFromBytes(bmpBytes, 0, bmpBytes.length, 1);
+    }
+    
+    public static byte[] requestBitmapBytes(String uri) throws Exception {
         BrowserField browserField = (BrowserField) BBMPlatformExtension._browserField.get();
         final BrowserFieldConfig bfConfig = browserField.getConfig();
         final BrowserFieldController bfController =
@@ -94,7 +99,7 @@ public class Util {
             } catch(EOFException e) {
             }
             
-            return Bitmap.createBitmapFromBytes(bmpBytes.getArray(), 0, bmpBytes.size(), 1);
+            return bmpBytes.getArray();
         } finally {
             try {
                 ic.close();

@@ -15,6 +15,8 @@
  */
 package blackberry.bbm.platform.self.profilebox;
 
+import java.nio.ByteBuffer;
+
 import net.rim.blackberry.api.bbm.platform.profile.UserProfile;
 import net.rim.blackberry.api.bbm.platform.profile.UserProfileBox;
 import net.rim.blackberry.api.bbm.platform.profile.UserProfileBoxAccessException;
@@ -117,8 +119,9 @@ public class ProfileBoxNamespace extends Scriptable {
             if(iconURI.equals(UNDEFINED)) {
                 iconID = -1;
             } else {
-                final Bitmap icon = Util.requestBitmap((String) iconURI);
-                iconID = Math.abs(icon.hashCode()); // icon ID is hash code of bitmap
+                final byte[] iconBytes = Util.requestBitmapBytes((String) iconURI);
+                final Bitmap icon = Bitmap.createBitmapFromBytes(iconBytes, 0, iconBytes.length, 1);
+                iconID = Math.abs(ByteBuffer.wrap(iconBytes).hashCode()); // icon ID is hash code of bitmap
                 if(! _profileBox.isIconRegistered(iconID)) {
                     _profileBox.registerIcon(iconID, PNGEncodedImage.encode(icon));
                 }
