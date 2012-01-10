@@ -186,11 +186,13 @@ public class WidgetBrowserFieldListener extends BrowserFieldListener {
                 bfScreen.getPageManager().clearFlags();
             }
 
-            // For naviagtion mode, add blackberry.focus namespace to JavaScriptExtension.
+            // For navigation mode, add blackberry.focus namespace to JavaScriptExtension.
             if( bfScreen.getAppNavigationMode() && document instanceof HTMLDocument ) {
                 // Add our JS navigation extension to JavaScript Engine.
                 if( proxyScriptEngine != null ) {
                     proxyScriptEngine.addExtension( NavigationNamespace.NAME, bfScreen.getNavigationExtension() );
+                    // Load navmode.js into script engine, must be done after blackberry.focus namespace is defined
+                    bfScreen.getNavigationJS().loadFeature( null, null, null, scriptEngine );                  
                 }
                 bfScreen.getNavigationController().reset();
             }
@@ -307,21 +309,21 @@ public class WidgetBrowserFieldListener extends BrowserFieldListener {
          */
         if( browserField.getDocument() == document ) {
             // For navigation mode.
-            if( browserField.getScreen() instanceof BrowserFieldScreen ) {
-                BrowserFieldScreen bfScreen = (BrowserFieldScreen) browserField.getScreen();
-
-                if( bfScreen.getAppNavigationMode() && browserField.getDocument() == document ) {
-                    bfScreen.getNavigationController().update();
-
-                    // Add Layout update event listener.
-                    if( document instanceof EventTarget ) {
-                        EventTarget target = (EventTarget) document;
-                        EventListener listener = new UpdateBinsEventListener( browserField );
-                        target.addEventListener( "DOMNodeInserted", listener, false );
-                        target.addEventListener( "DOMNodeRemoved", listener, false );
-                    }
-                }
-            }
+//            if( browserField.getScreen() instanceof BrowserFieldScreen ) {
+//                BrowserFieldScreen bfScreen = (BrowserFieldScreen) browserField.getScreen();
+//
+//                if( bfScreen.getAppNavigationMode() && browserField.getDocument() == document ) {
+//                    bfScreen.getNavigationController().update();
+//
+//                    // Add Layout update event listener.
+//                    if( document instanceof EventTarget ) {
+//                        EventTarget target = (EventTarget) document;
+//                        EventListener listener = new UpdateBinsEventListener( browserField );
+//                        target.addEventListener( "DOMNodeInserted", listener, false );
+//                        target.addEventListener( "DOMNodeRemoved", listener, false );
+//                    }
+//                }
+//            }
 
             // Pop the loading screeen if it is displayed.
             if( browserField.getScreen() instanceof BrowserFieldScreen ) {
@@ -405,32 +407,33 @@ public class WidgetBrowserFieldListener extends BrowserFieldListener {
         return jsContent;
     }
 
-    private static class UpdateBinsEventListener implements EventListener {
-        private WeakReference _browserFieldWeakReference;
+//    private static class UpdateBinsEventListener implements EventListener {
+//        private WeakReference _browserFieldWeakReference;
+//
+//        UpdateBinsEventListener( BrowserField browserField ) {
+//            super();
+//            _browserFieldWeakReference = new WeakReference( browserField );
+//        }
+//
+//        private BrowserField getBrowserField() {
+//            Object o = _browserFieldWeakReference.get();
+//            if( o instanceof BrowserField ) {
+//                return (BrowserField) o;
+//            } else {
+//                return null;
+//            }
+//        }
+//
+//        public void handleEvent( Event evt ) {
+//            Screen screen = getBrowserField().getScreen();
+//            if( screen instanceof BrowserFieldScreen ) {
+//                BrowserFieldScreen bfScreen = (BrowserFieldScreen) screen;
+//
+//                if( bfScreen.getAppNavigationMode() ) {
+//                    bfScreen.getNavigationController().update();
+//                }
+//            }
+//        }
+//    }
 
-        UpdateBinsEventListener( BrowserField browserField ) {
-            super();
-            _browserFieldWeakReference = new WeakReference( browserField );
-        }
-
-        private BrowserField getBrowserField() {
-            Object o = _browserFieldWeakReference.get();
-            if( o instanceof BrowserField ) {
-                return (BrowserField) o;
-            } else {
-                return null;
-            }
-        }
-
-        public void handleEvent( Event evt ) {
-            Screen screen = getBrowserField().getScreen();
-            if( screen instanceof BrowserFieldScreen ) {
-                BrowserFieldScreen bfScreen = (BrowserFieldScreen) screen;
-
-                if( bfScreen.getAppNavigationMode() ) {
-                    bfScreen.getNavigationController().update();
-                }
-            }
-        }
-    }
 }

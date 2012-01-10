@@ -23,14 +23,16 @@ import blackberry.bbm.platform.util.Util;
 
 public class BBMPlatformUser extends Scriptable {
     
-    public static final String FIELD_DISPLAY_PIC =  "displayPicture";
-    public static final String FIELD_DISPLAY_NAME = "displayName";
-    public static final String FIELD_PERSONAL_MSG = "personalMessage";
-    public static final String FIELD_STATUS =       "status";
-    public static final String FIELD_STATUS_MSG =   "statusMessage";
-    public static final String FIELD_HANDLE =       "handle";
-    public static final String FIELD_PPID =         "ppid";
-    public static final String FIELD_TYPE =         "type";
+    public static final String FIELD_DISPLAY_PIC =     "displayPicture";
+    public static final String FIELD_DISPLAY_NAME =    "displayName";
+    public static final String FIELD_PERSONAL_MSG =    "personalMessage";
+    public static final String FIELD_STATUS =          "status";
+    public static final String FIELD_STATUS_MSG =      "statusMessage";
+    public static final String FIELD_HANDLE =          "handle";
+    public static final String FIELD_PPID =            "ppid";
+    public static final String FIELD_TYPE =            "type";
+    public static final String FIELD_APP_VERSION =     "appVersion";
+    public static final String FIELD_BBM_SDK_VERSION = "bbmsdkVersion";
     
     public static final String STATUS_STR_AVAILABLE = "available";
     public static final String STATUS_STR_BUSY =      "busy";
@@ -57,6 +59,10 @@ public class BBMPlatformUser extends Scriptable {
             return BBMPlatformUser.statusToString(_presence.getStatus());
         } else if(name.equals(BBMPlatformUser.FIELD_STATUS_MSG)) {
             return _presence.getStatusMessage();
+        } else if(name.equals(BBMPlatformUser.FIELD_APP_VERSION)) {
+            return _presence.getAppVersion();
+        } else if(name.equals(BBMPlatformUser.FIELD_BBM_SDK_VERSION)) {
+            return new Integer(_presence.getBBMSDKVersion());
         } else if(name.equals(BBMPlatformUser.FIELD_TYPE)) {
             return "BBM";
         } else if(name.equals(BBMPlatformUser.FIELD_HANDLE)) {

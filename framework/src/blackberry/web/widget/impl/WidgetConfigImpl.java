@@ -92,6 +92,10 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     protected int _transitionType;
     protected int _transitionDuration;
     protected int _transitionDirection;
+	
+	// orientation configuration
+	protected int _orientation;
+	protected boolean _orientationDefined;
 
     // caches configuration
     protected boolean _cacheEnabled;
@@ -137,6 +141,10 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
         _transitionType = TransitionConstants.TRANSITION_NONE;
         _transitionDuration = TransitionConstants.DEFAULT_DURATION;
         _transitionDirection = TransitionConstants.DIRECTION_LEFT;
+		
+		// Set default orientation values
+		_orientationDefined = false;
+		_orientation = -1;
 
         // Set default value of cache configuration
         _cacheEnabled = true;
@@ -282,6 +290,15 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
     public int getTransitionDirection() {
         return _transitionDirection;
     }
+	
+	// Getters of orientation
+	public boolean isOrientationDefined() {
+		return _orientationDefined;
+	}
+	
+	public int getOrientation() {
+		return _orientation;
+	}
 
     // Getters of cache configuration
     public boolean isCacheEnabled() {

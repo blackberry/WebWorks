@@ -107,7 +107,7 @@ public class SelfNamespace extends BBMPlatformUser {
         
         protected FunctionSignature[] getFunctionSignatures() {
             FunctionSignature sig1 = new FunctionSignature(2);
-            sig1.addParam(String.class,             true);
+            sig1.addNullableParam(String.class,     true);
             sig1.addParam(ScriptableFunction.class, true);
             
             return new FunctionSignature[] {

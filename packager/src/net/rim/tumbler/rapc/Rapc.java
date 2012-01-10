@@ -343,8 +343,9 @@ public class Rapc {
 
                 param.append( anImport );
 
-                if( i < _imports.size() - 1 && _imports.size() != 1 )
-                    param.append( ";" );
+                if( i < _imports.size() - 1 && _imports.size() != 1 ) {
+                    param.append( File.pathSeparatorChar );
+                }
             }
             param.append( "\" " );
         }

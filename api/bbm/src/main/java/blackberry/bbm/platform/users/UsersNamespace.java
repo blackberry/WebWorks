@@ -17,6 +17,7 @@ package blackberry.bbm.platform.users;
 
 import net.rim.blackberry.api.bbm.platform.BBMPlatformContext;
 import net.rim.blackberry.api.bbm.platform.io.BBMPlatformConnection;
+import net.rim.blackberry.api.bbm.platform.io.BBMPlatformData;
 import net.rim.blackberry.api.bbm.platform.io.IOErrorCode;
 import net.rim.blackberry.api.bbm.platform.profile.BBMInvitationRequest;
 import net.rim.blackberry.api.bbm.platform.profile.BBMPlatformContact;
@@ -52,6 +53,8 @@ public class UsersNamespace extends Scriptable {
     private static final String FUNC_SEND_FILE =            "sendFile";
     private static final String FIELD_CONTACTS_WITH_APP =   "contactsWithApp";
     private static final String EVENT_ON_UPDATE =           "onupdate";
+    private static final String FUNC_SHARE_CONTENT =        "shareContent";
+    public static final String EVENT_ON_SHARE_CONTENT =     "onsharecontent";
     
     private static UsersNamespace instance;
 
@@ -62,6 +65,7 @@ public class UsersNamespace extends Scriptable {
     private UsersNamespace() {
         _wFields = new ScriptableFieldManager();
         _wFields.addField(EVENT_ON_UPDATE);
+        _wFields.addField(EVENT_ON_SHARE_CONTENT);
     }
     
     public static UsersNamespace getInstance() {
@@ -98,6 +102,8 @@ public class UsersNamespace extends Scriptable {
             return new InviteToBBMConnFunction();
         } else if(name.equals(FUNC_SEND_FILE)) {
             return new SendFileFunction();
+        } else if(name.equals(FUNC_SHARE_CONTENT)) {
+            return new ShareContentFunction();
         } else if(_wFields.hasField(name)) {
             return _wFields.getField(name);
         } else {
@@ -485,6 +491,80 @@ public class UsersNamespace extends Scriptable {
             };
         }
     } // SendFileFunction
+    
+    private static class ShareContentFunction extends ScriptableFunctionBase {
+
+        protected Object execute(Object thiz, Object[] args) throws Exception {
+            final String content =                            (String) args[0];
+            final String description =                        (String) args[1];
+            final ScriptableFunction onComplete = (ScriptableFunction) args[2];
+            final Object options;
+            if(args.length >= 4) {
+                options = args[3];
+            } else {
+                options = null;
+            }
+            
+            // Throw exceptions for too long parameters
+            final int maxContentLength = 61124;
+            if(content.length() > maxContentLength) {
+                throw new IllegalArgumentException("content.length > " + maxContentLength);
+            }
+            final int maxDescLength = 128;
+            if(description.length() > maxDescLength) {
+                throw new IllegalArgumentException("description.length > " + maxDescLength);
+            }
+            
+            // Parse options object for title and contacts
+            final String title;
+            final ContactListProvider contacts;
+            if(options == null || options.equals(UNDEFINED)) {
+                title = null;
+                contacts = null;
+            } else {
+                // Title
+                final Scriptable optionsObj = (Scriptable) options;
+                final Object titleObj = optionsObj.getField("title");
+                if(titleObj.equals(UNDEFINED)) {
+                    title = null;
+                } else {
+                    title = (String) titleObj;
+                }
+                
+                // Contacts
+                Object contactsObj = optionsObj.getField("users");
+                if(contactsObj.equals(UNDEFINED)) {
+                    contacts = null;
+                } else {
+                    final BBMPlatformUser[] users = Util.scriptableUsersArrayToUserArray((Scriptable) contactsObj);
+                    contacts = new Util.SimpleContactListProvider(users);
+                }
+            }
+            
+            // Call API
+            final BBMPlatformNamespace bbmpNpsc = BBMPlatformNamespace.getInstance();
+            final MessagingService msgService = bbmpNpsc.getMessagingService();
+            UiApplication.getUiApplication().invokeLater(new Runnable() {
+                public void run() {
+                    msgService.shareContent(description, new BBMPlatformData(content), contacts, title);
+                    Util.dispatchCallback(onComplete, null);
+                }
+            });
+            
+            return UNDEFINED;
+        }
+        
+        protected FunctionSignature[] getFunctionSignatures() {
+            FunctionSignature sig1 = new FunctionSignature(4);
+            sig1.addParam(String.class,             true);
+            sig1.addParam(String.class,             true);
+            sig1.addParam(ScriptableFunction.class, true);
+            sig1.addParam(Scriptable.class,         false);
+            return new FunctionSignature[] {
+                sig1
+            };
+        }
+    } // ShareContentFunction
 
     private static String eventTypeToString(int eventType) {
         switch(eventType) {

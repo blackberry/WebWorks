@@ -154,18 +154,22 @@ public class WidgetRequestController extends ProtocolController {
                 throw e;
             }
         }
+		
+        MemoryMaid mm = MemoryMaid.getInstance();
+        if( mm != null ) {
+            if( mm.isAlive() ) {
+                mm.flagGC();
+            } else {
+                // Start the memory manager after our first page has been loaded
+                mm.start();
+            }
+        }
     }
 
     /**
      * @see net.rim.device.api.browser.field2.BrowserFieldController
      */
     public InputConnection handleResourceRequest( BrowserFieldRequest request ) throws Exception {
-
-        // Clean up memory
-        MemoryMaid mm = MemoryMaid.getInstance();
-        if( mm != null && mm.isAlive() ) {
-            mm.flagGC();
-        }
 
         if( this._browserField == null ) {
             return new HTTPResponseStatus( HTTPResponseStatus.SC_SERVER_ERROR, request ).getResponse();

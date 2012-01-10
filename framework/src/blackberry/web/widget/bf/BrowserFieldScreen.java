@@ -35,6 +35,7 @@ import net.rim.device.api.web.WidgetExtension;
 import blackberry.web.widget.Widget;
 import blackberry.web.widget.WidgetScreen;
 import blackberry.web.widget.bf.navigationcontroller.NavigationController;
+import blackberry.web.widget.bf.navigationcontroller.NavigationExtension;
 import blackberry.web.widget.caching.CacheManager;
 import blackberry.web.widget.caching.WidgetCacheNamespace;
 import blackberry.web.widget.device.DeviceInfo;
@@ -61,8 +62,9 @@ public final class BrowserFieldScreen extends WidgetScreen {
 
     private static BrowserField _browserFieldReference;
 
+    private NavigationExtension _navigationJS;
     private NavigationController _navigationController;
-    private NavigationNamespace _navigationExtension;
+    private NavigationNamespace _navigationExtension;    
 
     private PageManager _pageManager;
 
@@ -184,7 +186,8 @@ public final class BrowserFieldScreen extends WidgetScreen {
                     | Manager.HORIZONTAL_SCROLLBAR );
 
             // navController depends on navExtension. Initialize navExtension first
-            _navigationExtension = new NavigationNamespace( this );
+            _navigationJS = new NavigationExtension();
+            _navigationExtension = new NavigationNamespace( this, (WidgetFieldManager) _manager );
             _navigationController = new NavigationController( this );
         } else {
             _manager = new VerticalFieldManager( Manager.VERTICAL_SCROLL | Manager.VERTICAL_SCROLLBAR | Manager.HORIZONTAL_SCROLL
@@ -312,6 +315,10 @@ public final class BrowserFieldScreen extends WidgetScreen {
         return _HTML5ToGearsExtension;
     }
 
+    public NavigationExtension getNavigationJS() {
+        return _navigationJS;
+    }
+    
     public NavigationNamespace getNavigationExtension() {
         return _navigationExtension;
     }

@@ -102,6 +102,8 @@ public class ConfigXMLParser implements XMLParser {
                     processNavigationNode(node);
                 } else if (node.getNodeName().equals("rim:cache")) {
                     processCacheNode(node);
+				} else if (node.getNodeName().equals("rim:orientation")) {
+                    processOrientationNode(node);
                 } else if (node.getNodeName().equals("name")) {
                     _widgetConfig.setName(getTextValue(node));
                 } else if (node.getNodeName().equals("description")) {
@@ -601,6 +603,32 @@ public class ConfigXMLParser implements XMLParser {
             _widgetConfig.setTransportOrder(transportArray);
         }
     }
+	
+	
+   // Processing for the <rim:orientation> node
+    private void processOrientationNode(Node orientationNode) throws Exception {
+        
+    	// get mode
+        NamedNodeMap attrs = orientationNode.getAttributes();
+        Node modeAttrNode = attrs.getNamedItem("mode");        
+        if (modeAttrNode != null) {        	
+        	try{
+				int orientation = -1;
+				if (modeAttrNode.getNodeValue().equalsIgnoreCase("portrait")) {
+					orientation = 0;
+				} else if (modeAttrNode.getNodeValue().equalsIgnoreCase("landscape")) {
+					orientation = 1;
+				} 
+				// Only set the orientation if it was properly specified
+				if (orientation != -1) {
+					_widgetConfig.setOrientation(orientation);
+				}
+        	}catch(Exception e){
+        		// Default values are used if an error happens        		
+        	}
+        } 
+    }    
+	
    // Processing for the <rim:cache> node
     private void processCacheNode(Node cacheNode) throws Exception {
         
