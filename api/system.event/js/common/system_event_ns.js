@@ -18,7 +18,7 @@
 	function SystemEvent(disp) {
 		this.onCoverageChange = function(onSystemEvent) { return disp.onCoverageChange(onSystemEvent); };
 
-		this.onHardwareKey = function(key, onSystemEvent) { return disp.onHardwareKey(key, onSystemEvent); };
+		this.onHardwareKey = function(key, onSystemEvent) { return disp.onHardwareKey(onSystemEvent, key); };
 	}
 
 	SystemEvent.prototype.__defineGetter__("KEY_BACK", function() { return 0; });

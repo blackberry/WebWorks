@@ -31,7 +31,7 @@ import org.w3c.dom.Document;
 public class DialogExtension implements WidgetExtension {
 
     public static final String FEATURE_DIALOG = "blackberry.ui.dialog";
-
+    
     /**
      * @see net.rim.device.api.web.WidgetExtension#register(WidgetConfig, BrowserField)
      */
@@ -44,6 +44,7 @@ public class DialogExtension implements WidgetExtension {
      */
     public void loadFeature( final String feature, final String version, final Document document, final ScriptEngine scriptengine )
             throws Exception {
+        
         if( feature.equals( FEATURE_DIALOG ) ) {
             scriptengine.addExtension( feature, new DialogNamespace() );
         }
