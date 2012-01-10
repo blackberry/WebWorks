@@ -23,7 +23,7 @@ import net.rim.device.api.system.Memory;
  */
 public class MemoryMaid extends Thread {
     protected final static int LOWMEM_THRESHHOLD = 1024 * 1024 * 5; // 5Mb
-    protected final static float DEVIATION_THRESHHOLD = 0.05f; // 5%
+    protected final static float DEVIATION_THRESHHOLD = 0.10f; // 10%
     protected final static long GC_TIMEOUT = 25000; // Wait time after a gc. To avoid calling gc too much
     protected final static long SAMPLE_RATE = 5000; // How often to check memory
 
@@ -110,4 +110,6 @@ public class MemoryMaid extends Thread {
     public void flagGC() {
         _doGC = true;
     }
+
+	
 }

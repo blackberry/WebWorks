@@ -135,6 +135,12 @@ public class WidgetConfig_v1Serializer implements WidgetConfigSerializer {
         if (_widgetConfig.getNavigationMode()) {
             buffer.append("_widgetNavigationMode = true;").append(NL_LVL_0);
         }
+		
+		// Set orientation
+        if (_widgetConfig.getOrientationDefined()) {
+            buffer.append("_orientationDefined = true;").append(NL_LVL_0);
+			buffer.append("_orientation = " + Integer.toString(_widgetConfig.getOrientation()) + ";").append(NL_LVL_0);
+        }
 
         // Add LoadingScreen configuration
         if (_widgetConfig.getFirstPageLoad()) {

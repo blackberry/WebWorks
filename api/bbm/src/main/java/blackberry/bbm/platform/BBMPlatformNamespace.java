@@ -27,6 +27,7 @@ import net.rim.device.api.ui.UiApplication;
 import blackberry.bbm.platform.io.IONamespace;
 import blackberry.bbm.platform.io.MessagingServiceListenerImpl;
 import blackberry.bbm.platform.self.SelfNamespace;
+import blackberry.bbm.platform.settings.SettingsNamespace;
 import blackberry.bbm.platform.ui.UINamespace;
 import blackberry.bbm.platform.users.UsersNamespace;
 import blackberry.bbm.platform.util.ConstantsUtil;
@@ -43,6 +44,7 @@ public final class BBMPlatformNamespace extends Scriptable {
 
     public static final String FUNC_REGISTER =                "register";
     public static final String FUNC_REQUEST_USER_PERMISSION = "requestUserPermission";
+    public static final String FUNC_SHOW_OPTIONS =            "showBBMAppOptions";
     public static final String FIELD_ENVIRONMENT =            "environment";
     public static final String EVENT_ON_APP_INVOKED =         "onappinvoked";
     public static final String EVENT_ON_ACCESS_CHANGED =      "onaccesschanged";
@@ -99,6 +101,8 @@ public final class BBMPlatformNamespace extends Scriptable {
             return new RegisterFunction();
         } else if(name.equals(BBMPlatformNamespace.FUNC_REQUEST_USER_PERMISSION)) {
             return new RequestUserPermissionFunction();
+        } else if(name.equals(BBMPlatformNamespace.FUNC_SHOW_OPTIONS)) {
+            return new ShowOptionsFunction();
         } else if(name.equals(SelfNamespace.NAME)) {
             return SelfNamespace.getInstance();
         } else if(name.equals(UsersNamespace.NAME)) {
@@ -107,6 +111,8 @@ public final class BBMPlatformNamespace extends Scriptable {
             return IONamespace.getInstance();
         } else if(name.equals(UINamespace.NAME)) {
             return UINamespace.getInstance();
+        } else if(name.equals(SettingsNamespace.NAME)) {
+            return SettingsNamespace.getInstance();
         } else if(_wFields.hasField(name)){
             return _wFields.getField(name);
         } else if(name.equals(FIELD_ENVIRONMENT)) {
@@ -126,22 +132,42 @@ public final class BBMPlatformNamespace extends Scriptable {
         } catch(ControlledAccessException e) {
             return UNDEFINED;
         }
-            
     }
     
     private class RegisterFunction extends ScriptableFunctionBase {
         
-        public static final String OPTIONS_FIELD_UUID = "uuid";
+        public static final String OPTIONS_FIELD_UUID =              "uuid";
+        public static final String OPTIONS_FIELD_SHARECONTENTSPLAT = "shareContentSplat";
         
         protected Object execute(Object thiz, Object[] args) throws Exception {
             final Object onAccessChanged = BBMPlatformNamespace.this.getField(EVENT_ON_ACCESS_CHANGED);
             if(onAccessChanged.equals(UNDEFINED)) {
-                throw new IllegalStateException("blackberry.bbm.platform.onAccessChanged == undefined");
+                throw new IllegalStateException("blackberry.bbm.platform.onaccesschanged == undefined");
             }
             
             final Scriptable options = (Scriptable) args[0];
             final String uuid = (String) options.getField(OPTIONS_FIELD_UUID);
-            final BBMPlatformApplication bbmApp = new BBMPlatformApplication(uuid);
+            
+            // Get optional shareContentSplat property
+            final Object shareContentSplatObj = options.getField(OPTIONS_FIELD_SHARECONTENTSPLAT);
+            boolean shareContentSplat;
+            try {
+                shareContentSplat = ((Boolean) shareContentSplatObj).booleanValue();
+            } catch(Exception e) {
+                shareContentSplat = false;
+            }
+            final boolean finalShareContentSplat = shareContentSplat;
+            
+            final BBMPlatformApplication bbmApp = new BBMPlatformApplication(uuid) {
+                public int getDefaultSettings() {
+                    if(finalShareContentSplat) {
+                        return super.getDefaultSettings() | BBMPlatformContext.SETTING_SHARECONTENT_SPLAT;
+                    } else {
+                        return super.getDefaultSettings();
+                    }
+                    
+                }
+            };
             
             Dispatcher.getInstance().dispatch(new DispatchableEvent(null) {
                 protected void dispatch() {
@@ -196,4 +222,33 @@ public final class BBMPlatformNamespace extends Scriptable {
             };
         }
     } // RequestUserPermissionFunction
+    
+    private class ShowOptionsFunction extends ScriptableFunctionBase {
+        
+        protected Object execute(Object thiz, Object[] args) throws Exception {
+            
+            final ScriptableFunction onComplete = (ScriptableFunction) args[0];
+            
+            UiApplication.getUiApplication().invokeLater(new Runnable() {
+                public void run() {
+                    UiApplication.getUiApplication().invokeLater(new Runnable() {
+                       public void run() {
+                           _bbmpContext.requestAppSettings();
+                           Util.dispatchCallback(onComplete, null);
+                       }
+                    });
+                }
+            });
+            
+            return UNDEFINED;
+        }
+        
+        protected FunctionSignature[] getFunctionSignatures() {
+            FunctionSignature sig1 = new FunctionSignature(1);
+            sig1.addParam(ScriptableFunction.class, true);
+            return new FunctionSignature[] {
+                sig1
+            };
+        }
+    } // ShowOptionsFunction
 }

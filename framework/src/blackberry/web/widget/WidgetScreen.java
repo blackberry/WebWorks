@@ -48,6 +48,7 @@ public abstract class WidgetScreen extends MainScreen {
         if( EventService.getInstance().fireEvent(ApplicationEventHandler.EVT_APP_EXIT, null, true) ) {
             return false;
         }
+        System.gc(); // MemoryMaid
         // Do not call the default onClose function so the save dialog is skipped.
         close();
         return true;

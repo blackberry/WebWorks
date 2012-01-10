@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:rim="http://www.blackberry.com/ns/widgets"
+        version="1.0"
+        rim:header="RIM-Widget: rim/widget">
+  <rim:navigation mode="focus" />
+  <name>NewScenario_5_Basic_Case</name>
+  <author>Igor</author>
+  <description>
+    Navigation mode - Scenario 5 - Basic Case
+  </description>
+  <icon src="wheel.png"/>
+  <content src="index.htm"/>
+  <access uri="*" />
+</widget>
+
+

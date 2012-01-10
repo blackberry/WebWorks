@@ -15,6 +15,7 @@
  */
 package blackberry.bbm.platform.io;
 
+import java.util.Date;
 import java.util.Hashtable;
 
 import net.rim.blackberry.api.bbm.platform.io.BBMPlatformChannel;
@@ -28,6 +29,7 @@ import net.rim.blackberry.api.bbm.platform.profile.BBMPlatformContact;
 import net.rim.blackberry.api.bbm.platform.service.MessagingServiceListener;
 import net.rim.device.api.script.ScriptableFunction;
 import blackberry.bbm.platform.users.BBMPlatformUser;
+import blackberry.bbm.platform.users.UsersNamespace;
 import blackberry.bbm.platform.util.ConstantsUtil;
 import blackberry.bbm.platform.util.Util;
 import blackberry.core.threading.DispatchableEvent;
@@ -230,4 +232,21 @@ public class MessagingServiceListenerImpl extends MessagingServiceListener {
         };
         Util.dispatchCallback(callback, args);
     }
+
+    public void onShareContentReceived(BBMPlatformContact contact, String description, BBMPlatformData content, long timestamp) {
+        final ScriptableFunction callback;
+        try {
+            callback = (ScriptableFunction) UsersNamespace.getInstance().getField(UsersNamespace.EVENT_ON_SHARE_CONTENT);
+        } catch(Exception e) {
+            return;
+        }
+        final Object[] args = {
+            new BBMPlatformUser(contact),
+            content.getDataAsString(),
+            description,
+            new Date(timestamp),
+        };
+        Util.dispatchCallback(callback, args);
+    }
+        
 }
