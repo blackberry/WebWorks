@@ -70,6 +70,8 @@ public class StandardAskAsyncFunction extends ScriptableFunctionBase {
         fs.addParam( Integer.class, true );
         // callback
         fs.addParam( ScriptableFunction.class, true );
+	// filler
+        fs.addParam( Object.class, true );
         return new FunctionSignature[] { fs };
     }
 }
