@@ -120,8 +120,10 @@ class KeyPressHandler {
                  * Checks to see if the current active screen is a Dialog.
                  */
                 private boolean isDialogUp() {
-                    if( UiApplication.getUiApplication().getActiveScreen().getScreenBelow() == null ) {
-                        return false;
+                    synchronized( Application.getEventLock() ) {
+                        if( UiApplication.getUiApplication().getActiveScreen().getScreenBelow() == null ) {
+                            return false;
+                        }
                     }
                     return true;
                 }
