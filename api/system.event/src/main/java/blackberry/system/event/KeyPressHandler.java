@@ -41,6 +41,9 @@ class KeyPressHandler {
     
     private KeyListener _keyMonitor;
     
+    private UiApplication _app;
+    private boolean _dialogUp;
+    
     private boolean[] _listenerForKey = new boolean[] { false, false, false, false, false, false, false, false};
     
     KeyPressHandler(ISystemEventListener manager) {
@@ -71,7 +74,7 @@ class KeyPressHandler {
                 public boolean keyDown( int keycode, int time ) {
                     int keyPressed = Keypad.key( keycode );
                     int event;
-                    boolean dialogUp = false;
+                    _dialogUp = false;
 
                     switch( keyPressed ) {
                         case Keypad.KEY_CONVENIENCE_1:
@@ -82,7 +85,7 @@ class KeyPressHandler {
                             break;
                         case Keypad.KEY_MENU:
                             event = IKEY_MENU;
-                            dialogUp = isDialogUp();
+                            isDialogUp();
                             break;
                         case Keypad.KEY_SEND:
                             event = IKEY_STARTCALL;
@@ -92,15 +95,15 @@ class KeyPressHandler {
                             break;
                         case Keypad.KEY_ESCAPE:
                             event = IKEY_BACK;
-                            dialogUp = isDialogUp();
+                            isDialogUp();
                             break;
                         case Keypad.KEY_VOLUME_DOWN:
                             event = IKEY_VOLUME_DOWN;
-                            dialogUp = isDialogUp();
+                            isDialogUp();
                             break;
                         case Keypad.KEY_VOLUME_UP:
                             event = IKEY_VOLUME_UP;
-                            dialogUp = isDialogUp();
+                            isDialogUp();
                             break;
                         default:
                             return false;
@@ -108,7 +111,7 @@ class KeyPressHandler {
 
                     // If we're listening for this hardware key, queue up an event for it,
                     // only queue if the active screen is not a dialog.
-                    if( _listenerForKey[ event ] && !dialogUp ) {
+                    if( _listenerForKey[ event ] && !_dialogUp ) {
                         _manager.onSystemEvent( _manager.EVENT_HARDWARE_KEY, String.valueOf( event ) );
 
                         return true;
@@ -119,13 +122,25 @@ class KeyPressHandler {
                 /*
                  * Checks to see if the current active screen is a Dialog.
                  */
-                private boolean isDialogUp() {
-                    synchronized( Application.getEventLock() ) {
-                        if( UiApplication.getUiApplication().getActiveScreen().getScreenBelow() == null ) {
-                            return false;
+                private void isDialogUp() {
+                    _app = UiApplication.getUiApplication();
+                    if( _app.isEventThread() ) {
+                        if( _app.getActiveScreen().getScreenBelow() == null ) {
+                            _dialogUp = false;
+                        } else {
+                            _dialogUp = true;
                         }
+                    } else {
+                        _app.invokeLater( new Runnable() {
+                            public void run() {
+                                if( _app.getActiveScreen().getScreenBelow() == null ) {
+                                    _dialogUp = false;
+                                } else {
+                                    _dialogUp = true;
+                                }
+                            }
+                        } );
                     }
-                    return true;
                 }
                 
                 /**
