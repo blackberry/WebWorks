@@ -125,21 +125,21 @@ class KeyPressHandler {
                 private void isDialogUp() {
                     _app = UiApplication.getUiApplication();
                     if( _app.isEventThread() ) {
-                        if( _app.getActiveScreen().getScreenBelow() == null ) {
-                            _dialogUp = false;
-                        } else {
-                            _dialogUp = true;
-                        }
+                        isDialogUpHelper();
                     } else {
                         _app.invokeLater( new Runnable() {
                             public void run() {
-                                if( _app.getActiveScreen().getScreenBelow() == null ) {
-                                    _dialogUp = false;
-                                } else {
-                                    _dialogUp = true;
-                                }
+                                isDialogUpHelper();
                             }
                         } );
+                    }
+                }
+                
+                public void isDialogUpHelper() {
+                    if( _app.getActiveScreen().getScreenBelow() == null ) {
+                        _dialogUp = false;
+                    } else {
+                        _dialogUp = true;
                     }
                 }
                 
