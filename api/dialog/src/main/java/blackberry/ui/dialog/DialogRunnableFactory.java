@@ -18,37 +18,92 @@ package blackberry.ui.dialog;
 
 import java.util.Vector;
 
-import net.rim.device.api.system.DeviceInfo;
 import net.rim.device.api.script.ScriptableFunction;
 import net.rim.device.api.script.ScriptableImpl;
-
-import blackberry.ui.dialog.datetime.DateTimeDialog;
-import blackberry.ui.dialog.IWebWorksDialog;
-import blackberry.ui.dialog.select.SelectDialog;
+import net.rim.device.api.system.DeviceInfo;
+import net.rim.device.api.ui.component.Dialog;
 import blackberry.ui.dialog.color.ColorPickerDialog;
+import blackberry.ui.dialog.datetime.DateTimeDialog;
+import blackberry.ui.dialog.select.SelectDialog;
 
+/**
+ * Factory class for running dialogs asynchronously
+ *
+ */
 public class DialogRunnableFactory {
     
-    public static Runnable getDateTimeRunnable( String type, String value, String min, String max, ScriptableFunction callback,
-            Object thiz ) {
+    /**
+     * Factory method for running an asynchronous DateTime dialog
+     * @param type the dialog's type
+     * @param value the value
+     * @param min the minimum value
+     * @param max the maximum value
+     * @param callback the callback function
+     * @return the Runnable responsible for opening the dialog
+     */
+    public static Runnable getDateTimeRunnable( String type, String value, String min, String max, ScriptableFunction callback) {
         IWebWorksDialog d = new DateTimeDialog( type, value, min, max );
-        return new DialogRunnable( d, callback, thiz );
+        return new DialogRunnable( d, callback );
     }
 
-    public static Runnable getColorPickerRunnable( int initialColor, ScriptableFunction callback, Object thiz ) {
+    /**
+     * Factory method for running an asynchronous ColorPicker dialog
+     * @param initialColor the initial color
+     * @param callback the callback function
+     * @return the Runnable responsible for opening the dialog
+     */
+    public static Runnable getColorPickerRunnable( int initialColor, ScriptableFunction callback ) {
         ColorPickerDialog d = new ColorPickerDialog( initialColor );
-        return new DialogRunnable( d, callback, thiz );
+        return new DialogRunnable( d, callback );
     }
     
-    public static Runnable getSelectRunnable(boolean allowMultiple, String[] labels, boolean[] enabled, boolean[] selected, int[] types, ScriptableFunction callback, Object thiz) {
+    /**
+     * Factory method for running an asynchronous Select dialog
+     * @param allowMultiple flag indicating whether multiple values are allowed
+     * @param labels the labels 
+     * @param enabled the enabled values
+     * @param selected the selected values
+     * @param types the types of the values 
+     * @param callback the callback function
+     * @return the Runnable responsible for opening the dialog
+     */
+    public static Runnable getSelectRunnable(boolean allowMultiple, String[] labels, boolean[] enabled, boolean[] selected, int[] types, ScriptableFunction callback) {
         IWebWorksDialog d = new SelectDialog(allowMultiple, labels, enabled, selected, types);
-        return new DialogRunnable(d, callback, thiz);
+        return new DialogRunnable(d, callback);
+    }
+    
+    /**
+     * Factory method for running an asynchronous CustomAsk dialog
+     * @param message the message to be displayed in the dialog
+     * @param buttons the choices presented as buttons
+     * @param values the values of the choices
+     * @param defaultChoice the default choice
+     * @param global the global status
+     * @param callback the callback function
+     * @return the Runnable responsible for opening the dialog
+     */
+    public static Runnable getCustomAskRunnable(String message, String[] buttons, int[] values, int defaultChoice, boolean global /* style, false */, ScriptableFunction callback) {
+    	Dialog d = new Dialog( message, buttons, values, defaultChoice, null /* bitmap */, global ? Dialog.GLOBAL_STATUS : 0 /* style */);
+        return new DialogAsyncRunnable(d, callback);
+    }
+    
+    /**
+     * Factory method for running an asynchronous StandardAsk dialog
+     * @param message the message to be displayed in the dialog
+     * @param type the dialog's type
+     * @param defaultChoice
+     * @param global the global status
+     * @param callback the callback function
+     * @return the Runnable responsible for running the dialog
+     */
+    public static Runnable getStandardAskRunnable(String message, int type, int defaultChoice, boolean global /* style, false */, ScriptableFunction callback) {
+    	Dialog d = new Dialog( type, message, defaultChoice, null /* bitmap */, global ? Dialog.GLOBAL_STATUS : 0 /* style */);
+        return new DialogAsyncRunnable(d, callback);
     }
     
     private static class DialogRunnable implements Runnable {
         private IWebWorksDialog _dialog;
         private ScriptableFunction _callback;
-        private Object _context;
             
         /**
          * Constructs a <code>DialogRunnable</code> object.
@@ -57,13 +112,10 @@ public class DialogRunnableFactory {
          *            The dialog
          * @param callback
          *            The callback
-         * @param context
-         *            The context in which the callback executes (its "this" object)
          */
-        DialogRunnable( IWebWorksDialog dialog, ScriptableFunction callback, Object context ) {
+        DialogRunnable( IWebWorksDialog dialog, ScriptableFunction callback ) {
             _dialog = dialog;
             _callback = callback;
-            _context = context;
         }
         
 
@@ -103,6 +155,42 @@ public class DialogRunnableFactory {
                 } catch (Exception e) {
                     throw new RuntimeException("Invoke callback failed: " + e.getMessage());
                 }
+            }
+        }
+    }
+    
+    private static class DialogAsyncRunnable implements Runnable {
+        private Dialog _dialog;
+        private ScriptableFunction _callback;
+        private Integer _dialogValue;
+            
+        /**
+         * Constructs a <code>DialogRunnable</code> object.
+         * 
+         * @param dialog
+         *            The dialog
+         * @param callback
+         *            The callback
+         */
+        DialogAsyncRunnable( Dialog dialog, ScriptableFunction callback ) {
+            _dialog = dialog;
+            _callback = callback;
+        }
+        
+
+        /**
+         * Run the dialog.
+         * 
+         * @see java.lang.Runnable#run()
+         */
+        public void run() { 
+        	_dialogValue = new Integer(_dialog.doModal());
+            //get object's string as all ecma primitives will return a valid string representation of themselves
+            Object retVal = _dialogValue.toString();        
+            try {
+                _callback.invoke(null, new Object[] { retVal });
+            } catch (Exception e) {
+                throw new RuntimeException("Invoke callback failed: " + e.getMessage());
             }
         }
     }
