@@ -82,9 +82,9 @@ public class DialogRunnableFactory {
      * @param callback the callback function
      * @return the Runnable responsible for opening the dialog
      */
-    public static Runnable getCustomAskRunnable(String message, String[] buttons, int[] values, int defaultChoice, boolean global /* style, false */, ScriptableFunction callback) {
-    	Dialog d = new Dialog( message, buttons, values, defaultChoice, null /* bitmap */, global ? Dialog.GLOBAL_STATUS : 0 /* style */);
-        return new DialogAsyncRunnable(d, callback);
+    public static Runnable getCustomAskRunnable(String message, String[] buttons, int defaultChoice, boolean global /* style, false */, ScriptableFunction callback) {
+        Dialog d = new Dialog( message, buttons, null, defaultChoice, null /* bitmap */, global ? Dialog.GLOBAL_STATUS : 0 /* style */);
+        return new DialogAsyncRunnable( d, callback );
     }
     
     /**
@@ -177,20 +177,19 @@ public class DialogRunnableFactory {
             _callback = callback;
         }
         
-
         /**
          * Run the dialog.
          * 
          * @see java.lang.Runnable#run()
          */
-        public void run() { 
-        	_dialogValue = new Integer(_dialog.doModal());
-            //get object's string as all ecma primitives will return a valid string representation of themselves
-            Object retVal = _dialogValue.toString();        
+        public void run() {
+            _dialogValue = new Integer( _dialog.doModal() );
+            // get object's string as all ecma primitives will return a valid string representation of themselves
+            Object retVal = _dialogValue.toString();
             try {
-                _callback.invoke(null, new Object[] { retVal });
-            } catch (Exception e) {
-                throw new RuntimeException("Invoke callback failed: " + e.getMessage());
+                _callback.invoke( null, new Object[] { retVal } );
+            } catch( Exception e ) {
+                throw new RuntimeException( "Invoke callback failed: " + e.getMessage() );
             }
         }
     }
