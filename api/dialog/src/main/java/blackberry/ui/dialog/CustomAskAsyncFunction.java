@@ -37,28 +37,25 @@ public class CustomAskAsyncFunction extends ScriptableFunctionBase {
     public Object execute( Object thiz, Object[] args ) throws Exception {
         String message;
         String[] buttons;
-        int[] values;
-        //the default value of the default choice. The developer cannot change it.
+        // the default value of the default choice. The developer cannot change it.
         final int defaultChoice = 0;
-        //callback function
+        // callback function
         ScriptableFunction callback = (ScriptableFunction) args[ 2 ];
-        //the default value of the global status. The developer cannot change it.
-        final boolean global = false;    
+        // the default value of the global status. The developer cannot change it.
+        final boolean global = false;
         // message
         message = (String) args[ 0 ];
         // choices & values
         Scriptable stringArray = (Scriptable) args[ 1 ];
         int count = stringArray.getElementCount();
         buttons = new String[ count ];
-        values = new int[ count ];
         for( int i = 0; i < count; i++ ) {
             buttons[ i ] = stringArray.getElement( i ).toString();
-            values[ i ] = i;
         }
 
-        Runnable dr = DialogRunnableFactory.getCustomAskRunnable(message, buttons, values, defaultChoice, global, callback);
+        Runnable dr = DialogRunnableFactory.getCustomAskRunnable( message, buttons, defaultChoice, global, callback );
         // queue
-        UiApplication.getUiApplication().invokeLater(dr);
+        UiApplication.getUiApplication().invokeLater( dr );
         // return value
         return Scriptable.UNDEFINED;
     }
@@ -75,7 +72,7 @@ public class CustomAskAsyncFunction extends ScriptableFunctionBase {
         fs.addParam( Scriptable.class, true );
         // callback
         fs.addParam( ScriptableFunction.class, true );
-	// filler
+        // filler
         fs.addParam( Object.class, false );
         return new FunctionSignature[] { fs };
     }
