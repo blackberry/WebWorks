@@ -19,6 +19,7 @@ package blackberry.system.event;
 import net.rim.device.api.system.Application;
 import net.rim.device.api.system.KeyListener;
 import net.rim.device.api.ui.Keypad;
+import net.rim.device.api.ui.UiApplication;
 
 /** 
  * Key listener implementation. Proxy for system key listener that
@@ -40,6 +41,9 @@ class KeyPressHandler {
     
     private KeyListener _keyMonitor;
     
+    private UiApplication _app;
+    private boolean _dialogUp;
+    
     private boolean[] _listenerForKey = new boolean[] { false, false, false, false, false, false, false, false};
     
     KeyPressHandler(ISystemEventListener manager) {
@@ -53,13 +57,13 @@ class KeyPressHandler {
      * @param forKey the key code to listen for
      */
     public void listen(String forKey) {
-        int keyToListenFor = Integer.parseInt(forKey);
-        
-        if(keyToListenFor < 0 || keyToListenFor > _listenerForKey.length) {
-            throw new IllegalArgumentException("Invalid key code requested [" + keyToListenFor + "]");
+        int keyToListenFor = Integer.parseInt( forKey );
+
+        if( keyToListenFor < 0 || keyToListenFor > _listenerForKey.length ) {
+            throw new IllegalArgumentException( "Invalid key code requested [" + keyToListenFor + "]" );
         }
-        
-        if(_keyMonitor == null) {
+
+        if( _keyMonitor == null ) {
             
             //Anonymous implementation of the net.rim.device.api.system.KeyListener interface
             _keyMonitor = new KeyListener() {
@@ -70,7 +74,8 @@ class KeyPressHandler {
                 public boolean keyDown( int keycode, int time ) {
                     int keyPressed = Keypad.key( keycode );
                     int event;
-            
+                    _dialogUp = false;
+
                     switch( keyPressed ) {
                         case Keypad.KEY_CONVENIENCE_1:
                             event = IKEY_CONVENIENCE_1;
@@ -80,6 +85,7 @@ class KeyPressHandler {
                             break;
                         case Keypad.KEY_MENU:
                             event = IKEY_MENU;
+                            isDialogUp();
                             break;
                         case Keypad.KEY_SEND:
                             event = IKEY_STARTCALL;
@@ -89,25 +95,52 @@ class KeyPressHandler {
                             break;
                         case Keypad.KEY_ESCAPE:
                             event = IKEY_BACK;
+                            isDialogUp();
                             break;
                         case Keypad.KEY_VOLUME_DOWN:
                             event = IKEY_VOLUME_DOWN;
+                            isDialogUp();
                             break;
                         case Keypad.KEY_VOLUME_UP:
                             event = IKEY_VOLUME_UP;
+                            isDialogUp();
                             break;
                         default:
                             return false;
                     }
-            
-                    //If we're listening for this hardware key, queue up an event for it
-                    if(_listenerForKey[event]) {
-                        _manager.onSystemEvent(_manager.EVENT_HARDWARE_KEY, String.valueOf(event));
-            
+
+                    // If we're listening for this hardware key, queue up an event for it,
+                    // only queue if the active screen is not a dialog.
+                    if( _listenerForKey[ event ] && !_dialogUp ) {
+                        _manager.onSystemEvent( _manager.EVENT_HARDWARE_KEY, String.valueOf( event ) );
+
                         return true;
                     }
-            
                     return false;
+                }
+                
+                /*
+                 * Checks to see if the current active screen is a Dialog.
+                 */
+                private void isDialogUp() {
+                    _app = UiApplication.getUiApplication();
+                    if( _app.isEventThread() ) {
+                        isDialogUpHelper();
+                    } else {
+                        _app.invokeLater( new Runnable() {
+                            public void run() {
+                                isDialogUpHelper();
+                            }
+                        } );
+                    }
+                }
+                
+                public void isDialogUpHelper() {
+                    if( _app.getActiveScreen().getScreenBelow() == null ) {
+                        _dialogUp = false;
+                    } else {
+                        _dialogUp = true;
+                    }
                 }
                 
                 /**

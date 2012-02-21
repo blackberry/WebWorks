@@ -41,7 +41,7 @@ public class ColorPickerAsyncFunction extends ScriptableFunctionBase {
         ScriptableFunction callback = (ScriptableFunction) args[ 1 ];
 
         // create dialog
-        Runnable dr = DialogRunnableFactory.getColorPickerRunnable( initialColor, callback, thiz );
+        Runnable dr = DialogRunnableFactory.getColorPickerRunnable( initialColor, callback );
 
         // queue
         UiApplication.getUiApplication().invokeLater( dr );
