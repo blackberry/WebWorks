@@ -47,7 +47,7 @@ public class DateTimeAsyncFunction extends ScriptableFunctionBase {
         String min = (String)options.getField("min");
         String max = (String)options.getField("max");
         
-        Runnable dr = DialogRunnableFactory.getDateTimeRunnable(type, value, min, max, callback, thiz);
+        Runnable dr = DialogRunnableFactory.getDateTimeRunnable(type, value, min, max, callback);
         
         // queue
         UiApplication.getUiApplication().invokeLater(dr);
