@@ -15,16 +15,11 @@
  */
 package blackberry.ui.dialog;
 
-import net.rim.device.api.script.ScriptEngine;
 import net.rim.device.api.script.Scriptable;
 import net.rim.device.api.script.ScriptableFunction;
 import net.rim.device.api.ui.UiApplication;
-import blackberry.common.util.json4j.JSONArray;
 import blackberry.core.FunctionSignature;
 import blackberry.core.ScriptableFunctionBase;
-
-import blackberry.ui.dialog.DialogRunnableFactory;
-import blackberry.ui.dialog.select.SelectDialog;
 
 /**
  * Implementation of asynchronous selection dialog
@@ -56,7 +51,7 @@ public class SelectAsyncFunction extends ScriptableFunctionBase {
 
         populateChoiceStateArrays( choices, labels, enabled, selected, types, allowMultiple );
         
-        Runnable dr = DialogRunnableFactory.getSelectRunnable(allowMultiple, labels, enabled, selected, types, callback, thiz);
+        Runnable dr = DialogRunnableFactory.getSelectRunnable(allowMultiple, labels, enabled, selected, types, callback);
         
         // queue
         UiApplication.getUiApplication().invokeLater(dr);
