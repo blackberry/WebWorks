@@ -164,7 +164,7 @@
  use NNNN as the maximum allowed size for icon data, default is 16384
  -resourcesize=NNNNN
  use NNNN as the max binary resource size allowed before the file is sliced up
- default is 61440
+ default is 128440
  -sourceroot=<directory>[;...]
  use list of directories to find .java source file names for debug info
  -emitstatic=<prefix>
